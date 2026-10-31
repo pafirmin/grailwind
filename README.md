@@ -1,5 +1,7 @@
 # Grailwind CSS
 
+![Eight coats of arms drawn with Grailwind: chevrons, quarters, fleurs-de-lis, a saltire, gyronny, a chief, a bend and a bordure](https://pafirmin.github.io/grailwind/preview.png)
+
 Heraldic blazon for [Tailwind CSS](https://tailwindcss.com). Draw coats of
 arms, or style anything else, in the language heralds have used for 800 years:
 
