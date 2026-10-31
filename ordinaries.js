@@ -34,12 +34,35 @@ const BETWEEN = {
   pall: { size: 18, points: [[50, 11], [18, 56], [82, 56]] },
 };
 
+// Where charges go for "on", along the ordinary's centre line, by number of charges.
+const ON = {
+  pale: { size: 20, counts: { 1: [[50, 45]], 2: [[50, 28], [50, 62]], 3: [[50, 18], [50, 45], [50, 72]] } },
+  fess: { size: 22, counts: { 1: [[50, 45]], 2: [[30, 45], [70, 45]], 3: [[20, 45], [50, 45], [80, 45]] } },
+  bend: { size: 18, counts: { 1: [[50, 50]], 2: [[33, 33], [67, 67]], 3: [[24, 24], [50, 50], [76, 76]] } },
+  "bend-sinister": { size: 18, counts: { 1: [[50, 50]], 2: [[67, 33], [33, 67]], 3: [[76, 24], [50, 50], [24, 76]] } },
+  chevron: { size: 12, counts: { 1: [[50, 36]], 3: [[20, 65], [50, 36], [80, 65]] } },
+  cross: { size: 15, counts: { 1: [[50, 45]], 5: [[50, 15], [18, 45], [50, 45], [82, 45], [50, 80]] } },
+  saltire: { size: 14, counts: { 1: [[50, 50]], 5: [[22, 22], [78, 22], [50, 50], [22, 78], [78, 78]] } },
+  pall: { size: 14, counts: { 1: [[50, 50]], 3: [[22, 22], [78, 22], [50, 75]] } },
+};
+
 const betweenVars = ({ size, points }) => {
   const vars = { "--between-size": `${size}%` };
   points.forEach(([left, top], i) => {
     vars[`--between-${i + 1}-x`] = `${left}%`;
     vars[`--between-${i + 1}-y`] = `${top}%`;
   });
+  return vars;
+};
+
+const onVars = ({ size, counts }) => {
+  const vars = { "--on-size": `${size}%` };
+  for (const [count, points] of Object.entries(counts)) {
+    points.forEach(([left, top], i) => {
+      vars[`--on-${count}-${i + 1}-x`] = `${left}%`;
+      vars[`--on-${count}-${i + 1}-y`] = `${top}%`;
+    });
+  }
   return vars;
 };
 
@@ -51,6 +74,7 @@ export default plugin(({ addUtilities }) => {
       utilities[`.${ordinary}-${tincture}`] = {
         position: "relative",
         ...(BETWEEN[ordinary] && betweenVars(BETWEEN[ordinary])),
+        ...(ON[ordinary] && onVars(ON[ordinary])),
         // With a chief, everything else is drawn in the field below it.
         ...(ordinary === "chief" && {
           "--field-top": "30%",

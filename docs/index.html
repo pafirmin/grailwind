@@ -64,6 +64,7 @@
           <li><a href="#charges">Charges</a></li>
           <li><a href="#arrangement">Arrangement</a></li>
           <li><a href="#your-own">Your own charges</a></li>
+          <li><a href="#together">All together</a></li>
           <li><a href="#accessibility">Accessibility</a></li>
         </ul>
       </nav>
@@ -532,15 +533,6 @@
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Sable, on a bend Or three lozenges gules">
-              <div class="escutcheon sable bend-or">
-                <div class="charges in-bend">
-                  <i class="lozenge gules"></i>
-                  <i class="lozenge gules"></i>
-                  <i class="lozenge gules"></i>
-                </div>
-              </div>
-            </figure>
           </div>
 
           <h3>Between</h3>
@@ -612,6 +604,49 @@
             </figure>
           </div>
 
+          <h3>On</h3>
+          <p>
+            <code>on</code> places charges along the ordinary on the shield, whichever it is.
+          </p>
+          <div class="examples">
+            <figure data-blazon="Sable, on a bend Or three lozenges Gules">
+              <div class="escutcheon sable bend-or">
+                <div class="charges on">
+                  <i class="lozenge gules"></i>
+                  <i class="lozenge gules"></i>
+                  <i class="lozenge gules"></i>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Argent, on a chevron Azure three bezants">
+              <div class="escutcheon argent chevron-azure">
+                <div class="charges on">
+                  <i class="bezant"></i>
+                  <i class="bezant"></i>
+                  <i class="bezant"></i>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Or, on a cross Gules five plates">
+              <div class="escutcheon or cross-gules">
+                <div class="charges on">
+                  <i class="plate"></i>
+                  <i class="plate"></i>
+                  <i class="plate"></i>
+                  <i class="plate"></i>
+                  <i class="plate"></i>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Vert, on a pale Argent a fleur-de-lis Gules">
+              <div class="escutcheon vert pale-argent">
+                <div class="charges on">
+                  <i class="fleur-de-lis gules"></i>
+                </div>
+              </div>
+            </figure>
+          </div>
+
           <h3 id="points">At a named point</h3>
           <p>
             Heraldry names nine points on the shield. Put one on a charge to place it there, as in
@@ -649,7 +684,7 @@
               <li><code>in-sinister-base</code> sinister base</li>
             </ol>
           </div>
-          <div class="examples">
+          <div class="examples mt-12">
             <figure data-blazon="Gules, a fess Argent, in dexter chief a mullet Or">
               <div class="escutcheon gules fess-argent">
                 <div class="charges">
@@ -758,6 +793,34 @@
               </div>
             </figure>
           </div>
+        </section>
+
+        <section id="together">
+          <h2>All together</h2>
+          <p>A divided field, an ordinary, a chief, a bordure, and charges on, between and in chief.</p>
+          <figure
+            class="my-8"
+            data-blazon="Per pale Azure and Gules, on a chevron Or between three mullets Argent three roses proper, on a chief Argent a fleur-de-lis Azure between two hearts Gules, all within a bordure Or"
+            data-size="w-72"
+          >
+            <div class="escutcheon per-pale-azure-gules chevron-or chief-argent bordure-or">
+              <div class="charges between">
+                <i class="mullet argent"></i>
+                <i class="mullet argent"></i>
+                <i class="mullet argent"></i>
+              </div>
+              <div class="charges on">
+                <img src="charges/rose.svg" alt="" />
+                <img src="charges/rose.svg" alt="" />
+                <img src="charges/rose.svg" alt="" />
+              </div>
+              <div class="charges">
+                <i class="charge-[url(charges/heart.svg)] gules in-dexter-chief"></i>
+                <i class="fleur-de-lis azure in-chief"></i>
+                <i class="charge-[url(charges/heart.svg)] gules in-sinister-chief"></i>
+              </div>
+            </div>
+          </figure>
         </section>
 
         <section id="accessibility">

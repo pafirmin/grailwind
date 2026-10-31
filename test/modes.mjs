@@ -11,12 +11,18 @@ const dir = mkdtempSync(join(root, "test", ".tmp-"));
 
 const CLASSES = ["bg-blue-500", "bg-azure", "azure", "fess-or", "per-pale-or-gules", "mullet", "in-dexter-chief", "charge-size-20"];
 
+// Rules without a plain `.class {` selector, checked by pattern.
+const PATTERNS = {
+  "bend-or publishes on points": /\.bend-or \{[^}]*--on-3-2-x: 50%;/,
+  "on reads them, with a fallback": /\.on:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: var\(--on-3-1-x, 28%\);/,
+};
+
 const EXPECTED = {
   "grailwind.css": { "bg-blue-500": true },
   "strict.css": { "bg-blue-500": false },
 };
 
-writeFileSync(join(dir, "index.html"), `<div class="${CLASSES.join(" ")}"></div>`);
+writeFileSync(join(dir, "index.html"), `<div class="${CLASSES.join(" ")} bend-or on"></div>`);
 
 const build = (entry) => {
   const input = join(dir, "input.css");
@@ -41,6 +47,12 @@ try {
       if (actual !== expected) {
         failures++;
         console.error(`✗ ${entry}: .${cls} should ${expected ? "" : "not "}exist`);
+      }
+    }
+    for (const [name, pattern] of Object.entries(PATTERNS)) {
+      if (!pattern.test(css)) {
+        failures++;
+        console.error(`✗ ${entry}: ${name}`);
       }
     }
     console.log(`${failures > before ? "✗" : "✓"} ${entry}`);

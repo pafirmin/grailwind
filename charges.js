@@ -160,6 +160,24 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   }
   utilities[".between"] = between;
 
+  // Falls back to the plain-field default when the ordinary has no points for this count.
+  // An undefined var() would otherwise unset `left`/`top` instead of  deferring to the :where() default.
+  const on = {};
+  for (const count of [1, 2, 3, 5]) {
+    const fallback = DEFAULTS[count];
+    for (let i = 1; i <= count; i++) {
+      const [left, top] = fallback?.points[i - 1] ?? [];
+      const at = (axis, value) =>
+        value === undefined ? `var(--on-${count}-${i}-${axis})` : `var(--on-${count}-${i}-${axis}, ${value}%)`;
+      on[`&${hasCount(count)} > :nth-child(${i})`] = {
+        left: at("x", left),
+        top: at("y", top),
+        width: `var(--charge-size, var(--on-size, ${fallback?.size ?? 16}%))`,
+      };
+    }
+  }
+  utilities[".on"] = on;
+
   for (const [name, [left, top]] of Object.entries(POINTS)) {
     utilities[`.in-${name}`] = {
       ".charges > &": CHIEF_POINTS.has(name)
