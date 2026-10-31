@@ -19,7 +19,7 @@ const SHAPES = {
   mullet: star(50, 53, 48),
   lozenge: `<polygon points="50,2 84,50 50,98 16,50"/>`,
   billet: `<rect x="28" y="4" width="44" height="92"/>`,
-  crescent: `<mask id="m"><rect width="100" height="100" fill="#fff"/><circle cx="50" cy="38" r="36"/></mask><circle cx="50" cy="56" r="44" mask="url(#m)"/>`,
+  crescent: `<mask id="m"><rect width="100" height="100" fill="#fff"/><circle cx="50" cy="35" r="35"/></mask><circle cx="50" cy="54" r="42" mask="url(#m)"/>`,
   "fleur-de-lis": `
     <path d="M50 2C61 16 64 36 55 56H45C36 36 39 16 50 2Z"/>
     <path d="M55 56C57 38 70 24 84 26C97 29 99 46 89 52C92 44 87 37 80 39C71 42 66 50 66 56Z"/>
@@ -118,7 +118,7 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   // Defaults use :where() so arrangements and `between` always win.
   const charges = {
     position: "absolute",
-    inset: "0",
+    inset: "var(--field-top, 0%) 0 0",
     "& > *": {
       position: "absolute",
       "aspect-ratio": "1",

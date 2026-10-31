@@ -51,10 +51,12 @@ export default plugin(({ addUtilities }) => {
       utilities[`.${ordinary}-${tincture}`] = {
         position: "relative",
         ...(BETWEEN[ordinary] && betweenVars(BETWEEN[ordinary])),
+        // With a chief, everything else is drawn in the field below it.
+        ...(ordinary === "chief" && { "--field-top": "30%" }),
         [PSEUDO[ordinary] ?? "&::before"]: {
           content: '""',
           position: "absolute",
-          inset: "0",
+          inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
           "background-color": `var(--color-${tincture})`,
           "clip-path": shape,
         },

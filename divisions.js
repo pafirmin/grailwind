@@ -5,31 +5,48 @@ import plugin from "tailwindcss/plugin";
 
 const TINCTURES = ["or", "argent", "gules", "azure", "vert", "purpure", "sable"];
 
-// Each division maps (first, second) tincture colours to a background.
+// Each division maps (first, second) tincture colours to background rules.
+const layer = (image) => ({ "background-image": image });
+
 const DIVISIONS = {
   // Vertical split: first on the dexter (viewer's left).
-  "per-pale": (a, b) => `linear-gradient(to right, ${a} 50%, ${b} 50%)`,
+  "per-pale": (a, b) => layer(`linear-gradient(to right, ${a} 50%, ${b} 50%)`),
 
   // Horizontal split: first in chief.
-  "per-fess": (a, b) => `linear-gradient(to bottom, ${a} 50%, ${b} 50%)`,
+  "per-fess": (a, b) => layer(`linear-gradient(to bottom, ${a} 50%, ${b} 50%)`),
 
   // Line from dexter chief to sinister base: first in the upper half.
   // With a corner-to-corner gradient, the 50% line joins the other two corners.
-  "per-bend": (a, b) => `linear-gradient(to bottom left, ${a} 50%, ${b} 50%)`,
+  "per-bend": (a, b) => layer(`linear-gradient(to bottom left, ${a} 50%, ${b} 50%)`),
 
   // Line from sinister chief to dexter base: first in the upper half.
   "per-bend-sinister": (a, b) =>
-    `linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`,
+    layer(`linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`),
 
   // Quarters 1 and 4 (dexter chief, sinister base) are the first tincture.
-  // The conic gradient starts at 12 o'clock and runs clockwise, so it begins
-  // with quarter 2.
-  quarterly: (a, b) =>
-    `conic-gradient(${b} 0 25%, ${a} 0 50%, ${b} 0 75%, ${a} 0)`,
+  // Linear gradients rather than conic, which render jagged edges in some browsers.
+  quarterly: (a, b) => ({
+    "background-image": `linear-gradient(to right, ${a} 50%, ${b} 50%), linear-gradient(to right, ${b} 50%, ${a} 50%)`,
+    "background-size": "100% 50%, 100% 100%",
+    "background-position": "top, top",
+    "background-repeat": "no-repeat",
+  }),
 
-  // Gyronny of eight: the first tincture is in the gyron just dexter of the
-  // top line, which is the last of the eight going clockwise from 12 o'clock.
-  gyronny: (a, b) => `repeating-conic-gradient(${b} 0 12.5%, ${a} 0 25%)`,
+  // Gyronny of eight: each quarter split corner to corner. The first tincture
+  // is in the gyron just dexter of the top line. The background colour fills
+  // any sub-pixel seam between quarters.
+  gyronny: (a, b) => ({
+    "background-color": b,
+    "background-image": [
+      `linear-gradient(to bottom left, ${a} 50%, ${b} 50%)`,
+      `linear-gradient(to bottom right, ${b} 50%, ${a} 50%)`,
+      `linear-gradient(to bottom left, ${b} 50%, ${a} 50%)`,
+      `linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`,
+    ].join(", "),
+    "background-size": "50% 50%",
+    "background-position": "left top, right top, right bottom, left bottom",
+    "background-repeat": "no-repeat",
+  }),
 };
 
 export default plugin(({ addUtilities }) => {
@@ -40,12 +57,10 @@ export default plugin(({ addUtilities }) => {
       for (const second of TINCTURES) {
         if (first === second) continue;
 
-        utilities[`.${division}-${first}-${second}`] = {
-          "background-image": background(
-            `var(--color-${first})`,
-            `var(--color-${second})`,
-          ),
-        };
+        utilities[`.${division}-${first}-${second}`] = background(
+          `var(--color-${first})`,
+          `var(--color-${second})`,
+        );
       }
     }
   }
