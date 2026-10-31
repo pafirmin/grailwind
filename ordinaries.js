@@ -52,7 +52,12 @@ export default plugin(({ addUtilities }) => {
         position: "relative",
         ...(BETWEEN[ordinary] && betweenVars(BETWEEN[ordinary])),
         // With a chief, everything else is drawn in the field below it.
-        ...(ordinary === "chief" && { "--field-top": "30%" }),
+        ...(ordinary === "chief" && {
+          "--field-top": "30%",
+          // The chief's centre line, relative to the charges container below it.
+          "--chief-points-y": "calc(-15% / 0.7)",
+          "--chief-points-size": "18%",
+        }),
         [PSEUDO[ordinary] ?? "&::before"]: {
           content: '""',
           position: "absolute",

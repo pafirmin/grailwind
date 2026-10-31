@@ -63,6 +63,9 @@ const POINTS = {
 };
 const POINT_SIZE = 22;
 
+// With a chief on the shield, these points sit on it (see ordinaries.js).
+const CHIEF_POINTS = new Set(["dexter-chief", "chief", "sinister-chief"]);
+
 const ARRANGEMENTS = {
   "in-pale": {
     2: { size: 30, points: [[50, 24], [50, 66]] },
@@ -119,6 +122,8 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   const charges = {
     position: "absolute",
     inset: "var(--field-top, 0%) 0 0",
+    // Above the chief, which is painted last, so charges can sit on it.
+    "z-index": "1",
     "& > *": {
       position: "absolute",
       "aspect-ratio": "1",
@@ -155,8 +160,16 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   }
   utilities[".between"] = between;
 
-  for (const [name, point] of Object.entries(POINTS)) {
-    utilities[`.in-${name}`] = { ".charges > &": place(point, POINT_SIZE) };
+  for (const [name, [left, top]] of Object.entries(POINTS)) {
+    utilities[`.in-${name}`] = {
+      ".charges > &": CHIEF_POINTS.has(name)
+        ? {
+            left: `${left}%`,
+            top: `var(--chief-points-y, ${top}%)`,
+            width: `var(--charge-size, var(--chief-points-size, ${POINT_SIZE}%))`,
+          }
+        : place([left, top], POINT_SIZE),
+    };
   }
 
   addUtilities(utilities);
