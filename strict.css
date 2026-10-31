@@ -1,0 +1,5 @@
+/*
+ * Grailwind CSS, strict: the tinctures replace Tailwind's colours entirely.
+ */
+@import "./palette-reset.css";
+@import "./grailwind.css";

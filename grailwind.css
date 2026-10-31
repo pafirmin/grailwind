@@ -1,10 +1,13 @@
 /*
- * Grailwind CSS: first experiment.
+ * Grailwind CSS: heraldic blazon for Tailwind v4.
  *
- * A Tailwind v4 stylesheet that replaces the colour palette with the
- * heraldic tinctures and adds a handful of field divisions.
+ * Import after Tailwind:
+ *   @import "tailwindcss";
+ *   @import "grailwind";
+ *
+ * Adds the tinctures alongside Tailwind's colours. For tinctures only,
+ * import "grailwind/strict" instead.
  */
-@import "tailwindcss";
 
 @plugin "./divisions.js";
 @plugin "./ordinaries.js";
@@ -14,8 +17,6 @@
  * Tinctures
  * ------------------------------------------------------------------------- */
 @theme {
-  --color-*: initial;
-
   /* Metals */
   --color-or: #f5c518;
   --color-argent: #ffffff;
