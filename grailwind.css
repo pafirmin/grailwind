@@ -89,3 +89,14 @@
   border-radius: 0 0 50% 50% / 0 0 45% 45%;
   box-shadow: 0 0 0 2px var(--color-sable);
 }
+
+/* ---------------------------------------------------------------------------
+ * Charge size
+ * ------------------------------------------------------------------------- */
+
+/* Charge width as a % of the shield, e.g. `charge-size-20` or `charge-size-[3rem]`.
+ * On a `charges` container it sizes every charge; on a charge, just that one. */
+@utility charge-size-* {
+  --charge-size: calc(--value(integer) * 1%);
+  --charge-size: --value([percentage], [length]);
+}

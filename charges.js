@@ -93,7 +93,7 @@ const maskRules = (image) => ({
 const place = ([left, top], size) => ({
   left: `${left}%`,
   top: `${top}%`,
-  width: `${size}%`,
+  width: `var(--charge-size, ${size}%)`,
 });
 
 const hasCount = (n) => `:has(> :nth-child(${n}):last-child)`;
@@ -150,7 +150,7 @@ export default plugin(({ addUtilities, matchUtilities }) => {
     between[`& > :nth-child(${i})`] = {
       left: `var(--between-${i}-x)`,
       top: `var(--between-${i}-y)`,
-      width: "var(--between-size)",
+      width: "var(--charge-size, var(--between-size))",
     };
   }
   utilities[".between"] = between;
