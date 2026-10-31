@@ -112,7 +112,7 @@
           <p>Grailwind is a plugin for Tailwind CSS v4.</p>
           <pre>npm install -D grailwind</pre>
           <p class="mt-4">Import it after Tailwind in your stylesheet:</p>
-          <pre>
+          <pre data-lang="css">
 @import "tailwindcss";
 @import "grailwind";</pre>
           <p class="mt-4">
@@ -126,7 +126,7 @@
             instead. The tinctures then replace Tailwind's colours entirely, and
             <code>bg-blue-500</code> no longer exists. This site uses strict mode.
           </p>
-          <pre>
+          <pre data-lang="css">
 @import "tailwindcss";
 @import "grailwind/strict";</pre>
         </section>
@@ -829,7 +829,7 @@
             A shield is a picture made of empty elements. Give it a text alternative, ideally its
             blazon:
           </p>
-          <pre>
+          <pre data-lang="html">
 &lt;div class="escutcheon azure fess-or" role="img"
      aria-label="Azure, a fess Or"&gt;&lt;/div&gt;</pre>
           <p class="mt-4">
@@ -847,6 +847,36 @@
     </footer>
 
     <script>
+      const tokenClasses = {
+        punct: "text-sable/50",
+        tag: "text-gules",
+        attr: "text-azure",
+        string: "text-purpure",
+        at: "text-gules",
+      };
+
+      const grammars = {
+        html: /(?<punct><\/?|>|=)|(?<=<\/?)(?<tag>[\w-]+)|(?<attr>[\w-]+)(?==)|(?<string>"[^"]*")/g,
+        css: /(?<at>@[\w-]+)|(?<string>"[^"]*")|(?<punct>;)/g,
+      };
+
+      // Wraps each token of a <pre> in a span coloured with a tincture class.
+      function highlight(pre, lang) {
+        const source = pre.textContent;
+        pre.textContent = "";
+        let last = 0;
+        for (const match of source.matchAll(grammars[lang])) {
+          pre.append(source.slice(last, match.index));
+          const kind = Object.keys(match.groups).find((name) => match.groups[name]);
+          const span = document.createElement("span");
+          span.className = tokenClasses[kind];
+          span.textContent = match[0];
+          pre.append(span);
+          last = match.index + match[0].length;
+        }
+        pre.append(source.slice(last));
+      }
+
       // Caption each example with its blazon and its own markup, read from the
       // live element so the two can't drift apart.
       for (const fig of document.querySelectorAll("figure[data-blazon]")) {
@@ -870,12 +900,17 @@
         }
 
         const pre = document.createElement("pre");
+        pre.dataset.lang = "html";
         pre.textContent = html.replaceAll("\n" + indent, "\n");
         caption.append(pre);
 
         shield.classList.add(fig.dataset.size ?? "w-36");
         shield.setAttribute("aria-hidden", "true");
         fig.append(caption);
+      }
+
+      for (const pre of document.querySelectorAll("pre[data-lang]")) {
+        highlight(pre, pre.dataset.lang);
       }
 
       // Mobile menu: the same links as the sidebar, in a panel under the header.
