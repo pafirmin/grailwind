@@ -1,0 +1,52 @@
+// Builds both entry points and checks which colours each one provides.
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const cli = join(root, "node_modules/.bin/tailwindcss");
+// Inside the project, so the build can resolve tailwindcss.
+const dir = mkdtempSync(join(root, "test", ".tmp-"));
+
+const CLASSES = ["bg-blue-500", "bg-azure", "azure", "fess-or", "per-pale-or-gules", "mullet", "in-dexter-chief", "charge-size-20"];
+
+const EXPECTED = {
+  "grailwind.css": { "bg-blue-500": true },
+  "strict.css": { "bg-blue-500": false },
+};
+
+writeFileSync(join(dir, "index.html"), `<div class="${CLASSES.join(" ")}"></div>`);
+
+const build = (entry) => {
+  const input = join(dir, "input.css");
+  const output = join(dir, "output.css");
+  writeFileSync(
+    input,
+    `@import "tailwindcss" source(none);\n@source "./index.html";\n@import "${join(root, entry)}";\n`,
+  );
+  execFileSync(cli, ["-i", input, "-o", output], { stdio: "pipe" });
+  return readFileSync(output, "utf8");
+};
+
+let failures = 0;
+
+try {
+  for (const [entry, overrides] of Object.entries(EXPECTED)) {
+    const css = build(entry);
+    const before = failures;
+    for (const cls of CLASSES) {
+      const expected = overrides[cls] ?? true;
+      const actual = css.includes(`.${cls} {`);
+      if (actual !== expected) {
+        failures++;
+        console.error(`✗ ${entry}: .${cls} should ${expected ? "" : "not "}exist`);
+      }
+    }
+    console.log(`${failures > before ? "✗" : "✓"} ${entry}`);
+  }
+} finally {
+  rmSync(dir, { recursive: true, force: true });
+}
+
+process.exit(failures ? 1 : 0);

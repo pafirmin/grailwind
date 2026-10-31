@@ -1,0 +1,81 @@
+@import "tailwindcss";
+@import "../strict.css";
+
+/* Junicode 2 by Peter S. Baker, subset to Latin. See fonts/OFL.txt. */
+@font-face {
+  font-family: "Junicode";
+  src: url("fonts/JunicodeVF-Roman.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Junicode";
+  src: url("fonts/JunicodeVF-Italic.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@theme {
+  --font-serif: "Junicode", ui-serif, Georgia, serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  a {
+    @apply text-azure underline underline-offset-2 hover:text-gules;
+  }
+
+  nav a {
+    @apply no-underline text-sable hover:text-gules;
+  }
+
+  header nav a {
+    @apply text-argent hover:text-or;
+  }
+
+  nav a[aria-current] {
+    @apply underline decoration-2 underline-offset-4;
+  }
+
+  /* Clears the sticky header on mobile. */
+  main [id] {
+    @apply scroll-mt-24 md:scroll-mt-8;
+  }
+
+  main :is(h1, h2, h3) {
+    @apply font-semibold;
+  }
+
+  main h2 {
+    @apply text-3xl mt-20 mb-4;
+  }
+
+  main h3 {
+    @apply text-xl mt-12 mb-3;
+  }
+
+  main > section > p {
+    @apply mb-4 max-w-prose leading-relaxed;
+  }
+
+  code {
+    @apply font-mono text-[0.85em];
+  }
+
+  pre {
+    @apply font-mono text-xs border border-sable/30 p-3 overflow-x-auto;
+  }
+}
+
+@utility examples {
+  display: grid;
+  gap: 2.5rem 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  margin-block: 2rem;
+}

@@ -1,18 +1,47 @@
 {
   "name": "grailwind",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "scripts": {
-    "build": "tailwindcss -i grailwind.css -o dist/grailwind.css",
-    "dev": "tailwindcss -i grailwind.css -o dist/grailwind.css --watch"
+    "build": "tailwindcss -i docs/app.css -o docs/site.css",
+    "dev": "tailwindcss -i docs/app.css -o docs/site.css --watch",
+    "test": "node test/modes.mjs"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "tailwindcss",
+    "tailwind",
+    "heraldry",
+    "blazon",
+    "css"
+  ],
+  "author": "Paul Firmin",
+  "license": "MIT",
+  "description": "Heraldic blazon for Tailwind CSS: tinctures, divisions, ordinaries and charges",
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
     "tailwindcss": "^4.3.3"
   },
   "private": true,
-  "type": "module"
+  "type": "module",
+  "style": "grailwind.css",
+  "exports": {
+    ".": {
+      "style": "./grailwind.css",
+      "default": "./grailwind.css"
+    },
+    "./strict": {
+      "style": "./strict.css",
+      "default": "./strict.css"
+    }
+  },
+  "files": [
+    "grailwind.css",
+    "divisions.js",
+    "ordinaries.js",
+    "charges.js",
+    "strict.css",
+    "palette-reset.css"
+  ],
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  }
 }
