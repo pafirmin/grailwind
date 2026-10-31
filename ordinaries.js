@@ -22,6 +22,27 @@ const ORDINARIES = {
 
 const PSEUDO = { chief: "&::after" };
 
+// Where charges go for "between", as [left%, top%], plus their size as % of width.
+const BETWEEN = {
+  pale: { size: 18, points: [[18, 42], [82, 42]] },
+  fess: { size: 20, points: [[30, 15], [70, 15], [50, 78]] },
+  bend: { size: 24, points: [[70, 26], [30, 68]] },
+  "bend-sinister": { size: 24, points: [[30, 26], [70, 68]] },
+  chevron: { size: 22, points: [[24, 22], [76, 22], [50, 70]] },
+  cross: { size: 18, points: [[20, 17], [80, 17], [24, 72], [76, 72]] },
+  saltire: { size: 16, points: [[50, 13], [14, 50], [86, 50], [50, 84]] },
+  pall: { size: 18, points: [[50, 11], [18, 56], [82, 56]] },
+};
+
+const betweenVars = ({ size, points }) => {
+  const vars = { "--between-size": `${size}%` };
+  points.forEach(([left, top], i) => {
+    vars[`--between-${i + 1}-x`] = `${left}%`;
+    vars[`--between-${i + 1}-y`] = `${top}%`;
+  });
+  return vars;
+};
+
 export default plugin(({ addUtilities }) => {
   const utilities = {};
 
@@ -29,6 +50,7 @@ export default plugin(({ addUtilities }) => {
     for (const tincture of TINCTURES) {
       utilities[`.${ordinary}-${tincture}`] = {
         position: "relative",
+        ...(BETWEEN[ordinary] && betweenVars(BETWEEN[ordinary])),
         [PSEUDO[ordinary] ?? "&::before"]: {
           content: '""',
           position: "absolute",

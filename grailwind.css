@@ -8,6 +8,7 @@
 
 @plugin "./divisions.js";
 @plugin "./ordinaries.js";
+@plugin "./charges.js";
 
 /* ---------------------------------------------------------------------------
  * Tinctures
@@ -81,6 +82,7 @@
 
 /* Escutcheon: a shield shape to draw arms in. */
 @utility escutcheon {
+  position: relative;
   aspect-ratio: 5 / 6;
   overflow: hidden;
   border-radius: 0 0 50% 50% / 0 0 45% 45%;
