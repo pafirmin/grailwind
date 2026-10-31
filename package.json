@@ -4,7 +4,8 @@
   "scripts": {
     "build": "tailwindcss -i docs/app.css -o docs/site.css",
     "dev": "tailwindcss -i docs/app.css -o docs/site.css --watch",
-    "test": "node test/modes.mjs"
+    "test": "node test/modes.mjs",
+    "dev:watch": "tailwindcss -i docs/app.css -o docs/site.css --watch=always & python3 -m http.server ${PORT:-8000} -d docs"
   },
   "keywords": [
     "tailwindcss",

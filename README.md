@@ -64,9 +64,8 @@ tinctures replace Tailwind's colours entirely.
 
 ```sh
 npm install
-npm test        # checks both the default and strict builds
-npm run build   # builds the docs site; `npm run dev` rebuilds on change
-python3 -m http.server -d docs
+npm test            # checks both the default and strict builds
+npm run dev:watch   # rebuilds the docs site on change and serves it at http://localhost:8000
 ```
 
 ## Licence
