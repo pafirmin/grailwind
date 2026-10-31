@@ -49,6 +49,20 @@ const DEFAULTS = {
   6: { size: 20, points: [[20, 18], [50, 18], [80, 18], [35, 42], [65, 42], [50, 66]] },
 };
 
+// The points of the shield, for placing a single charge, e.g. `in-dexter-chief`.
+const POINTS = {
+  "dexter-chief": [25, 17],
+  chief: [50, 15],
+  "sinister-chief": [75, 17],
+  "honour-point": [50, 30],
+  "fess-point": [50, 45],
+  "nombril-point": [50, 60],
+  "dexter-base": [30, 72],
+  base: [50, 84],
+  "sinister-base": [70, 72],
+};
+const POINT_SIZE = 22;
+
 const ARRANGEMENTS = {
   "in-pale": {
     2: { size: 30, points: [[50, 24], [50, 66]] },
@@ -140,6 +154,10 @@ export default plugin(({ addUtilities, matchUtilities }) => {
     };
   }
   utilities[".between"] = between;
+
+  for (const [name, point] of Object.entries(POINTS)) {
+    utilities[`.in-${name}`] = { ".charges > &": place(point, POINT_SIZE) };
+  }
 
   addUtilities(utilities);
 });
