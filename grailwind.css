@@ -1,0 +1,87 @@
+/*
+ * Grailwind CSS: first experiment.
+ *
+ * A Tailwind v4 stylesheet that replaces the colour palette with the
+ * heraldic tinctures and adds a handful of field divisions.
+ */
+@import "tailwindcss";
+
+@plugin "./divisions.js";
+
+/* ---------------------------------------------------------------------------
+ * Tinctures
+ * ------------------------------------------------------------------------- */
+@theme {
+  --color-*: initial;
+
+  /* Metals */
+  --color-or: #f5c518;
+  --color-argent: #ffffff;
+
+  /* Colours */
+  --color-gules: #d21f1f;
+  --color-azure: #1f4fb0;
+  --color-vert: #1d8a3c;
+  --color-purpure: #7e3a8e;
+  --color-sable: #141414;
+}
+
+/* ---------------------------------------------------------------------------
+ * Bare tinctures
+ * ------------------------------------------------------------------------- */
+@utility or      { background-color: var(--color-or); }
+@utility argent  { background-color: var(--color-argent); }
+@utility gules   { background-color: var(--color-gules); }
+@utility azure   { background-color: var(--color-azure); }
+@utility vert    { background-color: var(--color-vert); }
+@utility purpure { background-color: var(--color-purpure); }
+@utility sable   { background-color: var(--color-sable); }
+
+/* ---------------------------------------------------------------------------
+ * Field divisions
+ * ------------------------------------------------------------------------- */
+
+/* Per pale: split vertically into dexter | sinister. */
+@utility per-pale {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+/* Per fess: split horizontally into chief / base. */
+@utility per-fess {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: 1fr;
+}
+
+/* Quarterly: four quarters, numbered 1–4 across then down.
+ * Quarter 1 is dexter chief, i.e. the viewer's top left. */
+@utility quarterly {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+/* ---------------------------------------------------------------------------
+ * Subordinaries
+ * ------------------------------------------------------------------------- */
+
+/* Bordure: a border in a given tincture, e.g. `bordure-or`. */
+@utility bordure-* {
+  border-style: solid;
+  border-width: 0.75rem;
+  border-color: --value(--color-*);
+}
+
+/* ---------------------------------------------------------------------------
+ * The shield itself
+ * ------------------------------------------------------------------------- */
+
+/* Escutcheon: a shield shape to draw arms in. */
+@utility escutcheon {
+  aspect-ratio: 5 / 6;
+  overflow: hidden;
+  border-radius: 0 0 50% 50% / 0 0 45% 45%;
+  box-shadow: 0 0 0 2px var(--color-sable);
+}
