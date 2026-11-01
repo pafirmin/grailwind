@@ -10,6 +10,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `in-bend-sinister`: two or three charges in a line from sinister chief to
   dexter base.
+- Engrailed and invected ordinaries, e.g. `fess-engrailed-or` and
+  `chief-invected-azure`. Browsers without `clip-path: shape()` draw them with
+  straight edges.
 
 ### Fixed
 

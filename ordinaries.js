@@ -183,6 +183,97 @@ const bands = (layers, tincture) => ({
   "background-repeat": "no-repeat",
 });
 
+// Lines of partition. Scallops are round on the 5:6 shield; below a chief the
+// box is shorter, so they are slightly squashed.
+const SCALLOP = 14;
+const SCALLOPS = { chevron: 10 };
+const DEPTH = 0.35;
+
+const at = ([x, y]) => point([(x * 100) / W, (y * 100) / H]);
+
+// Arcs along an edge, in real units: { to, r, sweep }.
+const arcs = (a, b, scallop, sweep) => {
+  const length = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const n = Math.max(1, Math.round(length / scallop));
+  const chord = length / n;
+  const depth = chord * DEPTH;
+  const r = (chord * chord) / 4 / (2 * depth) + depth / 2;
+  return Array.from({ length: n }, (_, i) => {
+    const t = (i + 1) / n;
+    return { to: [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], r, sweep };
+  });
+};
+
+// Each line maps an edge to arcs; `inward` is the sweep that bulges into the ordinary.
+const LINES = {
+  engrailed: (a, b, scallop, inward) => arcs(a, b, scallop, inward),
+  invected: (a, b, scallop, inward) => arcs(a, b, scallop, inward === "cw" ? "ccw" : "cw"),
+};
+
+const side = (a, b, p) => (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
+
+// Centre of the minor arc from a to b.
+const centre = (a, b, { r, sweep }) => {
+  const [dx, dy] = [b[0] - a[0], b[1] - a[1]];
+  const len = Math.hypot(dx, dy);
+  const k = Math.sqrt(Math.max(0, r * r - (len / 2) ** 2)) * (sweep === "cw" ? 1 : -1);
+  return [(a[0] + b[0]) / 2 - (k * dy) / len, (a[1] + b[1]) / 2 + (k * dx) / len];
+};
+
+// Where the arc a→v crosses the arc v→b, if it does. Two circles through v meet
+// again at v's reflection across the line between their centres.
+const crossing = (a, v, b, first, second) => {
+  const c1 = centre(a, v, first);
+  const c2 = centre(v, b, second);
+  const [dx, dy] = [c2[0] - c1[0], c2[1] - c1[1]];
+  const t = ((v[0] - c1[0]) * dx + (v[1] - c1[1]) * dy) / (dx * dx + dy * dy);
+  const p = [2 * (c1[0] + t * dx) - v[0], 2 * (c1[1] + t * dy) - v[1]];
+  const onArc = (from, to, c) => Math.sign(side(from, to, p)) === -Math.sign(side(from, to, c));
+  return Math.hypot(p[0] - v[0], p[1] - v[1]) > 1e-6 && onArc(a, v, c1) && onArc(v, b, c2)
+    ? p
+    : null;
+};
+
+const shape = (vertices, line, scallop) => {
+  const inward = signedArea(vertices) > 0 ? "ccw" : "cw";
+  const pts = vertices.map(real);
+  const edges = pts.map((a, i) => {
+    const j = (i + 1) % pts.length;
+    return onShieldEdge(vertices[i], vertices[j])
+      ? [{ to: pts[j] }]
+      : line(a, pts[j], scallop, inward);
+  });
+
+  // Where arcs cross at a corner, e.g. a chevron engrailed's peak, end both at the
+  // crossing; otherwise the loop beyond it is filled.
+  let start = pts[0];
+  edges.forEach((edge, i) => {
+    const last = edge.at(-1);
+    const first = edges[(i + 1) % edges.length][0];
+    if (!last.r || !first.r) {
+      return;
+    }
+    const from = edge.length > 1 ? edge.at(-2).to : pts[i];
+    const p = crossing(from, last.to, first.to, last, first);
+    if (!p) {
+      return;
+    }
+    last.to = p;
+    if (i === edges.length - 1) {
+      start = p;
+    }
+  });
+
+  const commands = edges
+    .flat()
+    .map(({ to, r, sweep }) =>
+      r
+        ? `arc to ${at(to)} of ${pct((r / W) * 100)} ${pct((r / H) * 100)} ${sweep}`
+        : `line to ${at(to)}`,
+    );
+  return `shape(from ${at(start)}, ${commands.join(", ")}, close)`;
+};
+
 // Where charges go for "between", as [left%, top%], plus their size as % of width.
 // prettier-ignore
 const BETWEEN = {
@@ -300,6 +391,14 @@ export default plugin(({ addUtilities }) => {
               "clip-path": polygon(vertices),
             }),
       });
+      // Not fimbriated. Browsers without shape() keep the straight polygon.
+      for (const [name, line] of Object.entries(LINES)) {
+        utilities[`.${ordinary}-${name}-${tincture}`] = ordinaryRules(ordinary, {
+          inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
+          "background-color": `var(--color-${tincture})`,
+          "clip-path": [polygon(vertices), shape(vertices, line, SCALLOPS[ordinary] ?? SCALLOP)],
+        });
+      }
     }
   }
 

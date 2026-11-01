@@ -27,6 +27,9 @@ const CLASSES = [
   "quarterly-or-gules",
   "escutcheon",
   "charges",
+  "fess-engrailed-or",
+  "chief-invected-azure",
+  "chevron-engrailed-or",
 ];
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -72,6 +75,12 @@ const PATTERNS = {
   "counterchanged on the container applies to each charge":
     /\.counterchanged\.charges > \* \{[^]*?&::before \{[^}]*position: fixed;/,
   "the chief isn't fimbriated": /\.chief-or \{[^]*?&::after \{(?:(?!fimbriat)[^}])*\}/,
+  "fess-engrailed-or falls back to a polygon":
+    /\.fess-engrailed-or \{[^}]*&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(from 0 30%, arc to [^;]* ccw/,
+  "chief-invected-azure bulges out":
+    /\.chief-invected-azure \{[^}]*&::after \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\([^;]*line to 100% 30%, arc to [^;]* cw,/,
+  "chevron-engrailed-or peaks where its arcs cross":
+    /\.chevron-engrailed-or \{[^}]*&::before \{[^}]*clip-path: shape\(from 50% (?!25%)[\d.]+%,/,
 };
 
 const EXPECTED = {

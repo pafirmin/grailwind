@@ -53,8 +53,9 @@ tinctures replace Tailwind's colours entirely.
   `gyronny-or-sable` and more, or `per-pale`, `per-fess` and `quarterly` for
   layout.
 - **Ordinaries:** `fess-or`, `chevron-gules`, `cross-argent`, `chief-azure`
-  and more, with `fimbriated-*` for a narrow border, or `chevron-counterchanged`
-  and the like on a divided field.
+  and more, with `fimbriated-*` for a narrow border, `fess-engrailed-or` and
+  the like for an engrailed or invected edge, or `chevron-counterchanged` and
+  the like on a divided field.
 - **Charges:** `mullet`, `fleur-de-lis`, `bezant` and more, arranged by
   number, `in-pale`, `in-fess`, `in-bend`, `in-bend-sinister`, `on` or `between`
   the ordinary, or placed at a named point such as `in-dexter-chief`, sized
