@@ -6,6 +6,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `in-bend-sinister`: two or three charges in a line from sinister chief to
+  dexter base.
+
 ### Fixed
 
 - An ordinary in a quarter no longer paints over the shield's own ordinary.

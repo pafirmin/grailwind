@@ -81,6 +81,10 @@ const ARRANGEMENTS = {
     2: { size: 28, points: [[30, 26], [70, 64]] },
     3: { size: 22, points: [[22, 16], [50, 45], [78, 74]] },
   },
+  "in-bend-sinister": {
+    2: { size: 28, points: [[70, 26], [30, 64]] },
+    3: { size: 22, points: [[78, 16], [50, 45], [22, 74]] },
+  },
 };
 
 const svgUrl = (shape) =>

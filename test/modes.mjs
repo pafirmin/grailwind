@@ -61,6 +61,8 @@ const PATTERNS = {
   "a counterchanged ordinary does too":
     /\.chevron-counterchanged \{[^]*?&::before \{[^}]*z-index: 1;/,
   "the chief stays under charges on it": /\.chief-or \{[^]*?&::after \{(?:(?!z-index)[^}])*\}/,
+  "in-bend-sinister runs from sinister chief":
+    /\.in-bend-sinister:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: 78%;\s*top: 16%;/,
   "the escutcheon holds charges' fixed layers": /\.escutcheon \{[^}]*contain: layout;/,
   "charges are centred with margins, not translate":
     /\.charges \{[^]*?& > \* \{(?:(?!translate)[^}])*margin: calc\(var\(--charge-width\) \/ -2\) 0 0 calc\(var\(--charge-width\) \/ -2\);/,
@@ -79,7 +81,7 @@ const EXPECTED = {
 
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${CLASSES.join(" ")} bend-or on counterchanged"></div>`,
+  `<div class="${CLASSES.join(" ")} bend-or on counterchanged in-bend-sinister"></div>`,
 );
 
 const build = (entry) => {

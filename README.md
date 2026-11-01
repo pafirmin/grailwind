@@ -56,9 +56,9 @@ tinctures replace Tailwind's colours entirely.
   and more, with `fimbriated-*` for a narrow border, or `chevron-counterchanged`
   and the like on a divided field.
 - **Charges:** `mullet`, `fleur-de-lis`, `bezant` and more, arranged by
-  number, `in-pale`, `in-fess`, `in-bend`, `on` or `between` the ordinary, or
-  placed at a named point such as `in-dexter-chief`, sized with
-  `charge-size-*`, and `counterchanged` on a divided field.
+  number, `in-pale`, `in-fess`, `in-bend`, `in-bend-sinister`, `on` or `between`
+  the ordinary, or placed at a named point such as `in-dexter-chief`, sized
+  with `charge-size-*`, and `counterchanged` on a divided field.
 - **Your own charges:** any SVG, via `charge-[url(…)]`.
 
 ## Development
