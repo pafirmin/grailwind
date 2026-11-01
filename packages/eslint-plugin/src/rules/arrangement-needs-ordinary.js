@@ -19,8 +19,12 @@ export default {
     return {
       Program() {
         for (const el of getElements(context.sourceCode)) {
-          if (!el.classes?.has("charges") || el.parent === UNKNOWN || !el.parent.classes) continue;
-          if (ordinariesOf(el.parent.classes).ordinaries.length) continue;
+          if (!el.classes?.has("charges") || el.parent === UNKNOWN || !el.parent.classes) {
+            continue;
+          }
+          if (ordinariesOf(el.parent.classes).ordinaries.length) {
+            continue;
+          }
           for (const arrangement of ["between", "on"]) {
             if (el.classes.has(arrangement)) {
               context.report({ node: el.reportNode, messageId: "missing", data: { arrangement } });

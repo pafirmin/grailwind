@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import arrangementNeedsOrdinary from "./rules/arrangement-needs-ordinary.js";
 import chargesInContainer from "./rules/charges-in-container.js";
+import modifierNeedsTarget from "./rules/modifier-needs-target.js";
 import oneOrdinary from "./rules/one-ordinary.js";
 import ruleOfTincture from "./rules/rule-of-tincture.js";
 
@@ -15,6 +16,7 @@ const plugin = {
     "charges-in-container": chargesInContainer,
     "arrangement-needs-ordinary": arrangementNeedsOrdinary,
     "one-ordinary": oneOrdinary,
+    "modifier-needs-target": modifierNeedsTarget,
   },
   configs: {},
 };

@@ -47,7 +47,7 @@ export const ROUNDELS = {
 };
 
 // Plain-field arrangements of a `charges` container, besides `between` and `on`.
-export const ARRANGEMENTS = ["in-pale", "in-fess", "in-bend"];
+export const ARRANGEMENTS = ["in-pale", "in-fess", "in-bend", "in-bend-sinister"];
 
 // Where charges go for "between", as [left%, top%], plus their size as % of width.
 // prettier-ignore

@@ -7,7 +7,7 @@ npm install --save-dev @grailwind/eslint-plugin
 ```
 
 It reads the tinctures, ordinaries and charges from your installed `grailwind`, so it needs
-`grailwind` 0.2.0 or later. For typos and other class errors, see
+`grailwind` 0.4.0 or later. For typos and other class errors, see
 [Linting](https://github.com/pafirmin/grailwind#linting) in the Grailwind README.
 
 ## Setup
@@ -52,6 +52,8 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
 
 - An ordinary, chief or bordure is checked against the field on the same element:
   `escutcheon or fess-argent` is metal on metal.
+- A fimbriated ordinary is checked against its fimbriation, and the fimbriation against the
+  field: `or chevron-sable fimbriated-argent` is metal on metal (Argent on Or).
 - Charges in a `charges` container are checked against the field.
 - Charges in a `charges on` container are checked against the ordinary they lie on.
 - Charges at `in-dexter-chief`, `in-chief` or `in-sinister-chief` are checked against the chief,
@@ -59,6 +61,7 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
 
 A divided field (`per-pale-or-gules`) has no single tincture, so nothing is checked against it.
 Neither are `<img>` charges, charges with no tincture, or `bordure-*` with a non-heraldic colour.
+Counterchanged ordinaries and charges take the field's tinctures swapped, so they're skipped too.
 
 ### `charges-in-container`
 
@@ -74,7 +77,19 @@ one, other than a chief, they have nowhere to go.
 
 An element draws one ordinary plus, optionally, a chief. With two, such as
 `fess-azure chevron-gules`, only one shows. Two chiefs are flagged too. A `charges` container
-takes one arrangement: `between`, `on`, `in-pale`, `in-fess` or `in-bend`.
+takes one arrangement: `between`, `on`, `in-pale`, `in-fess`, `in-bend` or `in-bend-sinister`.
+Counterchanged ordinaries count as ordinaries.
+
+### `modifier-needs-target`
+
+Modifiers that would otherwise do nothing:
+
+- `chevron-counterchanged` (any `<ordinary>-counterchanged`) needs a divided field on the same
+  element, e.g. `per-pale-argent-gules`.
+- `counterchanged` on `charges`, or on a charge, needs a divided field on the shield that holds
+  the container.
+- `fimbriated-*` needs a tinctured ordinary other than a chief. A chief or a counterchanged
+  ordinary isn't fimbriated.
 
 ## Exceptions
 

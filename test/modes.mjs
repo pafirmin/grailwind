@@ -125,6 +125,10 @@ const DATA_CLASSES = [
   ...CHARGES,
   ...Object.keys(ROUNDELS),
   ...ARRANGEMENTS,
+  // Names the ESLint plugin builds from these lists.
+  ...ORDINARIES.map((o) => `${o}-counterchanged`),
+  ...TINCTURES.map((t) => `fimbriated-${t}`),
+  "counterchanged",
 ];
 
 writeFileSync(

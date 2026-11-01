@@ -18,7 +18,9 @@ export default {
     return {
       Program() {
         for (const el of getElements(context.sourceCode)) {
-          if (!el.classes || el.parent === UNKNOWN || !el.parent.classes) continue;
+          if (!el.classes || el.parent === UNKNOWN || !el.parent.classes) {
+            continue;
+          }
           const charge = chargeName(el.classes);
           if (charge && !el.parent.classes.has("charges")) {
             context.report({ node: el.reportNode, messageId: "outside", data: { charge } });

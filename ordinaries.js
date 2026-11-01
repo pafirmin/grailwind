@@ -140,7 +140,9 @@ const DIRECTION = {
 const stop = ({ kind, tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }, value) => {
   const w = x1 - x0;
   const h = y1 - y0;
-  if (kind.length > 1 && w !== h) throw new Error("diagonal bands need a square tile");
+  if (kind.length > 1 && w !== h) {
+    throw new Error("diagonal bands need a square tile");
+  }
   switch (kind) {
     case "x":
       return ((value - x0) * 100) / w;

@@ -16,20 +16,35 @@ const METAL = new Set(METALS);
 const COLOUR = new Set(COLOURS);
 const TINCTURE = new Set(TINCTURES);
 const CHARGE = new Set([...CHARGES, ...Object.keys(ROUNDELS)]);
+const FIMBRIATIONS = new Set(TINCTURES.map((t) => `fimbriated-${t}`));
 const CHIEF_POINTS = new Set(["in-dexter-chief", "in-chief", "in-sinister-chief"]);
 export const ALL_ARRANGEMENTS = ["between", "on", ...ARRANGEMENTS];
 
-// Every `{ordinary}-{tincture}` and `bordure-{tincture}` class, mapped to its parts.
+// Every `{ordinary}-{tincture}`, `{ordinary}-counterchanged` and `bordure-{tincture}` class,
+// mapped to its parts. A counterchanged ordinary has no tincture of its own.
 const ORDINARY_CLASSES = new Map();
 for (const ordinary of [...ORDINARIES, "bordure"]) {
-  for (const tincture of TINCTURES)
+  for (const tincture of TINCTURES) {
     ORDINARY_CLASSES.set(`${ordinary}-${tincture}`, { ordinary, tincture });
+  }
+}
+for (const ordinary of ORDINARIES) {
+  ORDINARY_CLASSES.set(`${ordinary}-counterchanged`, {
+    ordinary,
+    tincture: null,
+    counterchanged: true,
+  });
 }
 
 const DIVISION_CLASSES = new Set();
 for (const division of DIVISIONS) {
-  for (const a of TINCTURES)
-    for (const b of TINCTURES) if (a !== b) DIVISION_CLASSES.add(`${division}-${a}-${b}`);
+  for (const a of TINCTURES) {
+    for (const b of TINCTURES) {
+      if (a !== b) {
+        DIVISION_CLASSES.add(`${division}-${a}-${b}`);
+      }
+    }
+  }
 }
 
 export const kind = (tincture) =>
@@ -42,7 +57,9 @@ export function ordinariesOf(classes) {
   const found = { ordinaries: [], chiefs: [], bordures: [] };
   for (const cls of classes) {
     const match = ORDINARY_CLASSES.get(cls);
-    if (!match) continue;
+    if (!match) {
+      continue;
+    }
     const list =
       match.ordinary === "chief"
         ? "chiefs"
@@ -54,9 +71,13 @@ export function ordinariesOf(classes) {
   return found;
 }
 
+export const isDivided = (classes) => [...classes].some((cls) => DIVISION_CLASSES.has(cls));
+
 // The single bare tincture of a plain field. A divided field, or none, has no tincture.
 export function fieldTincture(classes) {
-  if ([...classes].some((cls) => DIVISION_CLASSES.has(cls))) return null;
+  if (isDivided(classes)) {
+    return null;
+  }
   const tinctures = [...classes].filter((cls) => TINCTURE.has(cls));
   return tinctures.length === 1 ? tinctures[0] : null;
 }
@@ -64,9 +85,19 @@ export function fieldTincture(classes) {
 // A charge's tincture, and the class that gives it, e.g. `bezant` → or.
 export function chargeTincture(classes) {
   const roundel = [...classes].find((cls) => ROUNDELS[cls]);
-  if (roundel) return { cls: roundel, tincture: ROUNDELS[roundel] };
+  if (roundel) {
+    return { cls: roundel, tincture: ROUNDELS[roundel] };
+  }
   const tinctures = [...classes].filter((cls) => TINCTURE.has(cls));
   return tinctures.length === 1 ? { cls: tinctures[0], tincture: tinctures[0] } : null;
+}
+
+// The element's fimbriation, e.g. `fimbriated-argent` → argent, or null.
+export function fimbriationOf(classes) {
+  const found = [...classes].filter((cls) => FIMBRIATIONS.has(cls));
+  return found.length === 1
+    ? { cls: found[0], tincture: found[0].slice("fimbriated-".length) }
+    : null;
 }
 
 export const chargeName = (classes) =>

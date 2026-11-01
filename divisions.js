@@ -99,7 +99,9 @@ export default plugin(({ addUtilities, theme }) => {
   for (const [division, background] of Object.entries(DIVISIONS)) {
     for (const first of TINCTURES) {
       for (const second of TINCTURES) {
-        if (first === second) continue;
+        if (first === second) {
+          continue;
+        }
 
         const a = `var(--color-${first})`;
         const b = `var(--color-${second})`;
