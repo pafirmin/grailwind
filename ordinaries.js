@@ -239,8 +239,11 @@ export default plugin(({ addUtilities }) => {
     };
   }
 
+  // Isolated, so an ordinary in a quarter paints under the shield's own ordinary.
+  // The chief's ::after stays unraised, so charges on it stay on top.
   const ordinaryRules = (ordinary, pseudo) => ({
     position: "relative",
+    isolation: "isolate",
     ...(BETWEEN[ordinary] && betweenVars(BETWEEN[ordinary])),
     ...(ON[ordinary] && onVars(ON[ordinary])),
     // With a chief, everything else is drawn in the field below it.
@@ -250,7 +253,12 @@ export default plugin(({ addUtilities }) => {
       "--chief-points-y": "calc(-15% / 0.7)",
       "--chief-points-size": "18%",
     }),
-    [PSEUDO[ordinary] ?? "&::before"]: { content: '""', position: "absolute", ...pseudo },
+    [PSEUDO[ordinary] ?? "&::before"]: {
+      content: '""',
+      position: "absolute",
+      ...(!PSEUDO[ordinary] && { "z-index": "1" }),
+      ...pseudo,
+    },
   });
 
   for (const [ordinary, vertices] of Object.entries(ORDINARIES)) {

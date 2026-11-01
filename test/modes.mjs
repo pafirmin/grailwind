@@ -19,6 +19,7 @@ const CLASSES = [
   "in-dexter-chief",
   "charge-size-20",
   "cross-azure",
+  "bend-sable",
   "chief-or",
   "fimbriated-argent",
   "chevron-counterchanged",
@@ -55,6 +56,11 @@ const PATTERNS = {
     /\.chevron-counterchanged \{[^]*?clip-path: polygon\(50% calc\(25% \+ var\(--field-top, 0%\) \* 0\.75\),/,
   "a counterchanged ordinary isn't fimbriated":
     /\.chevron-counterchanged \{[^]*?&::before \{(?:(?!fimbriat)[^}])*\}/,
+  "an ordinary is isolated": /\.bend-sable \{[^}]*isolation: isolate;/,
+  "an ordinary paints over a quarter's own": /\.bend-sable \{[^]*?&::before \{[^}]*z-index: 1;/,
+  "a counterchanged ordinary does too":
+    /\.chevron-counterchanged \{[^]*?&::before \{[^}]*z-index: 1;/,
+  "the chief stays under charges on it": /\.chief-or \{[^]*?&::after \{(?:(?!z-index)[^}])*\}/,
   "the escutcheon holds charges' fixed layers": /\.escutcheon \{[^}]*contain: layout;/,
   "charges are centred with margins, not translate":
     /\.charges \{[^]*?& > \* \{(?:(?!translate)[^}])*margin: calc\(var\(--charge-width\) \/ -2\) 0 0 calc\(var\(--charge-width\) \/ -2\);/,
