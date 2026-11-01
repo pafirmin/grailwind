@@ -6,21 +6,163 @@ import plugin from "tailwindcss/plugin";
 const TINCTURES = ["or", "argent", "gules", "azure", "vert", "purpure", "sable"];
 
 const ORDINARIES = {
-  pale: "polygon(35% 0, 65% 0, 65% 100%, 35% 100%)",
-  fess: "polygon(0 30%, 100% 30%, 100% 60%, 0 60%)",
-  bend: "polygon(0 0, 20% 0, 100% 80%, 100% 100%, 80% 100%, 0 20%)",
-  "bend-sinister":
-    "polygon(100% 0, 80% 0, 0 80%, 0 100%, 20% 100%, 100% 20%)",
-  chevron: "polygon(50% 25%, 100% 75%, 100% 95%, 50% 45%, 0 95%, 0 75%)",
-  cross:
-    "polygon(40% 0, 60% 0, 60% 35%, 100% 35%, 100% 55%, 60% 55%, 60% 100%, 40% 100%, 40% 55%, 0 55%, 0 35%, 40% 35%)",
-  saltire:
-    "polygon(0 0, 15% 0, 50% 35%, 85% 0, 100% 0, 100% 15%, 65% 50%, 100% 85%, 100% 100%, 85% 100%, 50% 65%, 15% 100%, 0 100%, 0 85%, 35% 50%, 0 15%)",
-  pall: "polygon(0 0, 15% 0, 50% 35%, 85% 0, 100% 0, 100% 15%, 60% 50%, 60% 100%, 40% 100%, 40% 50%, 0 15%)",
-  chief: "polygon(0 0, 100% 0, 100% 30%, 0 30%)",
+  pale: [[35, 0], [65, 0], [65, 100], [35, 100]],
+  fess: [[0, 30], [100, 30], [100, 60], [0, 60]],
+  bend: [[0, 0], [20, 0], [100, 80], [100, 100], [80, 100], [0, 20]],
+  "bend-sinister": [[100, 0], [80, 0], [0, 80], [0, 100], [20, 100], [100, 20]],
+  chevron: [[50, 25], [100, 75], [100, 95], [50, 45], [0, 95], [0, 75]],
+  cross: [
+    [40, 0], [60, 0], [60, 35], [100, 35], [100, 55], [60, 55],
+    [60, 100], [40, 100], [40, 55], [0, 55], [0, 35], [40, 35],
+  ],
+  saltire: [
+    [0, 0], [15, 0], [50, 35], [85, 0], [100, 0], [100, 15], [65, 50], [100, 85],
+    [100, 100], [85, 100], [50, 65], [15, 100], [0, 100], [0, 85], [35, 50], [0, 15],
+  ],
+  pall: [
+    [0, 0], [15, 0], [50, 35], [85, 0], [100, 0], [100, 15],
+    [60, 55], [60, 100], [40, 100], [40, 55], [0, 15],
+  ],
+  chief: [[0, 0], [100, 0], [100, 30], [0, 30]],
 };
 
+const num = (v) => +v.toFixed(3);
+const pct = (v) => (num(v) === 0 ? "0" : `${num(v)}%`);
+const point = ([x, y]) => `${pct(x)} ${pct(y)}`;
+const polygon = (vertices) => `polygon(${vertices.map(point).join(", ")})`;
+
 const PSEUDO = { chief: "&::after" };
+
+// Fimbriation: the ordinary's clip is widened and filled with the fimbriation
+// tincture, and the ordinary's own tincture is painted over it as gradient
+// bands.
+const W = 100;
+const H = 120;
+const FIMBRIATION = 3;
+
+const real = ([x, y]) => [(x * W) / 100, (y * H) / 100];
+const onShieldEdge = (a, b) =>
+  (a[0] === b[0] && (a[0] === 0 || a[0] === 100)) ||
+  (a[1] === b[1] && (a[1] === 0 || a[1] === 100));
+const signedArea = (vertices) =>
+  vertices.reduce((sum, [x1, y1], i) => {
+    const [x2, y2] = vertices[(i + 1) % vertices.length];
+    return sum + x1 * y2 - x2 * y1;
+  }, 0) / 2;
+
+// The edge a→b as a line n·p = c, moved outward by `distance` real units.
+const offsetLine = (a, b, outward, distance) => {
+  const [ax, ay] = real(a);
+  const [bx, by] = real(b);
+  const length = Math.hypot(bx - ax, by - ay);
+  const n = [(outward * (by - ay)) / length, (outward * (ax - bx)) / length];
+  return { n, c: n[0] * ax + n[1] * ay + distance };
+};
+
+// How far each vertex moves, in %, when fimbriated. Sides on the shield's edge
+// don't move, so their vertices slide along it.
+const widen = (vertices) => {
+  const outward = Math.sign(signedArea(vertices));
+  const count = vertices.length;
+  const line = (i) => {
+    const a = vertices[i];
+    const b = vertices[(i + 1) % count];
+    return offsetLine(a, b, outward, onShieldEdge(a, b) ? 0 : FIMBRIATION);
+  };
+  return vertices.map((v, i) => {
+    const p = line((i - 1 + count) % count);
+    const q = line(i);
+    const det = p.n[0] * q.n[1] - p.n[1] * q.n[0];
+    const [x, y] = [(p.c * q.n[1] - q.c * p.n[1]) / det, (p.n[0] * q.c - q.n[0] * p.c) / det];
+    const [rx, ry] = real(v);
+    return [((x - rx) * 100) / W, ((y - ry) * 100) / H];
+  });
+};
+
+const shift = (v, d) =>
+  num(d) === 0
+    ? pct(v)
+    : `calc(${num(v)}% ${d < 0 ? "-" : "+"} ${num(Math.abs(d))}% * var(--fimbriated, 0))`;
+const widenedPolygon = (vertices) => {
+  const offsets = widen(vertices);
+  const points = vertices.map(
+    ([x, y], i) => `${shift(x, offsets[i][0])} ${shift(y, offsets[i][1])}`,
+  );
+  return `polygon(${points.join(", ")})`;
+};
+
+// The ordinary's tincture, top layer first. `x`/`y` bands run between two x or y
+// values in %; `u-v`/`u+v` are diagonal, between values of x − y or x + y.
+// A `tile` [x0, y0, x1, y1] confines a layer to part of the box (square, if
+// diagonal). Stripes repaint the fimbriation where one arm's band runs on into
+// another's.
+const S = 12;
+const band = (kind, from, to, tile) => ({ kind, from, to, tile });
+const stripe = (kind, from, to, tile) => ({ kind, from, to, tile, stripe: true });
+const BANDS = {
+  pale: [band("x", 35, 65)],
+  fess: [band("y", 30, 60)],
+  bend: [band("u-v", -20, 20)],
+  "bend-sinister": [band("u+v", 80, 120)],
+  chevron: [
+    stripe("u+v", 75 - S, 75),
+    stripe("u-v", 25, 25 + S),
+    band("u+v", 75, 95),
+    band("u-v", 5, 25),
+  ],
+  cross: [band("x", 40, 60), band("y", 35, 55)],
+  saltire: [band("u-v", -15, 15), band("u+v", 85, 115)],
+  pall: [
+    stripe("x", 60, 60 + S, [0, 55, 100, 100]),
+    stripe("x", 40 - S, 40, [0, 55, 100, 100]),
+    stripe("u+v", 115, 115 + S, [60, 30, 100, 70]),
+    stripe("u-v", -15 - S, -15, [0, 30, 40, 70]),
+    band("u-v", -15, 15),
+    band("u+v", 85, 115),
+    band("x", 40, 60, [0, 55, 100, 100]),
+  ],
+};
+
+const DIRECTION = { x: "to right", y: "to bottom", "u-v": "to top right", "u+v": "to bottom right" };
+
+// A band's edges as % along its gradient, within its tile.
+const stop = ({ kind, tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }, value) => {
+  const w = x1 - x0;
+  const h = y1 - y0;
+  if (kind.length > 1 && w !== h) throw new Error("diagonal bands need a square tile");
+  switch (kind) {
+    case "x": return ((value - x0) * 100) / w;
+    case "y": return ((value - y0) * 100) / h;
+    case "u-v": return ((value - (x0 - y0)) * 100) / w / 2 + 50;
+    case "u+v": return ((value - x0 - y0) * 100) / w / 2;
+  }
+};
+
+// Soften each edge by a pixel, as hard gradient stops aren't antialiased.
+const gradient = (layer, colour) => {
+  const a = num(stop(layer, layer.from));
+  const b = num(stop(layer, layer.to));
+  return (
+    `linear-gradient(${DIRECTION[layer.kind]}, transparent calc(${a}% - 0.5px), ` +
+    `${colour} calc(${a}% + 0.5px) calc(${b}% - 0.5px), transparent calc(${b}% + 0.5px))`
+  );
+};
+
+const tilePosition = (start, size) => (size === 100 ? "0" : pct((start * 100) / (100 - size)));
+
+const bands = (layers, tincture) => ({
+  "background-image": layers
+    .map((l) => gradient(l, l.stripe ? "var(--fimbriation, transparent)" : `var(--color-${tincture})`))
+    .join(", "),
+  "background-size": layers
+    .map(({ tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }) => `${pct(x1 - x0)} ${pct(y1 - y0)}`)
+    .join(", "),
+  "background-position": layers
+    .map(({ tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }) =>
+      `${tilePosition(x0, x1 - x0)} ${tilePosition(y0, y1 - y0)}`)
+    .join(", "),
+  "background-repeat": "no-repeat",
+});
 
 // Where charges go for "between", as [left%, top%], plus their size as % of width.
 const BETWEEN = {
@@ -69,7 +211,14 @@ const onVars = ({ size, counts }) => {
 export default plugin(({ addUtilities }) => {
   const utilities = {};
 
-  for (const [ordinary, shape] of Object.entries(ORDINARIES)) {
+  for (const tincture of TINCTURES) {
+    utilities[`.fimbriated-${tincture}`] = {
+      "--fimbriated": "1",
+      "--fimbriation": `var(--color-${tincture})`,
+    };
+  }
+
+  for (const [ordinary, vertices] of Object.entries(ORDINARIES)) {
     for (const tincture of TINCTURES) {
       utilities[`.${ordinary}-${tincture}`] = {
         position: "relative",
@@ -86,8 +235,18 @@ export default plugin(({ addUtilities }) => {
           content: '""',
           position: "absolute",
           inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
-          "background-color": `var(--color-${tincture})`,
-          "clip-path": shape,
+          ...(BANDS[ordinary]
+            ? {
+                "--fimbriated": "inherit",
+                "--fimbriation": "inherit",
+                "background-color": `var(--fimbriation, var(--color-${tincture}))`,
+                ...bands(BANDS[ordinary], tincture),
+                "clip-path": widenedPolygon(vertices),
+              }
+            : {
+                "background-color": `var(--color-${tincture})`,
+                "clip-path": polygon(vertices),
+              }),
         },
       };
     }

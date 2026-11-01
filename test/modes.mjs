@@ -9,12 +9,17 @@ const cli = join(root, "node_modules/.bin/tailwindcss");
 // Inside the project, so the build can resolve tailwindcss.
 const dir = mkdtempSync(join(root, "test", ".tmp-"));
 
-const CLASSES = ["bg-blue-500", "bg-azure", "azure", "fess-or", "per-pale-or-gules", "mullet", "in-dexter-chief", "charge-size-20"];
+const CLASSES = ["bg-blue-500", "bg-azure", "azure", "fess-or", "per-pale-or-gules", "mullet", "in-dexter-chief", "charge-size-20", "cross-azure", "chief-or", "fimbriated-argent"];
 
 // Rules without a plain `.class {` selector, checked by pattern.
 const PATTERNS = {
   "bend-or publishes on points": /\.bend-or \{[^}]*--on-3-2-x: 50%;/,
   "on reads them, with a fallback": /\.on:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: var\(--on-3-1-x, 28%\);/,
+  "fimbriated-argent sets the fimbriation": /\.fimbriated-argent \{\s*--fimbriated: 1;\s*--fimbriation: var\(--color-argent\);/,
+  "fimbriation vars don't inherit": /@property --fimbriated \{\s*syntax: "\*";\s*inherits: false;[^]*@property --fimbriation \{\s*syntax: "\*";\s*inherits: false;/,
+  "an ordinary opts in to fimbriation": /\.cross-azure \{[^]*?&::before \{[^}]*--fimbriated: inherit;\s*--fimbriation: inherit;\s*background-color: var\(--fimbriation, var\(--color-azure\)\);/,
+  "a fimbriated ordinary is widened": /\.cross-azure \{[^]*?&::before \{[^}]*clip-path: polygon\(calc\(40% - 3% \* var\(--fimbriated, 0\)\) 0,/,
+  "the chief isn't fimbriated": /\.chief-or \{[^]*?&::after \{(?:(?!fimbriat)[^}])*\}/,
 };
 
 const EXPECTED = {
