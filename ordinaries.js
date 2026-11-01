@@ -33,6 +33,10 @@ const polygon = (vertices) => `polygon(${vertices.map(point).join(", ")})`;
 
 const PSEUDO = { chief: "&::after" };
 
+// A y in % of the field, as % of the whole shield when a chief takes the top of it.
+const belowChief = (y) =>
+  y === 100 ? "100%" : `calc(${num(y)}% + var(--field-top, 0%) * ${num(1 - y / 100)})`;
+
 // Fimbriation: the ordinary's clip is widened and filled with the fimbriation
 // tincture, and the ordinary's own tincture is painted over it as gradient
 // bands.
@@ -218,37 +222,56 @@ export default plugin(({ addUtilities }) => {
     };
   }
 
+  const ordinaryRules = (ordinary, pseudo) => ({
+    position: "relative",
+    ...(BETWEEN[ordinary] && betweenVars(BETWEEN[ordinary])),
+    ...(ON[ordinary] && onVars(ON[ordinary])),
+    // With a chief, everything else is drawn in the field below it.
+    ...(ordinary === "chief" && {
+      "--field-top": "30%",
+      // The chief's centre line, relative to the charges container below it.
+      "--chief-points-y": "calc(-15% / 0.7)",
+      "--chief-points-size": "18%",
+    }),
+    [PSEUDO[ordinary] ?? "&::before"]: { content: '""', position: "absolute", ...pseudo },
+  });
+
   for (const [ordinary, vertices] of Object.entries(ORDINARIES)) {
+    // Covers the whole shield, so the swapped field lines up with the real one,
+    // and the clip moves the ordinary below any chief instead.
+    utilities[`.${ordinary}-counterchanged`] = ordinaryRules(ordinary, {
+      inset: "0",
+      // Registered not to inherit, so a shield inside another can't pick up its swap.
+      ...Object.fromEntries(
+        ["color", "image", "size", "position", "repeat"].map((n) => [`--counterchange-${n}`, "inherit"]),
+      ),
+      "background-color": "var(--counterchange-color, transparent)",
+      "background-image": "var(--counterchange-image, none)",
+      "background-size": "var(--counterchange-size, auto)",
+      "background-position": "var(--counterchange-position, 0 0)",
+      "background-repeat": "var(--counterchange-repeat, repeat)",
+      "clip-path":
+        ordinary === "chief"
+          ? polygon(vertices)
+          : `polygon(${vertices.map(([x, y]) => `${pct(x)} ${belowChief(y)}`).join(", ")})`,
+    });
+
     for (const tincture of TINCTURES) {
-      utilities[`.${ordinary}-${tincture}`] = {
-        position: "relative",
-        ...(BETWEEN[ordinary] && betweenVars(BETWEEN[ordinary])),
-        ...(ON[ordinary] && onVars(ON[ordinary])),
-        // With a chief, everything else is drawn in the field below it.
-        ...(ordinary === "chief" && {
-          "--field-top": "30%",
-          // The chief's centre line, relative to the charges container below it.
-          "--chief-points-y": "calc(-15% / 0.7)",
-          "--chief-points-size": "18%",
-        }),
-        [PSEUDO[ordinary] ?? "&::before"]: {
-          content: '""',
-          position: "absolute",
-          inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
-          ...(BANDS[ordinary]
-            ? {
-                "--fimbriated": "inherit",
-                "--fimbriation": "inherit",
-                "background-color": `var(--fimbriation, var(--color-${tincture}))`,
-                ...bands(BANDS[ordinary], tincture),
-                "clip-path": widenedPolygon(vertices),
-              }
-            : {
-                "background-color": `var(--color-${tincture})`,
-                "clip-path": polygon(vertices),
-              }),
-        },
-      };
+      utilities[`.${ordinary}-${tincture}`] = ordinaryRules(ordinary, {
+        inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
+        ...(BANDS[ordinary]
+          ? {
+              "--fimbriated": "inherit",
+              "--fimbriation": "inherit",
+              "background-color": `var(--fimbriation, var(--color-${tincture}))`,
+              ...bands(BANDS[ordinary], tincture),
+              "clip-path": widenedPolygon(vertices),
+            }
+          : {
+              "background-color": `var(--color-${tincture})`,
+              "clip-path": polygon(vertices),
+            }),
+      });
     }
   }
 

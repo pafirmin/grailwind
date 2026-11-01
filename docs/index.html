@@ -13,7 +13,10 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://grailwind.dev/" />
-    <meta property="og:title" content="Grailwind CSS: heraldic blazon for Tailwind" />
+    <meta
+      property="og:title"
+      content="Grailwind CSS: heraldic blazon for Tailwind"
+    />
     <meta
       property="og:description"
       content="Draw coats of arms, or style anything else, with heraldic blazon as Tailwind CSS classes."
@@ -45,14 +48,21 @@
     <header class="azure text-argent sticky top-0 z-10 md:static">
       <div class="mx-auto max-w-6xl px-6 py-4 flex items-center gap-4">
         <div class="escutcheon w-9 gyronny-or-gules" aria-hidden="true"></div>
-        <a href="#" class="text-2xl no-underline text-or hover:text-argent">Grailwind CSS</a>
+        <a href="#" class="text-2xl no-underline text-or hover:text-argent"
+          >Grailwind CSS</a
+        >
         <span class="hidden sm:inline">Heraldic blazon for Tailwind CSS</span>
         <a
           href="https://github.com/pafirmin/grailwind"
           class="ml-auto p-2 no-underline text-argent hover:text-or"
           aria-label="GitHub"
         >
-          <svg class="block size-6" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <svg
+            class="block size-6"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            aria-hidden="true"
+          >
             <path
               d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"
             />
@@ -90,43 +100,57 @@
           </svg>
         </button>
       </div>
-      <nav id="mobile-nav" class="md:hidden border-t border-argent/30" aria-label="Sections" hidden>
+      <nav
+        id="mobile-nav"
+        class="md:hidden border-t border-argent/30"
+        aria-label="Sections"
+        hidden
+      >
         <ul class="mx-auto max-w-6xl px-6 py-4 space-y-3"></ul>
       </nav>
     </header>
 
-    <div class="mx-auto max-w-8xl px-6 md:grid md:grid-cols-[11rem_1fr] md:gap-12">
+    <div
+      class="mx-auto max-w-8xl px-6 md:grid md:grid-cols-[11rem_1fr] md:gap-12"
+    >
       <nav id="sidebar" class="hidden md:block" aria-label="Sections">
         <ul class="sticky top-0 max-h-screen overflow-y-auto py-10 space-y-2">
-          <li><a href="#install">Install</a>
+          <li>
+            <a href="#install">Install</a>
             <ul>
               <li><a href="#strict-mode">Strict mode</a></li>
             </ul>
           </li>
-          <li><a href="#tinctures">Tinctures</a>
+          <li>
+            <a href="#tinctures">Tinctures</a>
             <ul>
               <li><a href="#rule-of-tincture">The rule of tincture</a></li>
             </ul>
           </li>
           <li><a href="#shield">The shield</a></li>
-          <li><a href="#divisions">Dividing the field</a>
+          <li>
+            <a href="#divisions">Dividing the field</a>
             <ul>
               <li><a href="#layout">Dividing for layout</a></li>
               <li><a href="#bordure">Bordure</a></li>
             </ul>
           </li>
-          <li><a href="#ordinaries">Ordinaries</a>
+          <li>
+            <a href="#ordinaries">Ordinaries</a>
             <ul>
               <li><a href="#combining">Combining</a></li>
               <li><a href="#fimbriation">Fimbriation</a></li>
+              <li><a href="#counterchanged">Counterchanged</a></li>
             </ul>
           </li>
-          <li><a href="#charges">Charges</a>
+          <li>
+            <a href="#charges">Charges</a>
             <ul>
               <li><a href="#built-in-charges">Built-in charges</a></li>
             </ul>
           </li>
-          <li><a href="#arrangement">Arrangement</a>
+          <li>
+            <a href="#arrangement">Arrangement</a>
             <ul>
               <li><a href="#in-a-line">In a line</a></li>
               <li><a href="#between">Between</a></li>
@@ -144,24 +168,33 @@
       <main class="py-10 min-w-0">
         <section class="md:per-pale gap-12">
           <div>
-            <h1 class="text-5xl leading-tight mb-4">Heraldic blazon for Tailwind CSS</h1>
+            <h1 class="text-5xl leading-tight mb-4">
+              Heraldic blazon for Tailwind CSS
+            </h1>
             <figure class="mb-4">
-              <blockquote class="border-l-4 border-azure pl-4 italic leading-relaxed">
-                In heraldry and heraldic vexillology, a blazon is a formal description of a coat of
-                arms, flag, or similar emblem, from which the reader can reconstruct an accurate
-                image.
+              <blockquote
+                class="border-l-4 border-azure pl-4 italic leading-relaxed"
+              >
+                In heraldry and heraldic vexillology, a blazon is a formal
+                description of a coat of arms, flag, or similar emblem, from
+                which the reader can reconstruct an accurate image.
               </blockquote>
               <figcaption class="pl-5 mt-2 text-sm">
-                — <a href="https://en.wikipedia.org/wiki/Blazon">Wikipedia, “Blazon”</a>
+                —
+                <a href="https://en.wikipedia.org/wiki/Blazon"
+                  >Wikipedia, “Blazon”</a
+                >
               </figcaption>
             </figure>
             <p class="leading-relaxed">
-              Grailwind is a plugin for Tailwind CSS that lets you render coats of arms on your
-              webpages using the ancient language of the heralds.
+              Grailwind is a plugin for Tailwind CSS that lets you render coats
+              of arms on your webpages using the ancient language of the
+              heralds.
             </p>
             <p class="leading-relaxed mt-4">
-              <strong>Note: </strong>Grailwind is a light-hearted project at version 0.x, so
-              don't expect perfection. Class names may still change.
+              <strong>Note: </strong>Grailwind is a light-hearted project at
+              version 0.x, so don't expect perfection. Class names may still
+              change.
             </p>
           </div>
           <figure
@@ -188,7 +221,8 @@
 @import "tailwindcss";
 @import "grailwind";</pre>
           <p class="mt-4">
-            This adds the heraldic tinctures alongside Tailwind's own colours, so
+            This adds the heraldic tinctures alongside Tailwind's own colours,
+            so
             <code>bg-azure</code> and <code>bg-blue-500</code> both work.
           </p>
 
@@ -196,7 +230,8 @@
           <p>
             To commit fully to the bit, import <code>grailwind/strict</code>
             instead. The tinctures then replace Tailwind's colours entirely, and
-            <code>bg-blue-500</code> no longer exists. This site uses strict mode.
+            <code>bg-blue-500</code> no longer exists. This site uses strict
+            mode.
           </p>
           <pre data-lang="css">
 @import "tailwindcss";
@@ -206,10 +241,11 @@
         <section id="tinctures">
           <h2>Tinctures</h2>
           <p>
-            Heraldry has two metals and five colours. A tincture on its own sets the background, as
-            it describes the field in blazon:
-            <code>&lt;div class="azure"&gt;</code>. Everywhere else, use Tailwind's usual prefixes:
-            <code>text-or</code>, <code>border-sable</code>, and so on.
+            Heraldry has two metals and five colours. A tincture on its own sets
+            the background, as it describes the field in blazon:
+            <code>&lt;div class="azure"&gt;</code>. Everywhere else, use
+            Tailwind's usual prefixes: <code>text-or</code>,
+            <code>border-sable</code>, and so on.
           </p>
 
           <div class="flex flex-wrap gap-6 my-8">
@@ -222,7 +258,9 @@
             <figure class="w-24 text-center">
               <div class="escutcheon argent"></div>
               <figcaption class="mt-2">
-                <code>argent</code><br /><span class="text-sm">silver, metal</span>
+                <code>argent</code><br /><span class="text-sm"
+                  >silver, metal</span
+                >
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
@@ -259,8 +297,8 @@
 
           <h3 id="rule-of-tincture">The rule of tincture</h3>
           <p>
-            Never put a metal on a metal or a colour on a colour, so the design can be read from a
-            distance. Grailwind doesn't enforce this (yet).
+            Never put a metal on a metal or a colour on a colour, so the design
+            can be read from a distance. Grailwind doesn't enforce this (yet).
           </p>
           <div class="examples">
             <figure
@@ -281,38 +319,49 @@
         <section id="shield">
           <h2>The shield</h2>
           <p>
-            <code>escutcheon</code> gives an element a shield shape. Size it however you like, e.g.
-            <code>escutcheon w-40</code>.
+            <code>escutcheon</code> gives an element a shield shape. Size it
+            however you like, e.g. <code>escutcheon w-40</code>.
           </p>
           <p>
-            The top is the <strong>chief</strong> and the bottom is the <strong>base</strong>. Left
-            and right are from the point of view of the person holding the shield.
-            <strong>Dexter</strong> is their right, which is the left as you look at it, and
-            <strong>sinister</strong> is their left, which to you is the right. It couldn't be
-            simpler.
+            The top is the <strong>chief</strong> and the bottom is the
+            <strong>base</strong>. Left and right are from the point of view of
+            the person holding the shield. <strong>Dexter</strong> is their
+            right, which is the left as you look at it, and
+            <strong>sinister</strong> is their left, which to you is the right.
+            It couldn't be simpler.
           </p>
           <p>
             You'll meet these words in the order of tinctures, in classes like
-            <code>bend-sinister</code>, and in the <a href="#points">named points</a> for placing
-            charges.
+            <code>bend-sinister</code>, and in the
+            <a href="#points">named points</a> for placing charges.
           </p>
           <div
             class="escutcheon w-64 quarterly text-sm my-8"
             role="img"
             aria-label="The quarters of a shield, labelled"
           >
-            <div class="argent flex items-center justify-center">Dexter chief</div>
-            <div class="azure text-argent flex items-center justify-center">Sinister chief</div>
-            <div class="azure text-argent flex items-center justify-center pb-10">Dexter base</div>
-            <div class="argent flex items-center justify-center pb-10">Sinister base</div>
+            <div class="argent flex items-center justify-center">
+              Dexter chief
+            </div>
+            <div class="azure text-argent flex items-center justify-center">
+              Sinister chief
+            </div>
+            <div
+              class="azure text-argent flex items-center justify-center pb-10"
+            >
+              Dexter base
+            </div>
+            <div class="argent flex items-center justify-center pb-10">
+              Sinister base
+            </div>
           </div>
         </section>
 
         <section id="divisions">
           <h2>Dividing the field</h2>
           <p>
-            One class paints a divided field. Any two different tinctures work. The first tincture
-            named goes on the dexter side or in chief.
+            One class paints a divided field. Any two different tinctures work.
+            The first tincture named goes on the dexter side or in chief.
           </p>
           <div class="examples">
             <figure data-blazon="Per pale Or and Gules">
@@ -337,9 +386,10 @@
 
           <h3 id="layout">Dividing for layout</h3>
           <p>
-            <code>per-pale</code>, <code>per-fess</code> and <code>quarterly</code> divide an
-            element into equal parts, one child element per part, in blazon order. They're grids, so
-            they also work for laying out a page. The top of this page uses
+            <code>per-pale</code>, <code>per-fess</code> and
+            <code>quarterly</code> divide an element into equal parts, one child
+            element per part, in blazon order. They're grids, so they also work
+            for laying out a page. The top of this page uses
             <code>md:per-pale</code>.
           </p>
           <div class="examples">
@@ -349,7 +399,9 @@
                 <div class="gules"></div>
               </div>
             </figure>
-            <figure data-blazon="Quarterly: 1 and 4 per fess Or and Azure, 2 and 3 Gules">
+            <figure
+              data-blazon="Quarterly: 1 and 4 per fess Or and Azure, 2 and 3 Gules"
+            >
               <div class="escutcheon quarterly">
                 <div class="per-fess-or-azure"></div>
                 <div class="gules"></div>
@@ -374,8 +426,9 @@
         <section id="ordinaries">
           <h2>Ordinaries</h2>
           <p>
-            The ordinaries are bold geometric shapes drawn over the field. Add a tincture to name
-            one: <code>fess-or</code>, <code>cross-gules</code>.
+            The ordinaries are bold geometric shapes drawn over the field. Add a
+            tincture to name one: <code>fess-or</code>,
+            <code>cross-gules</code>.
           </p>
           <div class="examples">
             <figure data-blazon="Azure, a fess Or">
@@ -409,9 +462,9 @@
 
           <h3 id="combining">Combining</h3>
           <p>
-            An element can have one ordinary plus a chief. With a chief, the other ordinary and any
-            charges are drawn in the field below it. Ordinaries can go over any field, including a
-            divided one.
+            An element can have one ordinary plus a chief. With a chief, the
+            other ordinary and any charges are drawn in the field below it.
+            Ordinaries can go over any field, including a divided one.
           </p>
           <div class="examples">
             <figure data-blazon="Or, a chevron Gules, a chief Azure">
@@ -441,8 +494,50 @@
             <figure data-blazon="Azure, a pall Gules fimbriated Or">
               <div class="escutcheon azure pall-gules fimbriated-or"></div>
             </figure>
-            <figure data-blazon="Or, a chevron Sable fimbriated Argent, a chief Azure">
-              <div class="escutcheon or chevron-sable fimbriated-argent chief-azure"></div>
+            <figure
+              data-blazon="Or, a chevron Sable fimbriated Argent, a chief Azure"
+            >
+              <div
+                class="escutcheon or chevron-sable fimbriated-argent chief-azure"
+              ></div>
+            </figure>
+          </div>
+
+          <h3 id="counterchanged">Counterchanged</h3>
+          <p>
+            On a divided field, a <em>counterchanged</em> ordinary has its
+            tinctures mutually reversed against the surrounding field. It
+            doesn't work with a field divided for layout, and it can't be
+            fimbriated.
+          </p>
+          <div class="examples">
+            <figure
+              data-blazon="Per pale Argent and Gules, a chevron counterchanged"
+            >
+              <div
+                class="escutcheon per-pale-argent-gules chevron-counterchanged"
+              ></div>
+            </figure>
+            <figure
+              data-blazon="Quarterly Or and Gules, a cross counterchanged"
+            >
+              <div
+                class="escutcheon quarterly-or-gules cross-counterchanged"
+              ></div>
+            </figure>
+            <figure
+              data-blazon="Gyronny Argent and Azure, a saltire counterchanged"
+            >
+              <div
+                class="escutcheon gyronny-argent-azure saltire-counterchanged"
+              ></div>
+            </figure>
+            <figure
+              data-blazon="Per pale Argent and Azure, a chief counterchanged"
+            >
+              <div
+                class="escutcheon per-pale-argent-azure chief-counterchanged"
+              ></div>
             </figure>
           </div>
         </section>
@@ -450,8 +545,8 @@
         <section id="charges">
           <h2>Charges</h2>
           <p>
-            Charges are child elements inside a <code>charges</code> container, coloured with a
-            tincture class.
+            Charges are child elements inside a <code>charges</code> container,
+            coloured with a tincture class.
           </p>
           <div class="examples">
             <figure data-blazon="Gules, three fleurs-de-lis Or">
@@ -510,7 +605,10 @@
               <figcaption class="mt-2"><code>fleur-de-lis</code></figcaption>
             </figure>
           </div>
-          <p>Roundels have their own names by tincture, so these need no tincture class:</p>
+          <p>
+            Roundels have their own names by tincture, so these need no tincture
+            class:
+          </p>
           <div class="flex flex-wrap gap-6 my-8">
             <figure class="w-24 text-center">
               <div class="escutcheon vert">
@@ -625,10 +723,13 @@
 
           <h3 id="between">Between</h3>
           <p>
-            <code>between</code> places charges around the ordinary on the shield, whichever it is.
+            <code>between</code> places charges around the ordinary on the
+            shield, whichever it is.
           </p>
           <div class="examples">
-            <figure data-blazon="Argent, a fess Azure between three crescents Gules">
+            <figure
+              data-blazon="Argent, a fess Azure between three crescents Gules"
+            >
               <div class="escutcheon argent fess-azure">
                 <div class="charges between">
                   <i class="crescent gules"></i>
@@ -637,7 +738,9 @@
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Azure, a pale Or between two fleurs-de-lis Argent">
+            <figure
+              data-blazon="Azure, a pale Or between two fleurs-de-lis Argent"
+            >
               <div class="escutcheon azure pale-or">
                 <div class="charges between">
                   <i class="fleur-de-lis argent"></i>
@@ -653,7 +756,9 @@
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Argent, a bend sinister Gules between two mullets Sable">
+            <figure
+              data-blazon="Argent, a bend sinister Gules between two mullets Sable"
+            >
               <div class="escutcheon argent bend-sinister-gules">
                 <div class="charges between">
                   <i class="mullet sable"></i>
@@ -681,7 +786,9 @@
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Azure, a pall Argent between three fleurs-de-lis Or">
+            <figure
+              data-blazon="Azure, a pall Argent between three fleurs-de-lis Or"
+            >
               <div class="escutcheon azure pall-argent">
                 <div class="charges between">
                   <i class="fleur-de-lis or"></i>
@@ -694,7 +801,8 @@
 
           <h3 id="on">On</h3>
           <p>
-            <code>on</code> places charges along the ordinary on the shield, whichever it is.
+            <code>on</code> places charges along the ordinary on the shield,
+            whichever it is.
           </p>
           <div class="examples">
             <figure data-blazon="Sable, on a bend Or three lozenges Gules">
@@ -737,7 +845,8 @@
 
           <h3 id="points">At a named point</h3>
           <p>
-            Heraldry names nine points on the shield. Put one on a charge to place it there, as in
+            Heraldry names nine points on the shield. Put one on a charge to
+            place it there, as in
             <em>in dexter chief a mullet</em>.
           </p>
           <div class="md:per-pale gap-12 items-center my-8 max-w-2xl">
@@ -773,14 +882,18 @@
             </ol>
           </div>
           <div class="examples mt-12">
-            <figure data-blazon="Gules, a fess Argent, in dexter chief a mullet Or">
+            <figure
+              data-blazon="Gules, a fess Argent, in dexter chief a mullet Or"
+            >
               <div class="escutcheon gules fess-argent">
                 <div class="charges">
                   <i class="mullet or in-dexter-chief"></i>
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Or, a chevron Gules, in base a fleur-de-lis Azure">
+            <figure
+              data-blazon="Or, a chevron Gules, in base a fleur-de-lis Azure"
+            >
               <div class="escutcheon or chevron-gules">
                 <div class="charges">
                   <i class="fleur-de-lis azure in-base"></i>
@@ -796,7 +909,9 @@
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Argent, a chevron Gules between three crescents Azure, on a chief Gules three mullets Argent">
+            <figure
+              data-blazon="Argent, a chevron Gules between three crescents Azure, on a chief Gules three mullets Argent"
+            >
               <div class="escutcheon argent chevron-gules chief-gules">
                 <div class="charges between">
                   <i class="crescent azure"></i>
@@ -810,13 +925,13 @@
                 </div>
               </div>
             </figure>
-
           </div>
           <h3 id="sizing">Sizing</h3>
           <p>
             Each arrangement picks a sensible size. To change it, use
             <code>charge-size-*</code> with a percentage of the shield's width:
-            <code>charge-size-15</code>, or any length, like <code>charge-size-[2rem]</code>. On the
+            <code>charge-size-15</code>, or any length, like
+            <code>charge-size-[2rem]</code>. On the
             <code>charges</code>
             container it sizes every charge. On a single charge, just that one.
           </p>
@@ -843,10 +958,11 @@
         <section id="your-own">
           <h2>Your own charges</h2>
           <p>
-            Any element inside <code>charges</code> gets placed, so you can bring your own.
-            <code>charge-[url(…)]</code> uses your SVG as a mask, so a tincture class colours it.
-            The URL is resolved relative to your built stylesheet, and the image must come from the
-            same site or be served with CORS headers.
+            Any element inside <code>charges</code> gets placed, so you can
+            bring your own. <code>charge-[url(…)]</code> uses your SVG as a
+            mask, so a tincture class colours it. The URL is resolved relative
+            to your built stylesheet, and the image must come from the same site
+            or be served with CORS headers.
           </p>
           <div class="examples">
             <figure data-blazon="Or, three hearts Gules">
@@ -858,7 +974,9 @@
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Azure, a chevron Or between three hearts Argent">
+            <figure
+              data-blazon="Azure, a chevron Or between three hearts Argent"
+            >
               <div class="escutcheon azure chevron-or">
                 <div class="charges between">
                   <i class="charge-[url(charges/heart.svg)] argent"></i>
@@ -869,8 +987,8 @@
             </figure>
           </div>
           <p>
-            An <code>&lt;img&gt;</code> keeps the image's own colours, like a charge
-            <em>proper</em>.
+            An <code>&lt;img&gt;</code> keeps the image's own colours, like a
+            charge <em>proper</em>.
           </p>
           <div class="examples">
             <figure data-blazon="Argent, a rose Gules seeded Or">
@@ -885,13 +1003,18 @@
 
         <section id="together">
           <h2>All together</h2>
-          <p>A divided field, an ordinary, a chief, a bordure, and charges on, between and in chief.</p>
+          <p>
+            A divided field, an ordinary, a chief, a bordure, and charges on,
+            between and in chief.
+          </p>
           <figure
             class="my-8"
             data-blazon="Per pale Azure and Gules, on a chevron Or between three mullets Argent three roses proper, on a chief Argent a fleur-de-lis Azure between two hearts Gules, all within a bordure Or"
             data-size="w-72"
           >
-            <div class="escutcheon per-pale-azure-gules chevron-or chief-argent bordure-or">
+            <div
+              class="escutcheon per-pale-azure-gules chevron-or chief-argent bordure-or"
+            >
               <div class="charges between">
                 <i class="mullet argent"></i>
                 <i class="mullet argent"></i>
@@ -903,9 +1026,13 @@
                 <img src="charges/rose.svg" alt="" />
               </div>
               <div class="charges">
-                <i class="charge-[url(charges/heart.svg)] gules in-dexter-chief"></i>
+                <i
+                  class="charge-[url(charges/heart.svg)] gules in-dexter-chief"
+                ></i>
                 <i class="fleur-de-lis azure in-chief"></i>
-                <i class="charge-[url(charges/heart.svg)] gules in-sinister-chief"></i>
+                <i
+                  class="charge-[url(charges/heart.svg)] gules in-sinister-chief"
+                ></i>
               </div>
             </div>
           </figure>
@@ -914,15 +1041,15 @@
         <section id="accessibility">
           <h2>Accessibility</h2>
           <p>
-            A shield is a picture made of empty elements. Give it a text alternative, ideally its
-            blazon:
+            A shield is a picture made of empty elements. Give it a text
+            alternative, ideally its blazon:
           </p>
           <pre data-lang="html">
 &lt;div class="escutcheon azure fess-or" role="img"
      aria-label="Azure, a fess Or"&gt;&lt;/div&gt;</pre>
           <p class="mt-4">
-            Grailwind uses <code>:has()</code>, CSS masks and CSS nesting, so it needs a current
-            browser.
+            Grailwind uses <code>:has()</code>, CSS masks and CSS nesting, so it
+            needs a current browser.
           </p>
         </section>
       </main>
@@ -932,12 +1059,24 @@
       <div class="mx-auto max-w-6xl px-6 py-8 text-base space-y-4">
         <p>
           © 2026 Paul Firmin. Released under the
-          <a href="https://github.com/pafirmin/grailwind/blob/main/LICENSE" class="text-argent hover:text-or">MIT licence</a>.
+          <a
+            href="https://github.com/pafirmin/grailwind/blob/main/LICENSE"
+            class="text-argent hover:text-or"
+            >MIT licence</a
+          >.
         </p>
         <p>
-          <a href="https://github.com/pafirmin/grailwind" class="text-argent hover:text-or">GitHub</a>
+          <a
+            href="https://github.com/pafirmin/grailwind"
+            class="text-argent hover:text-or"
+            >GitHub</a
+          >
           <span class="mx-3 text-or" aria-hidden="true">·</span>
-          <a href="https://www.npmjs.com/package/grailwind" class="text-argent hover:text-or">npm</a>
+          <a
+            href="https://www.npmjs.com/package/grailwind"
+            class="text-argent hover:text-or"
+            >npm</a
+          >
         </p>
       </div>
     </footer>
@@ -963,7 +1102,9 @@
         let last = 0;
         for (const match of source.matchAll(grammars[lang])) {
           pre.append(source.slice(last, match.index));
-          const kind = Object.keys(match.groups).find((name) => match.groups[name]);
+          const kind = Object.keys(match.groups).find(
+            (name) => match.groups[name],
+          );
           const span = document.createElement("span");
           span.className = tokenClasses[kind];
           span.textContent = match[0];
@@ -1036,8 +1177,8 @@
       // Underline the nav links for the heading being read, and its section: the
       // last heading whose top has scrolled past the upper third of the window.
       const links = [...document.querySelectorAll('nav a[href^="#"]')];
-      const sections = [...new Set(links.map((link) => link.hash))].map((hash) =>
-        document.querySelector(hash),
+      const sections = [...new Set(links.map((link) => link.hash))].map(
+        (hash) => document.querySelector(hash),
       );
       let pending = false;
 
@@ -1045,18 +1186,26 @@
         pending = false;
         let current = null;
         for (const section of sections) {
-          if (section.getBoundingClientRect().top <= innerHeight / 3) current = section;
+          if (section.getBoundingClientRect().top <= innerHeight / 3)
+            current = section;
         }
         // Short final sections may never reach the top, so the bottom of the
         // page always counts as the last section.
-        if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) {
+        if (
+          innerHeight + scrollY >=
+          document.documentElement.scrollHeight - 2
+        ) {
           current = sections.at(-1);
         }
         for (const link of links) link.removeAttribute("aria-current");
         for (const link of links) {
           if (current && link.hash === `#${current.id}`) {
             link.setAttribute("aria-current", "location");
-            link.closest("ul ul")?.closest("li").querySelector("a").setAttribute("aria-current", "true");
+            link
+              .closest("ul ul")
+              ?.closest("li")
+              .querySelector("a")
+              .setAttribute("aria-current", "true");
           }
         }
       }

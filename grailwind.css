@@ -21,6 +21,26 @@
   syntax: "*";
   inherits: false;
 }
+@property --counterchange-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --counterchange-image {
+  syntax: "*";
+  inherits: false;
+}
+@property --counterchange-size {
+  syntax: "*";
+  inherits: false;
+}
+@property --counterchange-position {
+  syntax: "*";
+  inherits: false;
+}
+@property --counterchange-repeat {
+  syntax: "*";
+  inherits: false;
+}
 
 /* ---------------------------------------------------------------------------
  * Tinctures

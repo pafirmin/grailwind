@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format is based
 on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Counterchanged ordinaries: `<ordinary>-counterchanged` swaps the tinctures
+  of a divided field, e.g. `per-pale-argent-gules chevron-counterchanged`.
+
+### Changed
+
+- The horizontal line of `per-fess-*` and `quarterly-*` fields now passes
+  through the fess point, 45% down the shield, where the fess and cross are
+  centred. It was at 50%.
+
 ## [0.2.0] - 2026-11-01
 
 ### Added
