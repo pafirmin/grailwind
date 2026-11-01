@@ -1,0 +1,53 @@
+{
+  "name": "@grailwind/eslint-plugin",
+  "version": "0.1.0",
+  "description": "ESLint rules for Grailwind heraldry markup: the rule of tincture and charge structure",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "grailwind",
+    "heraldry",
+    "tailwindcss"
+  ],
+  "author": "Paul Firmin",
+  "license": "MIT",
+  "peerDependencies": {
+    "@html-eslint/parser": "*",
+    "eslint": "^9.0.0 || ^10.0.0",
+    "grailwind": ">=0.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@html-eslint/parser": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@html-eslint/parser": "^0.67.0",
+    "eslint": "^10.14.0",
+    "grailwind": "file:../.."
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://pafirmin.github.io/grailwind/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pafirmin/grailwind.git",
+    "directory": "packages/eslint-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/pafirmin/grailwind/issues"
+  }
+}

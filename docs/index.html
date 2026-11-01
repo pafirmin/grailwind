@@ -336,8 +336,14 @@
 
           <h3 id="rule-of-tincture">The rule of tincture</h3>
           <p>
-            Never put a metal on a metal or a colour on a colour, so the design
-            can be read from a distance. Grailwind doesn't enforce this (yet).
+            Even medieval heralds had visual contrast requirements. Never put a
+            metal on a metal or a colour on a colour, so the design can be read
+            from a distance. The
+            <a
+              href="https://github.com/pafirmin/grailwind/tree/main/packages/eslint-plugin"
+              >ESLint plugin</a
+            >
+            can flag this for you.
           </p>
           <div class="examples">
             <figure
@@ -350,6 +356,7 @@
               data-blazon="Gules, a fess Azure"
               data-note="Bad: a colour on a colour."
             >
+              <!-- eslint-disable-next-line grailwind/rule-of-tincture -- the deliberate bad example -->
               <div class="escutcheon gules fess-azure"></div>
             </figure>
           </div>

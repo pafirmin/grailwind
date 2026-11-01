@@ -2,6 +2,7 @@
  * Grailwind CSS: charges and their arrangement.
  */
 import plugin from "tailwindcss/plugin";
+import { ROUNDELS } from "./data.js";
 
 const star = (cx, cy, r, points = 5) => {
   const coords = [];
@@ -28,15 +29,6 @@ const SHAPES = {
     <path d="M45 65H55C55 74 53 82 50 90C47 82 45 74 45 65Z"/>
     <path d="M58 65C62 74 72 80 84 78C80 88 64 90 56 74Z"/>
     <path d="M42 65C38 74 28 80 16 78C20 88 36 90 44 74Z"/>`,
-};
-
-// Roundels have their own names by tincture.
-const ROUNDELS = {
-  bezant: "or",
-  plate: "argent",
-  torteau: "gules",
-  hurt: "azure",
-  pellet: "sable",
 };
 
 // Points as [left%, top%] of the shield, plus a charge size as % of its width.

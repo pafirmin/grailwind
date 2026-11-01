@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { ARRANGEMENTS, CHARGES, DIVISIONS, ORDINARIES, ROUNDELS, TINCTURES } from "../data.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const cli = join(root, "node_modules/.bin/tailwindcss");
@@ -116,9 +117,19 @@ const EXPECTED = {
   "strict.css": { "bg-blue-500": false, "per-pale-ermine-ermines": false },
 };
 
+// Every class named in data.js must be generated, so tooling can't drift from the CSS.
+const DATA_CLASSES = [
+  ...TINCTURES,
+  ...DIVISIONS.map((d) => `${d}-or-gules`),
+  ...ORDINARIES.map((o) => `${o}-or`),
+  ...CHARGES,
+  ...Object.keys(ROUNDELS),
+  ...ARRANGEMENTS,
+];
+
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${CLASSES.join(" ")} bend-or on counterchanged in-bend-sinister"></div>`,
+  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on counterchanged in-bend-sinister"></div>`,
 );
 
 const build = (entry, { css = "", source = "index.html" } = {}) => {
@@ -144,6 +155,12 @@ try {
       if (actual !== expected) {
         failures++;
         console.error(`✗ ${entry}: .${cls} should ${expected ? "" : "not "}exist`);
+      }
+    }
+    for (const cls of DATA_CLASSES) {
+      if (!new RegExp(`\\.${cls}[ :{]`).test(css)) {
+        failures++;
+        console.error(`✗ ${entry}: data.js names .${cls}, which isn't generated`);
       }
     }
     for (const [name, pattern] of Object.entries(PATTERNS)) {

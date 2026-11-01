@@ -2,9 +2,8 @@
  * Grailwind CSS: field divisions as decoration.
  */
 import plugin from "tailwindcss/plugin";
+import { TINCTURES } from "./data.js";
 import { FURS, furLayers } from "./furs.js";
-
-const TINCTURES = ["or", "argent", "gules", "azure", "vert", "purpure", "sable"];
 
 // Horizontal lines of partition pass through the fess point, as the cross and fess do.
 const FESS_POINT = "45%";
