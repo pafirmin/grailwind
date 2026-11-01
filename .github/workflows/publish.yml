@@ -1,0 +1,46 @@
+name: Publish
+
+on:
+  push:
+    # v1.2.3 publishes grailwind; eslint-plugin-v1.2.3 publishes @grailwind/eslint-plugin.
+    tags: ["v*", "eslint-plugin-v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm >= 11.5.1
+      - run: npm install -g npm@latest
+      - name: Pick the package from the tag
+        run: |
+          case "$GITHUB_REF_NAME" in
+            eslint-plugin-v*)
+              echo "PACKAGE_DIR=packages/eslint-plugin" >> "$GITHUB_ENV"
+              echo "TAG_PREFIX=eslint-plugin-v" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "PACKAGE_DIR=." >> "$GITHUB_ENV"
+              echo "TAG_PREFIX=v" >> "$GITHUB_ENV"
+              ;;
+          esac
+      - name: Check tag matches package.json
+        run: |
+          version="$TAG_PREFIX$(node -p "require('./$PACKAGE_DIR/package.json').version")"
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match $PACKAGE_DIR/package.json $version"
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm test
+      - run: npm stage publish
+        working-directory: ${{ env.PACKAGE_DIR }}
