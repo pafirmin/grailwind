@@ -53,16 +53,46 @@
       </nav>
     </header>
 
-    <div class="mx-auto max-w-6xl px-6 md:grid md:grid-cols-[10rem_1fr] md:gap-12">
+    <div class="mx-auto max-w-8xl px-6 md:grid md:grid-cols-[11rem_1fr] md:gap-12">
       <nav id="sidebar" class="hidden md:block" aria-label="Sections">
-        <ul class="sticky top-0 py-10 space-y-2">
-          <li><a href="#install">Install</a></li>
-          <li><a href="#tinctures">Tinctures</a></li>
+        <ul class="sticky top-0 max-h-screen overflow-y-auto py-10 space-y-2">
+          <li><a href="#install">Install</a>
+            <ul>
+              <li><a href="#strict-mode">Strict mode</a></li>
+            </ul>
+          </li>
+          <li><a href="#tinctures">Tinctures</a>
+            <ul>
+              <li><a href="#rule-of-tincture">The rule of tincture</a></li>
+            </ul>
+          </li>
           <li><a href="#shield">The shield</a></li>
-          <li><a href="#divisions">Dividing the field</a></li>
-          <li><a href="#ordinaries">Ordinaries</a></li>
-          <li><a href="#charges">Charges</a></li>
-          <li><a href="#arrangement">Arrangement</a></li>
+          <li><a href="#divisions">Dividing the field</a>
+            <ul>
+              <li><a href="#layout">Dividing for layout</a></li>
+              <li><a href="#bordure">Bordure</a></li>
+            </ul>
+          </li>
+          <li><a href="#ordinaries">Ordinaries</a>
+            <ul>
+              <li><a href="#combining">Combining</a></li>
+              <li><a href="#fimbriation">Fimbriation</a></li>
+            </ul>
+          </li>
+          <li><a href="#charges">Charges</a>
+            <ul>
+              <li><a href="#built-in-charges">Built-in charges</a></li>
+            </ul>
+          </li>
+          <li><a href="#arrangement">Arrangement</a>
+            <ul>
+              <li><a href="#in-a-line">In a line</a></li>
+              <li><a href="#between">Between</a></li>
+              <li><a href="#on">On</a></li>
+              <li><a href="#points">At a named point</a></li>
+              <li><a href="#sizing">Sizing</a></li>
+            </ul>
+          </li>
           <li><a href="#your-own">Your own charges</a></li>
           <li><a href="#together">All together</a></li>
           <li><a href="#accessibility">Accessibility</a></li>
@@ -120,7 +150,7 @@
             <code>bg-azure</code> and <code>bg-blue-500</code> both work.
           </p>
 
-          <h3>Strict mode</h3>
+          <h3 id="strict-mode">Strict mode</h3>
           <p>
             To commit fully to the bit, import <code>grailwind/strict</code>
             instead. The tinctures then replace Tailwind's colours entirely, and
@@ -185,7 +215,7 @@
             </figure>
           </div>
 
-          <h3>The rule of tincture</h3>
+          <h3 id="rule-of-tincture">The rule of tincture</h3>
           <p>
             Never put a metal on a metal or a colour on a colour, so the design can be read from a
             distance. Grailwind doesn't enforce this (yet).
@@ -263,7 +293,7 @@
             </figure>
           </div>
 
-          <h3>Dividing for layout</h3>
+          <h3 id="layout">Dividing for layout</h3>
           <p>
             <code>per-pale</code>, <code>per-fess</code> and <code>quarterly</code> divide an
             element into equal parts, one child element per part, in blazon order. They're grids, so
@@ -287,7 +317,7 @@
             </figure>
           </div>
 
-          <h3>Bordure</h3>
+          <h3 id="bordure">Bordure</h3>
           <p><code>bordure-or</code>, or any other tincture, adds a border.</p>
           <div class="examples">
             <figure data-blazon="Vert, a bordure Argent">
@@ -335,7 +365,7 @@
             </figure>
           </div>
 
-          <h3>Combining</h3>
+          <h3 id="combining">Combining</h3>
           <p>
             An element can have one ordinary plus a chief. With a chief, the other ordinary and any
             charges are drawn in the field below it. Ordinaries can go over any field, including a
@@ -358,7 +388,7 @@
             </figure>
           </div>
 
-          <h3>Fimbriation</h3>
+          <h3 id="fimbriation">Fimbriation</h3>
           <div class="examples">
             <figure data-blazon="Gules, a cross Azure fimbriated Argent">
               <div class="escutcheon gules cross-azure fimbriated-argent"></div>
@@ -393,7 +423,7 @@
             </figure>
           </div>
 
-          <h3>Built-in charges</h3>
+          <h3 id="built-in-charges">Built-in charges</h3>
           <div class="flex flex-wrap gap-6 my-8">
             <figure class="w-24 text-center">
               <div class="escutcheon azure">
@@ -516,7 +546,7 @@
             </figure>
           </div>
 
-          <h3>In a line</h3>
+          <h3 id="in-a-line">In a line</h3>
           <p>
             <code>in-pale</code>, <code>in-fess</code> and <code>in-bend</code>
             put two or three charges in a vertical, horizontal or diagonal line.
@@ -551,7 +581,7 @@
             </figure>
           </div>
 
-          <h3>Between</h3>
+          <h3 id="between">Between</h3>
           <p>
             <code>between</code> places charges around the ordinary on the shield, whichever it is.
           </p>
@@ -620,7 +650,7 @@
             </figure>
           </div>
 
-          <h3>On</h3>
+          <h3 id="on">On</h3>
           <p>
             <code>on</code> places charges along the ordinary on the shield, whichever it is.
           </p>
@@ -740,7 +770,7 @@
             </figure>
 
           </div>
-          <h3>Sizing</h3>
+          <h3 id="sizing">Sizing</h3>
           <p>
             Each arrangement picks a sensible size. To change it, use
             <code>charge-size-*</code> with a percentage of the shield's width:
@@ -933,10 +963,8 @@
       const menuButton = document.getElementById("menu-button");
       const mobileNav = document.getElementById("mobile-nav");
 
-      for (const link of document.querySelectorAll("#sidebar a")) {
-        const item = document.createElement("li");
-        item.append(link.cloneNode(true));
-        mobileNav.querySelector("ul").append(item);
+      for (const item of document.querySelectorAll("#sidebar > ul > li")) {
+        mobileNav.querySelector("ul").append(item.cloneNode(true));
       }
 
       function setMenu(open) {
@@ -955,8 +983,8 @@
         }
       });
 
-      // Underline the nav links for the section being read: the last section
-      // whose top has scrolled past the upper third of the window.
+      // Underline the nav links for the heading being read, and its section: the
+      // last heading whose top has scrolled past the upper third of the window.
       const links = [...document.querySelectorAll('nav a[href^="#"]')];
       const sections = [...new Set(links.map((link) => link.hash))].map((hash) =>
         document.querySelector(hash),
@@ -974,10 +1002,12 @@
         if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) {
           current = sections.at(-1);
         }
+        for (const link of links) link.removeAttribute("aria-current");
         for (const link of links) {
-          if (current && link.hash === `#${current.id}`)
+          if (current && link.hash === `#${current.id}`) {
             link.setAttribute("aria-current", "location");
-          else link.removeAttribute("aria-current");
+            link.closest("ul ul")?.closest("li").querySelector("a").setAttribute("aria-current", "true");
+          }
         }
       }
 

@@ -43,6 +43,31 @@
     @apply underline decoration-2 underline-offset-4;
   }
 
+  nav > ul > li > a {
+    @apply text-lg font-semibold;
+  }
+
+  /* Sub-items: a rule down the left, marked in gules for the current one. */
+  nav ul ul {
+    @apply mt-1 space-y-1 text-[0.9375rem] border-l border-sable/20;
+  }
+
+  header nav ul ul {
+    @apply border-argent/30;
+  }
+
+  nav ul ul a {
+    @apply block -ml-px pl-3 border-l-2 border-transparent;
+  }
+
+  nav ul ul a[aria-current] {
+    @apply no-underline border-gules;
+  }
+
+  header nav ul ul a[aria-current] {
+    @apply border-or;
+  }
+
   /* Clears the sticky header on mobile. */
   main [id] {
     @apply scroll-mt-24 md:scroll-mt-8;
