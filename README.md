@@ -1,6 +1,6 @@
 # Grailwind CSS
 
-![Eight coats of arms drawn with Grailwind: chevrons, quarters, fleurs-de-lis, a saltire, gyronny, a chief, a bend and a bordure](https://pafirmin.github.io/grailwind/preview.png)
+![Eight coats of arms drawn with Grailwind: chevrons, quarters, fleurs-de-lis, a saltire, gyronny, a chief, a bend and a bordure](https://grailwind.dev/preview.png)
 
 Heraldic blazon for [Tailwind CSS](https://tailwindcss.com). Draw coats of
 arms, or style anything else, in the language heralds have used for 800 years:
@@ -18,7 +18,7 @@ arms, or style anything else, in the language heralds have used for 800 years:
 That's *Azure, a chevron Or between three mullets Argent*: a blue shield, a
 gold chevron, and three silver stars around it.
 
-**[Read the documentation](https://pafirmin.github.io/grailwind/)** for every class, with live examples.
+**[Read the documentation](https://grailwind.dev/)** for every class, with live examples.
 
 > Grailwind is a light-hearted project at version 0.x, so class names may
 > still change.
