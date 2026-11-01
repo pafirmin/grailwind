@@ -1,6 +1,6 @@
 {
   "name": "grailwind",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "build": "tailwindcss -i docs/app.css -o docs/site.css",
     "dev": "tailwindcss -i docs/app.css -o docs/site.css --watch",
