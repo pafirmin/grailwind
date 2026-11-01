@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -1 62 62">
+  <clipPath id="shield">
+    <path d="M0 0H50V33A25 27 0 0 1 25 60A25 27 0 0 1 0 33Z"/>
+  </clipPath>
+  <g clip-path="url(#shield)">
+    <rect width="50" height="60" fill="#d21f1f"/>
+    <path fill="#f5c518" d="M25 30L0 0H25ZM25 30L50 0V30ZM25 30L50 60H25ZM25 30L0 60V30Z"/>
+  </g>
+  <path d="M0 0H50V33A25 27 0 0 1 25 60A25 27 0 0 1 0 33Z" fill="none" stroke="#141414" stroke-width="2.5"/>
+</svg>
