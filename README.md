@@ -15,7 +15,7 @@ arms, or style anything else, in the language heralds have used for 800 years:
 </div>
 ```
 
-That's *Azure, a chevron Or between three mullets Argent*: a blue shield, a
+That's _Azure, a chevron Or between three mullets Argent_: a blue shield, a
 gold chevron, and three silver stars around it.
 
 **[Read the documentation](https://grailwind.dev/)** for every class, with live examples.
@@ -57,8 +57,8 @@ tinctures replace Tailwind's colours entirely.
   and the like on a divided field.
 - **Charges:** `mullet`, `fleur-de-lis`, `bezant` and more, arranged by
   number, `in-pale`, `in-fess`, `in-bend`, `on` or `between` the ordinary, or
-  placed at a named point such as `in-dexter-chief`, and sized with
-  `charge-size-*`.
+  placed at a named point such as `in-dexter-chief`, sized with
+  `charge-size-*`, and `counterchanged` on a divided field.
 - **Your own charges:** any SVG, via `charge-[url(…)]`.
 
 ## Development
@@ -66,6 +66,7 @@ tinctures replace Tailwind's colours entirely.
 ```sh
 npm install
 npm test            # checks both the default and strict builds
+npm run format      # formats with Prettier; CI runs format:check
 npm run dev:watch   # rebuilds the docs site on change and serves it at http://localhost:8000
 ```
 

@@ -10,12 +10,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Counterchanged ordinaries: `<ordinary>-counterchanged` swaps the tinctures
   of a divided field, e.g. `per-pale-argent-gules chevron-counterchanged`.
+- Counterchanged charges: `counterchanged` on a charge, or on the `charges`
+  container for all of them.
 
 ### Changed
 
 - The horizontal line of `per-fess-*` and `quarterly-*` fields now passes
   through the fess point, 45% down the shield, where the fess and cross are
   centred. It was at 50%.
+- Charges are centred with negative margins instead of `translate`, so
+  Tailwind's `translate-*` on a charge now moves it from its place.
+- `escutcheon` sets `contain: layout`.
 
 ## [0.2.0] - 2026-11-01
 

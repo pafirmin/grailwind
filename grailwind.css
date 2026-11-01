@@ -61,13 +61,27 @@
 /* ---------------------------------------------------------------------------
  * Bare tinctures
  * ------------------------------------------------------------------------- */
-@utility or      { background-color: var(--color-or); }
-@utility argent  { background-color: var(--color-argent); }
-@utility gules   { background-color: var(--color-gules); }
-@utility azure   { background-color: var(--color-azure); }
-@utility vert    { background-color: var(--color-vert); }
-@utility purpure { background-color: var(--color-purpure); }
-@utility sable   { background-color: var(--color-sable); }
+@utility or {
+  background-color: var(--color-or);
+}
+@utility argent {
+  background-color: var(--color-argent);
+}
+@utility gules {
+  background-color: var(--color-gules);
+}
+@utility azure {
+  background-color: var(--color-azure);
+}
+@utility vert {
+  background-color: var(--color-vert);
+}
+@utility purpure {
+  background-color: var(--color-purpure);
+}
+@utility sable {
+  background-color: var(--color-sable);
+}
 
 /* ---------------------------------------------------------------------------
  * Field divisions
@@ -117,6 +131,8 @@
   overflow: hidden;
   border-radius: 0 0 50% 50% / 0 0 45% 45%;
   box-shadow: 0 0 0 2px var(--color-sable);
+  /* The containing block for counterchanged charges' fixed layers. */
+  contain: layout;
 }
 
 /* ---------------------------------------------------------------------------

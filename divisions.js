@@ -23,8 +23,7 @@ const DIVISIONS = {
   "per-bend": (a, b) => layer(`linear-gradient(to bottom left, ${a} 50%, ${b} 50%)`),
 
   // Line from sinister chief to dexter base: first in the upper half.
-  "per-bend-sinister": (a, b) =>
-    layer(`linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`),
+  "per-bend-sinister": (a, b) => layer(`linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`),
 
   // Quarters 1 and 4 (dexter chief, sinister base) are the first tincture.
   // Linear gradients rather than conic, which render jagged edges in some browsers.

@@ -5,6 +5,7 @@ import plugin from "tailwindcss/plugin";
 
 const TINCTURES = ["or", "argent", "gules", "azure", "vert", "purpure", "sable"];
 
+// prettier-ignore
 const ORDINARIES = {
   pale: [[35, 0], [65, 0], [65, 100], [35, 100]],
   fess: [[0, 30], [100, 30], [100, 60], [0, 60]],
@@ -103,6 +104,7 @@ const widenedPolygon = (vertices) => {
 const S = 12;
 const band = (kind, from, to, tile) => ({ kind, from, to, tile });
 const stripe = (kind, from, to, tile) => ({ kind, from, to, tile, stripe: true });
+// prettier-ignore
 const BANDS = {
   pale: [band("x", 35, 65)],
   fess: [band("y", 30, 60)],
@@ -127,7 +129,12 @@ const BANDS = {
   ],
 };
 
-const DIRECTION = { x: "to right", y: "to bottom", "u-v": "to top right", "u+v": "to bottom right" };
+const DIRECTION = {
+  x: "to right",
+  y: "to bottom",
+  "u-v": "to top right",
+  "u+v": "to bottom right",
+};
 
 // A band's edges as % along its gradient, within its tile.
 const stop = ({ kind, tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }, value) => {
@@ -135,10 +142,14 @@ const stop = ({ kind, tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }, value) => {
   const h = y1 - y0;
   if (kind.length > 1 && w !== h) throw new Error("diagonal bands need a square tile");
   switch (kind) {
-    case "x": return ((value - x0) * 100) / w;
-    case "y": return ((value - y0) * 100) / h;
-    case "u-v": return ((value - (x0 - y0)) * 100) / w / 2 + 50;
-    case "u+v": return ((value - x0 - y0) * 100) / w / 2;
+    case "x":
+      return ((value - x0) * 100) / w;
+    case "y":
+      return ((value - y0) * 100) / h;
+    case "u-v":
+      return ((value - (x0 - y0)) * 100) / w / 2 + 50;
+    case "u+v":
+      return ((value - x0 - y0) * 100) / w / 2;
   }
 };
 
@@ -156,19 +167,24 @@ const tilePosition = (start, size) => (size === 100 ? "0" : pct((start * 100) / 
 
 const bands = (layers, tincture) => ({
   "background-image": layers
-    .map((l) => gradient(l, l.stripe ? "var(--fimbriation, transparent)" : `var(--color-${tincture})`))
+    .map((l) =>
+      gradient(l, l.stripe ? "var(--fimbriation, transparent)" : `var(--color-${tincture})`),
+    )
     .join(", "),
   "background-size": layers
     .map(({ tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }) => `${pct(x1 - x0)} ${pct(y1 - y0)}`)
     .join(", "),
   "background-position": layers
-    .map(({ tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }) =>
-      `${tilePosition(x0, x1 - x0)} ${tilePosition(y0, y1 - y0)}`)
+    .map(
+      ({ tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }) =>
+        `${tilePosition(x0, x1 - x0)} ${tilePosition(y0, y1 - y0)}`,
+    )
     .join(", "),
   "background-repeat": "no-repeat",
 });
 
 // Where charges go for "between", as [left%, top%], plus their size as % of width.
+// prettier-ignore
 const BETWEEN = {
   pale: { size: 18, points: [[18, 42], [82, 42]] },
   fess: { size: 20, points: [[30, 15], [70, 15], [50, 78]] },
@@ -181,6 +197,7 @@ const BETWEEN = {
 };
 
 // Where charges go for "on", along the ordinary's centre line, by number of charges.
+// prettier-ignore
 const ON = {
   pale: { size: 20, counts: { 1: [[50, 45]], 2: [[50, 28], [50, 62]], 3: [[50, 18], [50, 45], [50, 72]] } },
   fess: { size: 22, counts: { 1: [[50, 45]], 2: [[30, 45], [70, 45]], 3: [[20, 45], [50, 45], [80, 45]] } },
@@ -243,7 +260,10 @@ export default plugin(({ addUtilities }) => {
       inset: "0",
       // Registered not to inherit, so a shield inside another can't pick up its swap.
       ...Object.fromEntries(
-        ["color", "image", "size", "position", "repeat"].map((n) => [`--counterchange-${n}`, "inherit"]),
+        ["color", "image", "size", "position", "repeat"].map((n) => [
+          `--counterchange-${n}`,
+          "inherit",
+        ]),
       ),
       "background-color": "var(--counterchange-color, transparent)",
       "background-image": "var(--counterchange-image, none)",

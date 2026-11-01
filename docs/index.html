@@ -147,6 +147,7 @@
             <a href="#charges">Charges</a>
             <ul>
               <li><a href="#built-in-charges">Built-in charges</a></li>
+              <li><a href="#counterchanged-charges">Counterchanged</a></li>
             </ul>
           </li>
           <li>
@@ -649,6 +650,49 @@
               <figcaption class="mt-2">
                 <code>pellet</code><br /><span class="text-sm">Sable</span>
               </figcaption>
+            </figure>
+          </div>
+
+          <h3 id="counterchanged-charges">Counterchanged</h3>
+          <p>
+            Charges can be <a href="#counterchanged">counterchanged</a> too: add
+            <code>counterchanged</code> to a charge, or to the
+            <code>charges</code> container for all of them. Don't rotate or
+            scale a counterchanged charge, or it loses its place on the field.
+          </p>
+          <div class="examples">
+            <figure
+              data-blazon="Per pale Argent and Gules, a chevron between three roundels counterchanged"
+            >
+              <div
+                class="escutcheon per-pale-argent-gules chevron-counterchanged"
+              >
+                <div class="charges between counterchanged">
+                  <i class="roundel"></i>
+                  <i class="roundel"></i>
+                  <i class="roundel"></i>
+                </div>
+              </div>
+            </figure>
+            <figure
+              data-blazon="Quarterly Or and Azure, a mullet counterchanged"
+            >
+              <div class="escutcheon quarterly-or-azure">
+                <div class="charges charge-size-70">
+                  <i class="mullet counterchanged"></i>
+                </div>
+              </div>
+            </figure>
+            <figure
+              data-blazon="Per fess Or and Sable, three fleurs-de-lis counterchanged"
+            >
+              <div class="escutcheon per-fess-or-sable">
+                <div class="charges counterchanged">
+                  <i class="fleur-de-lis"></i>
+                  <i class="fleur-de-lis"></i>
+                  <i class="fleur-de-lis"></i>
+                </div>
+              </div>
             </figure>
           </div>
         </section>

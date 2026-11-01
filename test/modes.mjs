@@ -9,23 +9,60 @@ const cli = join(root, "node_modules/.bin/tailwindcss");
 // Inside the project, so the build can resolve tailwindcss.
 const dir = mkdtempSync(join(root, "test", ".tmp-"));
 
-const CLASSES = ["bg-blue-500", "bg-azure", "azure", "fess-or", "per-pale-or-gules", "mullet", "in-dexter-chief", "charge-size-20", "cross-azure", "chief-or", "fimbriated-argent", "chevron-counterchanged", "chief-counterchanged", "quarterly-or-gules"];
+const CLASSES = [
+  "bg-blue-500",
+  "bg-azure",
+  "azure",
+  "fess-or",
+  "per-pale-or-gules",
+  "mullet",
+  "in-dexter-chief",
+  "charge-size-20",
+  "cross-azure",
+  "chief-or",
+  "fimbriated-argent",
+  "chevron-counterchanged",
+  "chief-counterchanged",
+  "quarterly-or-gules",
+  "escutcheon",
+  "charges",
+];
 
 // Rules without a plain `.class {` selector, checked by pattern.
 const PATTERNS = {
   "bend-or publishes on points": /\.bend-or \{[^}]*--on-3-2-x: 50%;/,
-  "on reads them, with a fallback": /\.on:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: var\(--on-3-1-x, 28%\);/,
-  "fimbriated-argent sets the fimbriation": /\.fimbriated-argent \{\s*--fimbriated: 1;\s*--fimbriation: var\(--color-argent\);/,
-  "fimbriation vars don't inherit": /@property --fimbriated \{\s*syntax: "\*";\s*inherits: false;[^]*@property --fimbriation \{\s*syntax: "\*";\s*inherits: false;/,
-  "an ordinary opts in to fimbriation": /\.cross-azure \{[^]*?&::before \{[^}]*--fimbriated: inherit;\s*--fimbriation: inherit;\s*background-color: var\(--fimbriation, var\(--color-azure\)\);/,
-  "a fimbriated ordinary is widened": /\.cross-azure \{[^]*?&::before \{[^}]*clip-path: polygon\(calc\(40% - 3% \* var\(--fimbriated, 0\)\) 0,/,
-  "a division publishes its swap": /\.per-pale-or-gules \{[^}]*--counterchange-image: linear-gradient\(to right, var\(--color-gules\) 50%, var\(--color-or\) 50%\);/,
-  "quarterly splits at the fess point": /\.quarterly-or-gules \{[^}]*background-size: 100% 45%, 100% 100%;/,
-  "counterchange vars don't inherit": /@property --counterchange-image \{\s*syntax: "\*";\s*inherits: false;/,
-  "a counterchanged ordinary pulls them from its shield": /\.chevron-counterchanged \{[^]*?&::before \{[^}]*--counterchange-image: inherit;/,
-  "a counterchanged ordinary paints it": /\.chevron-counterchanged \{[^]*?&::before \{[^}]*background-image: var\(--counterchange-image, none\);/,
-  "a counterchanged ordinary sits below a chief": /\.chevron-counterchanged \{[^]*?clip-path: polygon\(50% calc\(25% \+ var\(--field-top, 0%\) \* 0\.75\),/,
-  "a counterchanged ordinary isn't fimbriated": /\.chevron-counterchanged \{[^]*?&::before \{(?:(?!fimbriat)[^}])*\}/,
+  "on reads them, with a fallback":
+    /\.on:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: var\(--on-3-1-x, 28%\);/,
+  "fimbriated-argent sets the fimbriation":
+    /\.fimbriated-argent \{\s*--fimbriated: 1;\s*--fimbriation: var\(--color-argent\);/,
+  "fimbriation vars don't inherit":
+    /@property --fimbriated \{\s*syntax: "\*";\s*inherits: false;[^]*@property --fimbriation \{\s*syntax: "\*";\s*inherits: false;/,
+  "an ordinary opts in to fimbriation":
+    /\.cross-azure \{[^]*?&::before \{[^}]*--fimbriated: inherit;\s*--fimbriation: inherit;\s*background-color: var\(--fimbriation, var\(--color-azure\)\);/,
+  "a fimbriated ordinary is widened":
+    /\.cross-azure \{[^]*?&::before \{[^}]*clip-path: polygon\(calc\(40% - 3% \* var\(--fimbriated, 0\)\) 0,/,
+  "a division publishes its swap":
+    /\.per-pale-or-gules \{[^}]*--counterchange-image: linear-gradient\(to right, var\(--color-gules\) 50%, var\(--color-or\) 50%\);/,
+  "quarterly splits at the fess point":
+    /\.quarterly-or-gules \{[^}]*background-size: 100% 45%, 100% 100%;/,
+  "counterchange vars don't inherit":
+    /@property --counterchange-image \{\s*syntax: "\*";\s*inherits: false;/,
+  "a counterchanged ordinary pulls them from its shield":
+    /\.chevron-counterchanged \{[^]*?&::before \{[^}]*--counterchange-image: inherit;/,
+  "a counterchanged ordinary paints it":
+    /\.chevron-counterchanged \{[^]*?&::before \{[^}]*background-image: var\(--counterchange-image, none\);/,
+  "a counterchanged ordinary sits below a chief":
+    /\.chevron-counterchanged \{[^]*?clip-path: polygon\(50% calc\(25% \+ var\(--field-top, 0%\) \* 0\.75\),/,
+  "a counterchanged ordinary isn't fimbriated":
+    /\.chevron-counterchanged \{[^]*?&::before \{(?:(?!fimbriat)[^}])*\}/,
+  "the escutcheon holds charges' fixed layers": /\.escutcheon \{[^}]*contain: layout;/,
+  "charges are centred with margins, not translate":
+    /\.charges \{[^]*?& > \* \{(?:(?!translate)[^}])*margin: calc\(var\(--charge-width\) \/ -2\) 0 0 calc\(var\(--charge-width\) \/ -2\);/,
+  "charges pass the swap down": /\.charges \{[^}]*--counterchange-image: inherit;/,
+  "a counterchanged charge has a fixed layer":
+    /\.charges > \.counterchanged \{[^]*?&::before \{[^}]*position: fixed;[^}]*background-image: var\(--counterchange-image\);/,
+  "counterchanged on the container applies to each charge":
+    /\.counterchanged\.charges > \* \{[^]*?&::before \{[^}]*position: fixed;/,
   "the chief isn't fimbriated": /\.chief-or \{[^]*?&::after \{(?:(?!fimbriat)[^}])*\}/,
 };
 
@@ -34,7 +71,10 @@ const EXPECTED = {
   "strict.css": { "bg-blue-500": false },
 };
 
-writeFileSync(join(dir, "index.html"), `<div class="${CLASSES.join(" ")} bend-or on"></div>`);
+writeFileSync(
+  join(dir, "index.html"),
+  `<div class="${CLASSES.join(" ")} bend-or on counterchanged"></div>`,
+);
 
 const build = (entry) => {
   const input = join(dir, "input.css");

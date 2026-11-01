@@ -41,6 +41,7 @@ const ROUNDELS = {
 
 // Points as [left%, top%] of the shield, plus a charge size as % of its width.
 // The default for each number of charges, e.g. three are placed 2 and 1.
+// prettier-ignore
 const DEFAULTS = {
   1: { size: 50, points: [[50, 45]] },
   2: { size: 30, points: [[50, 24], [50, 66]] },
@@ -66,6 +67,7 @@ const POINT_SIZE = 22;
 // With a chief on the shield, these points sit on it (see ordinaries.js).
 const CHIEF_POINTS = new Set(["dexter-chief", "chief", "sinister-chief"]);
 
+// prettier-ignore
 const ARRANGEMENTS = {
   "in-pale": {
     2: { size: 30, points: [[50, 24], [50, 66]] },
@@ -96,8 +98,29 @@ const maskRules = (image) => ({
 const place = ([left, top], size) => ({
   left: `${left}%`,
   top: `${top}%`,
-  width: `var(--charge-size, ${size}%)`,
+  "--charge-width": `var(--charge-size, ${size}%)`,
 });
+
+// The field with its tinctures swapped, from the shield's division (see divisions.js).
+const COUNTERCHANGE = ["color", "image", "size", "position", "repeat"];
+const inheritCounterchange = Object.fromEntries(
+  COUNTERCHANGE.map((n) => [`--counterchange-${n}`, "inherit"]),
+);
+
+// A layer the size of the shield, as the escutcheon is the containing block
+// for fixed positioning. The charge's mask cuts it to shape.
+const counterchanged = {
+  ...inheritCounterchange,
+  "&::before": {
+    content: '""',
+    position: "fixed",
+    inset: "0",
+    ...inheritCounterchange,
+    ...Object.fromEntries(
+      COUNTERCHANGE.map((n) => [`background-${n}`, `var(--counterchange-${n})`]),
+    ),
+  },
+};
 
 const hasCount = (n) => `:has(> :nth-child(${n}):last-child)`;
 
@@ -124,17 +147,20 @@ export default plugin(({ addUtilities, matchUtilities }) => {
     inset: "var(--field-top, 0%) 0 0",
     // Above the chief, which is painted last, so charges can sit on it.
     "z-index": "1",
+    ...inheritCounterchange,
     "& > *": {
       position: "absolute",
       "aspect-ratio": "1",
-      translate: "-50% -50%",
+      // Centred with margins, not translate: a transform would stop a
+      // counterchanged charge's fixed layer from lining up with the shield.
+      width: "var(--charge-width)",
+      margin: "calc(var(--charge-width) / -2) 0 0 calc(var(--charge-width) / -2)",
       "object-fit": "contain",
     },
   };
   for (const [count, { size, points }] of Object.entries(DEFAULTS)) {
     points.forEach((point, i) => {
-      charges[`&:where(${hasCount(count)}) > :where(:nth-child(${i + 1}))`] =
-        place(point, size);
+      charges[`&:where(${hasCount(count)}) > :where(:nth-child(${i + 1}))`] = place(point, size);
     });
   }
   utilities[".charges"] = charges;
@@ -155,7 +181,7 @@ export default plugin(({ addUtilities, matchUtilities }) => {
     between[`& > :nth-child(${i})`] = {
       left: `var(--between-${i}-x)`,
       top: `var(--between-${i}-y)`,
-      width: "var(--charge-size, var(--between-size))",
+      "--charge-width": "var(--charge-size, var(--between-size))",
     };
   }
   utilities[".between"] = between;
@@ -168,11 +194,13 @@ export default plugin(({ addUtilities, matchUtilities }) => {
     for (let i = 1; i <= count; i++) {
       const [left, top] = fallback?.points[i - 1] ?? [];
       const at = (axis, value) =>
-        value === undefined ? `var(--on-${count}-${i}-${axis})` : `var(--on-${count}-${i}-${axis}, ${value}%)`;
+        value === undefined
+          ? `var(--on-${count}-${i}-${axis})`
+          : `var(--on-${count}-${i}-${axis}, ${value}%)`;
       on[`&${hasCount(count)} > :nth-child(${i})`] = {
         left: at("x", left),
         top: at("y", top),
-        width: `var(--charge-size, var(--on-size, ${fallback?.size ?? 16}%))`,
+        "--charge-width": `var(--charge-size, var(--on-size, ${fallback?.size ?? 16}%))`,
       };
     }
   }
@@ -184,11 +212,17 @@ export default plugin(({ addUtilities, matchUtilities }) => {
         ? {
             left: `${left}%`,
             top: `var(--chief-points-y, ${top}%)`,
-            width: `var(--charge-size, var(--chief-points-size, ${POINT_SIZE}%))`,
+            "--charge-width": `var(--charge-size, var(--chief-points-size, ${POINT_SIZE}%))`,
           }
         : place([left, top], POINT_SIZE),
     };
   }
+
+  // On a charge, or on `charges` for all of them.
+  utilities[".counterchanged"] = {
+    ".charges > &": counterchanged,
+    "&.charges > *": counterchanged,
+  };
 
   addUtilities(utilities);
 });
