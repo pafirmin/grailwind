@@ -45,7 +45,7 @@
     <link rel="stylesheet" href="site.css" />
   </head>
   <body class="argent text-sable font-serif text-lg">
-    <header class="azure text-argent sticky top-0 z-10 md:static">
+    <header class="azure text-argent sticky top-0 z-10 lg:static">
       <div class="mx-auto max-w-6xl px-6 py-4 flex items-center gap-4">
         <div class="escutcheon w-9 gyronny-or-gules" aria-hidden="true"></div>
         <a href="#" class="text-2xl no-underline text-or hover:text-argent"
@@ -71,7 +71,7 @@
         <button
           id="menu-button"
           type="button"
-          class="group md:hidden p-2 hover:text-or"
+          class="group lg:hidden p-2 hover:text-or"
           aria-label="Menu"
           aria-expanded="false"
           aria-controls="mobile-nav"
@@ -102,7 +102,7 @@
       </div>
       <nav
         id="mobile-nav"
-        class="md:hidden border-t border-argent/30"
+        class="lg:hidden border-t border-argent/30"
         aria-label="Sections"
         hidden
       >
@@ -111,9 +111,9 @@
     </header>
 
     <div
-      class="mx-auto max-w-8xl px-6 md:grid md:grid-cols-[11rem_1fr] md:gap-12"
+      class="mx-auto max-w-6xl px-6 lg:grid lg:grid-cols-[11rem_1fr] lg:gap-12"
     >
-      <nav id="sidebar" class="hidden md:block" aria-label="Sections">
+      <nav id="sidebar" class="hidden lg:block" aria-label="Sections">
         <ul class="sticky top-0 max-h-screen overflow-y-auto py-10 space-y-2">
           <li>
             <a href="#install">Install</a>
@@ -194,8 +194,8 @@
             </p>
             <p class="leading-relaxed mt-4">
               <strong>Note: </strong>Grailwind is a light-hearted project at
-              version 0.x, so don't expect perfection. Class names may still
-              change.
+              version 0.x. It's far from perfect, but I hope you at least find
+              it fun!
             </p>
           </div>
           <figure
@@ -216,7 +216,43 @@
         <section id="install">
           <h2>Install</h2>
           <p>Grailwind is a plugin for Tailwind CSS v4.</p>
-          <pre>npm install -D grailwind</pre>
+          <div class="relative max-w-prose">
+            <pre class="pr-12">npm install -D grailwind</pre>
+            <button
+              type="button"
+              class="copy group cursor-pointer absolute right-1 top-1/2 -translate-y-1/2 p-2 text-sable/60 hover:text-gules"
+              aria-label="Copy to clipboard"
+            >
+              <svg
+                class="size-4 group-data-copied:hidden"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="9" y="9" width="12" height="12" rx="2" />
+                <path
+                  d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"
+                />
+              </svg>
+              <svg
+                class="size-4 hidden group-data-copied:block text-vert"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12l5 5L20 7" />
+              </svg>
+              <span class="sr-only" aria-live="polite"></span>
+            </button>
+          </div>
           <p class="mt-4">Import it after Tailwind in your stylesheet:</p>
           <pre data-lang="css">
 @import "tailwindcss";
@@ -925,7 +961,11 @@
               <li><code>in-sinister-base</code> sinister base</li>
             </ol>
           </div>
-          <div class="examples mt-12">
+          <p>
+            Points work alongside ordinaries and other charges. With a chief on
+            the shield, the three chief points sit on the chief.
+          </p>
+          <div class="examples">
             <figure
               data-blazon="Gules, a fess Argent, in dexter chief a mullet Or"
             >
@@ -1048,8 +1088,10 @@
         <section id="together">
           <h2>All together</h2>
           <p>
-            A divided field, an ordinary, a chief, a bordure, and charges on,
-            between and in chief.
+            There is still plenty that Grailwind can't do, and it'll almost
+            certainly never do everything! All the same, I hope you have fun
+            playing around with it. Below are some more complex examples to
+            stoke the imagination.
           </p>
           <figure
             class="my-12"
@@ -1228,6 +1270,27 @@
 
       for (const pre of document.querySelectorAll("pre[data-lang]")) {
         highlight(pre, pre.dataset.lang);
+      }
+
+      // Copy buttons copy the code block beside them.
+      for (const button of document.querySelectorAll("button.copy")) {
+        const status = button.querySelector("[aria-live]");
+        let timer;
+        button.addEventListener("click", async () => {
+          const code = button.parentElement.querySelector("pre").textContent;
+          try {
+            await navigator.clipboard.writeText(code);
+          } catch {
+            return;
+          }
+          button.dataset.copied = "";
+          status.textContent = "Copied";
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            delete button.dataset.copied;
+            status.textContent = "";
+          }, 2000);
+        });
       }
 
       // Mobile menu: the same links as the sidebar, in a panel under the header.
