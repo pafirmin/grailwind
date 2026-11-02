@@ -50,6 +50,10 @@ const charged = (shield, charges, size, points, why) =>
     expect: "or",
     why: points.length > 1 ? `${why}, charge ${i + 1}` : why,
   }));
+// A fur's tile, as % of the shield: 6 across, and 5:6 like the shield, so the same % down.
+const FUR_TILE = 100 / 6;
+const furSpot = (k, j) => [FUR_TILE * (k + 0.25), FUR_TILE * (j + 0.25) + FUR_TILE / 10];
+const furGround = (k, j) => [FUR_TILE * (k + 0.75), FUR_TILE * (j + 0.25)];
 const gap = (shield, charges, n) => ({ shield, charges, items: bezants(n), expect: "azure" });
 const atPoint = (name, at) => [
   {
@@ -163,6 +167,39 @@ const PROBES = [
 
   { shield: "per-pale-or-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: [30, 45], expect: "gules", why: "a counterchanged charge on the or half" },
   { shield: "per-pale-or-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: [70, 45], expect: "or", why: "a counterchanged charge on the gules half" },
+
+  // Fur spots on the field, from furs.js: tiles 6 across, so spots sit at (T/4 + kT, T/4 + jT) and
+  // (3T/4 + kT, 3T/4 + jT), where T is a tile. furSpot is a spot's body, a tenth of a tile below its
+  // centre; furGround is empty ground between spots.
+  { shield: "ermine", at: furSpot(1, 1), expect: "sable", why: "an ermine spot" },
+  { shield: "ermine", at: furGround(1, 1), expect: "argent", why: "the ermine ground" },
+  { shield: "ermines", at: furSpot(1, 1), expect: "argent", why: "an ermines spot" },
+  { shield: "ermines", at: furGround(1, 1), expect: "sable", why: "the ermines ground" },
+  { shield: "erminois", at: furSpot(1, 1), expect: "sable", why: "an erminois spot" },
+  { shield: "erminois", at: furGround(1, 1), expect: "or", why: "the erminois ground" },
+  { shield: "pean", at: furSpot(1, 1), expect: "or", why: "a pean spot" },
+  { shield: "pean", at: furGround(1, 1), expect: "sable", why: "the pean ground" },
+
+  // A charge is two tiles across, centred, so a spot sits at its centre.
+  { shield: "gules", charges: "", items: ["mullet ermine"], at: [50, 47.5], expect: "sable", why: "a spot at the charge's centre" },
+  { shield: "gules", charges: "", items: ["mullet ermine"], at: [50, 39.17], expect: "argent", why: "the fur's ground in the mullet" },
+  { shield: "gules", charges: "", items: ["mullet ermine"], at: [27, 27], expect: "gules", why: "the field outside the mullet" },
+
+  { shield: "per-pale-ermine-gules", at: furSpot(1, 1), expect: "sable", why: "a spot on the ermine half" },
+  { shield: "per-pale-ermine-gules", at: furSpot(4, 1), expect: "gules", why: "no spot on the gules half" },
+  { shield: "quarterly-ermine-azure", at: furSpot(1, 1), expect: "sable", why: "a spot in quarter 1" },
+  { shield: "quarterly-ermine-azure", at: furGround(1, 1), expect: "argent", why: "the ground in quarter 1" },
+  { shield: "quarterly-ermine-azure", at: furSpot(4, 1), expect: "azure", why: "quarter 2 is azure" },
+  { shield: "quarterly-ermine-azure", at: furSpot(1, 4), expect: "azure", why: "quarter 3 is azure" },
+  { shield: "quarterly-ermine-azure", at: furSpot(4, 4), expect: "sable", why: "a spot in quarter 4" },
+  { shield: "gyronny-gules-ermine", at: [45, 5], expect: "gules", why: "the first gyron" },
+  { shield: "gyronny-gules-ermine", at: furSpot(0, 2), expect: "sable", why: "a spot in the second gyron" },
+  { shield: "gyronny-gules-ermine", at: furGround(0, 2), expect: "argent", why: "the ground in the second gyron" },
+
+  { shield: "per-pale-ermine-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: [30, 45], expect: "gules", why: "a counterchanged charge on the ermine half" },
+  { shield: "per-pale-ermine-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: furSpot(4, 2), expect: "sable", why: "a counterchanged charge on the gules half, on the field's spot grid" },
+  { shield: "per-pale-ermine-gules fess-counterchanged", at: [25, 45], expect: "gules", why: "a counterchanged fess on the ermine half" },
+  { shield: "per-pale-ermine-gules fess-counterchanged", at: furSpot(4, 2), expect: "sable", why: "a counterchanged fess on the gules half, on the field's spot grid" },
 ];
 
 const LINES = ["", "-engrailed", "-invected"];

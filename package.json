@@ -43,6 +43,7 @@
     "divisions.js",
     "ordinaries.js",
     "charges.js",
+    "furs.js",
     "strict.css",
     "palette-reset.css",
     "CHANGELOG.md"

@@ -30,6 +30,13 @@ const CLASSES = [
   "fess-engrailed-or",
   "chief-invected-azure",
   "chevron-engrailed-or",
+  "ermine",
+  "ermines",
+  "erminois",
+  "pean",
+  "per-pale-ermine-gules",
+  "quarterly-azure-ermine",
+  "per-pale-ermine-ermines",
 ];
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -81,11 +88,23 @@ const PATTERNS = {
     /\.chief-invected-azure \{[^}]*&::after \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\([^;]*line to 100% 30%, arc to [^;]* cw,/,
   "chevron-engrailed-or peaks where its arcs cross":
     /\.chevron-engrailed-or \{[^}]*&::before \{[^}]*clip-path: shape\(from 50% (?!25%)[\d.]+%,/,
+  "ermine has an argent ground and sable spots":
+    /\.ermine \{[^}]*background-color: var\(--color-argent\);[^}]*background-image: url\("data:image\/svg\+xml,[^"]*%23141414/,
+  "pean has or spots":
+    /\.pean \{[^}]*background-color: var\(--color-sable\);[^}]*background-image: url\("data:image\/svg\+xml,[^"]*%23f5c518/,
+  "a fur on a charge is two tiles across, centred":
+    /\.ermine \{[^]*?\.charges > & \{\s*background-size: 50% auto;\s*background-position: center;/,
+  "a fur division leaves the fur's half transparent":
+    /\.per-pale-ermine-gules \{[^}]*background-image: linear-gradient\(to right, transparent 50%, var\(--color-gules\) 50%\), url\("data:/,
+  "fur quarterly doesn't overlap":
+    /\.quarterly-azure-ermine \{[^}]*background-size: 100% 45%, 100% calc\(100% - 45%\), calc\(100% \/ 6\) auto, 100% 100%;/,
+  "a fur division counterchanges":
+    /\.per-pale-ermine-gules \{[^}]*--counterchange-image: linear-gradient\(to right, var\(--color-gules\) 50%, transparent 50%\), url\("data:/,
 };
 
 const EXPECTED = {
-  "grailwind.css": { "bg-blue-500": true },
-  "strict.css": { "bg-blue-500": false },
+  "grailwind.css": { "bg-blue-500": true, "per-pale-ermine-ermines": false },
+  "strict.css": { "bg-blue-500": false, "per-pale-ermine-ermines": false },
 };
 
 writeFileSync(
@@ -93,12 +112,12 @@ writeFileSync(
   `<div class="${CLASSES.join(" ")} bend-or on counterchanged in-bend-sinister"></div>`,
 );
 
-const build = (entry) => {
+const build = (entry, { css = "", source = "index.html" } = {}) => {
   const input = join(dir, "input.css");
   const output = join(dir, "output.css");
   writeFileSync(
     input,
-    `@import "tailwindcss" source(none);\n@source "./index.html";\n@import "${join(root, entry)}";\n`,
+    `@import "tailwindcss" source(none);\n@source "./${source}";\n@import "${join(root, entry)}";\n${css}`,
   );
   execFileSync(cli, ["-i", input, "-o", output], { stdio: "pipe" });
   return readFileSync(output, "utf8");
@@ -126,6 +145,25 @@ try {
     }
     console.log(`${failures > before ? "✗" : "✓"} ${entry}`);
   }
+
+  // Fur spots are baked in at build time, so a re-themed tincture must reach them.
+  const themed = build("grailwind.css", { css: "@theme { --color-sable: #00ff00; }\n" });
+  const furChecks = {
+    "a re-themed sable reaches ermine's spots": /\.ermine \{[^}]*%2300ff00/.test(themed),
+    "and a fur division's": /\.per-pale-ermine-gules \{[^}]*%2300ff00/.test(themed),
+  };
+  // Tailwind only emits the theme variables that generated CSS uses.
+  writeFileSync(join(dir, "erminois.html"), `<div class="escutcheon erminois"></div>`);
+  furChecks["a fur alone still defines its ground's colour"] = /--color-or: #f5c518;/.test(
+    build("grailwind.css", { source: "erminois.html" }),
+  );
+  for (const [name, ok] of Object.entries(furChecks)) {
+    if (!ok) {
+      failures++;
+      console.error(`✗ furs: ${name}`);
+    }
+  }
+  console.log(`${Object.values(furChecks).every(Boolean) ? "✓" : "✗"} furs and the theme`);
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

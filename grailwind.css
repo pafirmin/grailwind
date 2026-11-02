@@ -12,6 +12,7 @@
 @plugin "./divisions.js";
 @plugin "./ordinaries.js";
 @plugin "./charges.js";
+@plugin "./furs.js";
 
 @property --fimbriated {
   syntax: "*";
@@ -60,6 +61,9 @@
 
 /* ---------------------------------------------------------------------------
  * Bare tinctures
+ *
+ * The furs (`ermine` and the like) are in furs.js, as they need the theme's
+ * colours at build time.
  * ------------------------------------------------------------------------- */
 @utility or {
   background-color: var(--color-or);

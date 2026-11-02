@@ -2,6 +2,7 @@
  * Grailwind CSS: field divisions as decoration.
  */
 import plugin from "tailwindcss/plugin";
+import { FURS, furLayers } from "./furs.js";
 
 const TINCTURES = ["or", "argent", "gules", "azure", "vert", "purpure", "sable"];
 
@@ -27,10 +28,11 @@ const DIVISIONS = {
 
   // Quarters 1 and 4 (dexter chief, sinister base) are the first tincture.
   // Linear gradients rather than conic, which render jagged edges in some browsers.
-  quarterly: (a, b) => ({
+  // With a fur, the bands can't overlap, or the fur's transparent half shows the band below.
+  quarterly: (a, b, fur) => ({
     "background-image": `linear-gradient(to right, ${a} 50%, ${b} 50%), linear-gradient(to right, ${b} 50%, ${a} 50%)`,
-    "background-size": `100% ${FESS_POINT}, 100% 100%`,
-    "background-position": "top, top",
+    "background-size": `100% ${FESS_POINT}, 100% ${fur ? `calc(100% - ${FESS_POINT})` : "100%"}`,
+    "background-position": fur ? "top, bottom" : "top, top",
     "background-repeat": "no-repeat",
   }),
 
@@ -51,6 +53,38 @@ const DIVISIONS = {
   }),
 };
 
+// A division's background rules as one { image, size, position, repeat } per layer.
+const toLayers = (rules) => {
+  return rules["background-image"].split(/, (?=linear-gradient)/).map((gradient, i) => {
+    const size = (rules["background-size"] ?? "100% 100%").split(", ");
+    const position = (rules["background-position"] ?? "0 0").split(", ");
+    const repeat = (rules["background-repeat"] ?? "no-repeat").split(", ");
+
+    return {
+      image: gradient,
+      size: size[i % size.length],
+      position: position[i % position.length],
+      repeat: repeat[i % repeat.length],
+    };
+  });
+};
+
+// A division with one fur: the fur's part is left transparent, over the fur's own layers.
+const withFur = (division, first, second, theme) => {
+  const fur = FURS[first] ? first : second;
+  const paint = (t) => (t === fur ? "transparent" : `var(--color-${t})`);
+  const all = [
+    ...toLayers(DIVISIONS[division](paint(first), paint(second), true)),
+    ...furLayers(fur, theme),
+  ];
+  return Object.fromEntries(
+    ["image", "size", "position", "repeat"].map((p) => [
+      `background-${p}`,
+      all.map((layer) => layer[p]).join(", "),
+    ]),
+  );
+};
+
 // The field with its tinctures swapped, for counterchanged ordinaries to paint.
 const counterchange = (rules) =>
   Object.fromEntries(
@@ -60,7 +94,7 @@ const counterchange = (rules) =>
     ]),
   );
 
-export default plugin(({ addUtilities }) => {
+export default plugin(({ addUtilities, theme }) => {
   const utilities = {};
 
   for (const [division, background] of Object.entries(DIVISIONS)) {
@@ -74,6 +108,23 @@ export default plugin(({ addUtilities }) => {
           ...background(a, b),
           ...counterchange(background(b, a)),
         };
+      }
+    }
+  }
+
+  // One fur and one tincture; two furs can't each be kept to their own part.
+  for (const division of Object.keys(DIVISIONS)) {
+    for (const fur of Object.keys(FURS)) {
+      for (const tincture of TINCTURES) {
+        for (const [first, second] of [
+          [fur, tincture],
+          [tincture, fur],
+        ]) {
+          utilities[`.${division}-${first}-${second}`] = {
+            ...withFur(division, first, second, theme),
+            ...counterchange(withFur(division, second, first, theme)),
+          };
+        }
       }
     }
   }

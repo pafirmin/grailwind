@@ -13,6 +13,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Engrailed and invected ordinaries, e.g. `fess-engrailed-or` and
   `chief-invected-azure`. Browsers without `clip-path: shape()` draw them with
   straight edges.
+- Furs: `ermine`, `ermines`, `erminois` and `pean`, on the field, on a charge,
+  or in a division (`per-pale-ermine-gules`).
 
 ### Fixed
 
