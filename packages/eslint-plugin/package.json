@@ -1,6 +1,6 @@
 {
   "name": "@grailwind/eslint-plugin",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.0",
   "description": "ESLint rules for Grailwind heraldry markup: the rule of tincture and charge structure",
   "type": "module",
   "main": "./src/index.js",
@@ -26,7 +26,7 @@
   "peerDependencies": {
     "@html-eslint/parser": "*",
     "eslint": "^9.0.0 || ^10.0.0",
-    "grailwind": ">=0.4.0"
+    "grailwind": "^0.4.0"
   },
   "peerDependenciesMeta": {
     "@html-eslint/parser": {

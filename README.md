@@ -63,11 +63,41 @@ tinctures replace Tailwind's colours entirely.
   with `charge-size-*`, and `counterchanged` on a divided field.
 - **Your own charges:** any SVG, via `charge-[url(…)]`.
 
+## Linting
+
+For typos and clashing classes, use
+[`eslint-plugin-better-tailwindcss`](https://github.com/schoero/eslint-plugin-better-tailwindcss).
+It reads Grailwind's classes from your CSS entry file, so it flags `fess-ore` or
+`per-pale-or-or`, and catches two classes fighting over the same thing, such as
+`bend-sable bend-or`:
+
+```js
+// eslint.config.js
+import betterTailwindcss from "eslint-plugin-better-tailwindcss";
+
+export default [
+  {
+    plugins: { "better-tailwindcss": betterTailwindcss },
+    settings: { "better-tailwindcss": { entryPoint: "src/app.css" } },
+    rules: {
+      "better-tailwindcss/no-unknown-classes": "error",
+      "better-tailwindcss/no-conflicting-classes": "error",
+    },
+  },
+];
+```
+
+For the heraldry itself, such as the rule of tincture and charges outside a `charges`
+container, there is [`@grailwind/eslint-plugin`](packages/eslint-plugin) (beta).
+
+The plugin reads names from `grailwind/data`. That export is **experimental**: it's there for
+Grailwind's own tooling, and its shape may change in any minor release.
+
 ## Development
 
 ```sh
 npm install
-npm test            # checks both the default and strict builds
+npm test            # checks the default and strict builds, and the ESLint plugin
 npm run test:render # renders shields in Chromium and Firefox and checks their colours;
                     # run `npx playwright install chromium firefox` first
 npm run format      # formats with Prettier; CI runs format:check

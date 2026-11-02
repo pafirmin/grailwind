@@ -35,12 +35,22 @@ jobs:
           esac
       - name: Check tag matches package.json
         run: |
-          version="$TAG_PREFIX$(node -p "require('./$PACKAGE_DIR/package.json').version")"
-          if [ "$version" != "$GITHUB_REF_NAME" ]; then
-            echo "Tag $GITHUB_REF_NAME does not match $PACKAGE_DIR/package.json $version"
+          version="$(node -p "require('./$PACKAGE_DIR/package.json').version")"
+          if [ "$TAG_PREFIX$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match $PACKAGE_DIR/package.json $TAG_PREFIX$version"
             exit 1
           fi
+          # A prerelease such as 0.1.0-beta.0 goes to its own dist-tag (beta), not latest.
+          case "$version" in
+            *-*)
+              prerelease="${version#*-}"
+              echo "NPM_TAG=${prerelease%%.*}" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "NPM_TAG=latest" >> "$GITHUB_ENV"
+              ;;
+          esac
       - run: npm ci
       - run: npm test
-      - run: npm stage publish
+      - run: npm stage publish --tag "$NPM_TAG"
         working-directory: ${{ env.PACKAGE_DIR }}
