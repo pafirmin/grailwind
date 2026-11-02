@@ -5,6 +5,7 @@
     "build": "tailwindcss -i docs/app.css -o docs/site.css",
     "dev": "tailwindcss -i docs/app.css -o docs/site.css --watch",
     "test": "node test/modes.mjs",
+    "test:render": "node test/render.mjs",
     "dev:watch": "tailwindcss -i docs/app.css -o docs/site.css --watch=always & python3 -m http.server ${PORT:-8000} -d docs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -21,6 +22,7 @@
   "description": "Heraldic blazon for Tailwind CSS: tinctures, divisions, ordinaries and charges",
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
+    "playwright": "~1.64.1",
     "prettier": "^3.9.10",
     "tailwindcss": "^4.3.3"
   },

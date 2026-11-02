@@ -67,6 +67,8 @@ tinctures replace Tailwind's colours entirely.
 ```sh
 npm install
 npm test            # checks both the default and strict builds
+npm run test:render # renders shields in Chromium and Firefox and checks their colours;
+                    # run `npx playwright install chromium firefox` first
 npm run format      # formats with Prettier; CI runs format:check
 npm run dev:watch   # rebuilds the docs site on change and serves it at http://localhost:8000
 ```
