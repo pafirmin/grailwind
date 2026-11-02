@@ -23,8 +23,48 @@ const ORDINARIES = [
 ];
 const WIDTH = 300;
 
+const bezants = (n) => Array.from({ length: n }, () => "bezant");
+
+// A charge's centre, plus four points at 0.8 of its radius, so that a charge moved by more than
+// a fifth of its radius leaves one of them uncovered. A roundel's radius is 0.46 of its width.
+const ring = ([x, y], size) => {
+  const r = 0.8 * 0.46 * size;
+  const ry = (r * 5) / 6;
+  return [
+    [x, y],
+    [x - r, y],
+    [x + r, y],
+    [x, y - ry],
+    [x, y + ry],
+  ];
+};
+
+// One probe per charge; `charges` is the container's classes besides `charges`, and `size` the
+// charge width as % of the shield's.
+const charged = (shield, charges, size, points, why) =>
+  points.map((point, i) => ({
+    shield,
+    charges,
+    items: bezants(points.length),
+    at: ring(point, size),
+    expect: "or",
+    why: points.length > 1 ? `${why}, charge ${i + 1}` : why,
+  }));
+const gap = (shield, charges, n) => ({ shield, charges, items: bezants(n), expect: "azure" });
+const atPoint = (name, at) => [
+  {
+    shield: "azure",
+    charges: "",
+    items: [`bezant in-${name}`],
+    at: ring(at, 22),
+    expect: "or",
+    why: `in ${name}`,
+  },
+];
+
 // `at` is [x%, y%] of the shield. Bite and bulge points are at the middle scallop of an inner
-// edge, half the scallop's depth from the straight edge.
+// edge, half the scallop's depth from the straight edge. Charges are bezants, whose centres
+// sit at the points in charges.js and the ordinaries' `between`/`on` tables.
 // prettier-ignore
 const PROBES = [
   { shield: "azure pale-or", at: [50, 30], expect: "or", why: "the pale is drawn" },
@@ -66,11 +106,72 @@ const PROBES = [
   { shield: "gules cross-azure fimbriated-argent", at: [50, 45], expect: "azure", why: "the fimbriated cross itself" },
   { shield: "per-pale-or-gules chevron-counterchanged", at: [25, 60], expect: "gules", why: "the counterchanged chevron's dexter half" },
   { shield: "per-pale-or-gules chevron-counterchanged", at: [75, 60], expect: "or", why: "the counterchanged chevron's sinister half" },
+
+  ...charged("azure", "", 50, [[50, 45]], "one charge"),
+  ...charged("azure", "", 30, [[50, 24], [50, 66]], "two charges"),
+  ...charged("azure", "", 28, [[28, 25], [72, 25], [50, 64]], "three charges, 2 and 1"),
+  ...charged("azure", "", 24, [[30, 24], [70, 24], [32, 60], [68, 60]], "four charges"),
+  ...charged("azure", "", 20, [[20, 18], [50, 18], [80, 18], [35, 42], [65, 42], [50, 66]], "six charges"),
+  { ...gap("azure", "", 3), at: [50, 25], why: "three charges: a gap between the top two" },
+
+  ...charged("azure", "in-pale", 30, [[50, 24], [50, 66]], "two in pale"),
+  ...charged("azure", "in-pale", 22, [[50, 16], [50, 43], [50, 70]], "three in pale"),
+  ...charged("azure", "in-fess", 30, [[30, 45], [70, 45]], "two in fess"),
+  ...charged("azure", "in-fess", 24, [[22, 45], [50, 45], [78, 45]], "three in fess"),
+  { ...gap("azure", "in-fess", 3), at: [36, 45], why: "three in fess: a gap between the first two" },
+  ...charged("azure", "in-bend", 28, [[30, 26], [70, 64]], "two in bend"),
+  ...charged("azure", "in-bend", 22, [[22, 16], [50, 45], [78, 74]], "three in bend"),
+  ...charged("azure", "in-bend-sinister", 28, [[70, 26], [30, 64]], "two in bend sinister"),
+  ...charged("azure", "in-bend-sinister", 22, [[78, 16], [50, 45], [22, 74]], "three in bend sinister"),
+
+  ...atPoint("dexter-chief", [25, 17]),
+  ...atPoint("chief", [50, 15]),
+  ...atPoint("sinister-chief", [75, 17]),
+  ...atPoint("honour-point", [50, 30]),
+  ...atPoint("fess-point", [50, 45]),
+  ...atPoint("nombril-point", [50, 60]),
+  ...atPoint("dexter-base", [30, 72]),
+  ...atPoint("base", [50, 84]),
+  ...atPoint("sinister-base", [70, 72]),
+
+  { shield: "azure chief-gules", charges: "", items: ["bezant in-chief"], at: ring([50, 15], 18), expect: "or", why: "a charge in chief sits on the chief" },
+  { shield: "azure chief-gules", charges: "", items: ["bezant in-fess-point"], at: ring([50, 61.5], 22), expect: "or", why: "the fess point moves below a chief" },
+  { shield: "azure chief-gules", charges: "", items: ["bezant in-fess-point"], at: [50, 45], expect: "azure", why: "nothing left at the old fess point" },
+  ...charged("azure chief-gules", "", 28, [[28, 47.5], [72, 47.5], [50, 74.8]], "three charges below a chief"),
+
+  ...charged("azure pale-gules", "between", 18, [[18, 42], [82, 42]], "between a pale"),
+  ...charged("azure fess-gules", "between", 20, [[30, 15], [70, 15], [50, 78]], "between a fess"),
+  ...charged("azure bend-gules", "between", 24, [[70, 26], [30, 68]], "between a bend"),
+  ...charged("azure bend-sinister-gules", "between", 24, [[30, 26], [70, 68]], "between a bend sinister"),
+  ...charged("azure chevron-gules", "between", 22, [[24, 22], [76, 22], [50, 70]], "between a chevron"),
+  ...charged("azure cross-gules", "between", 18, [[20, 17], [80, 17], [24, 72], [76, 72]], "between a cross"),
+  ...charged("azure saltire-gules", "between", 16, [[50, 13], [14, 50], [86, 50], [50, 84]], "between a saltire"),
+  ...charged("azure pall-gules", "between", 18, [[50, 11], [18, 56], [82, 56]], "between a pall"),
+
+  ...charged("azure pale-gules", "on", 20, [[50, 18], [50, 45], [50, 72]], "on a pale"),
+  ...charged("azure fess-gules", "on", 22, [[20, 45], [50, 45], [80, 45]], "on a fess"),
+  ...charged("azure bend-gules", "on", 18, [[24, 24], [50, 50], [76, 76]], "on a bend"),
+  ...charged("azure bend-sinister-gules", "on", 18, [[76, 24], [50, 50], [24, 76]], "on a bend sinister"),
+  ...charged("azure chevron-gules", "on", 12, [[20, 65], [50, 36], [80, 65]], "on a chevron"),
+  ...charged("azure cross-gules", "on", 15, [[50, 15], [18, 45], [50, 45], [82, 45], [50, 80]], "on a cross"),
+  ...charged("azure saltire-gules", "on", 14, [[22, 22], [78, 22], [50, 50], [22, 78], [78, 78]], "on a saltire"),
+  ...charged("azure pall-gules", "on", 14, [[22, 22], [78, 22], [50, 75]], "on a pall"),
+
+  { shield: "azure", charges: "", items: ["bezant"], at: [68, 45], expect: "or", why: "one charge is half the shield wide" },
+  { shield: "azure", charges: "charge-size-20", items: ["bezant"], at: [68, 45], expect: "azure", why: "charge-size-20 shrinks it" },
+  ...charged("azure", "charge-size-20", 20, [[50, 45]], "a resized charge"),
+
+  { shield: "per-pale-or-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: [30, 45], expect: "gules", why: "a counterchanged charge on the or half" },
+  { shield: "per-pale-or-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: [70, 45], expect: "or", why: "a counterchanged charge on the gules half" },
 ];
 
 const LINES = ["", "-engrailed", "-invected"];
-const CONTACT = ORDINARIES.flatMap((o) => LINES.map((line) => `azure ${o}${line}-or`));
-const SHIELDS = [...new Set(PROBES.map((p) => p.shield))];
+const CONTACT = ORDINARIES.flatMap((o) =>
+  LINES.map((line) => ({ shield: `azure ${o}${line}-or` })),
+);
+const key = ({ shield, charges, items }) => `${shield}|${charges}|${items}`;
+const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
+const CHARGED = SHIELDS.filter((s) => s.items);
 const TINCTURE_MATCH_THRESHOLD = 12;
 
 const isWithinThreshold = (threshold, gotRgb, wantRgb) => {
@@ -87,9 +188,19 @@ const nearest = (rgb, swatches) => {
   return null;
 };
 
+const markup = ({ shield, charges, items }, attrs = "") => {
+  const inner = items
+    ? `<div class="charges ${charges}">${items.map((c) => `<i class="${c}"></i>`).join("")}</div>`
+    : "";
+  return `<div class="escutcheon ${shield}"${attrs}>${inner}</div>`;
+};
+const caption = ({ shield, charges, items }) =>
+  items ? `${shield} · ${charges || "plain"} · ${items.join(", ")}` : shield;
+
 const build = (dir) => {
-  const classes = [...SHIELDS, ...CONTACT, ...TINCTURES, "escutcheon"].join(" ");
-  writeFileSync(join(dir, "index.html"), `<div class="${classes}"></div>`);
+  const specs = [...SHIELDS, ...CONTACT];
+  const classes = [...specs.map((s) => markup(s)), ...TINCTURES.map((t) => `<i class="${t}"></i>`)];
+  writeFileSync(join(dir, "index.html"), classes.join("\n"));
   const input = join(dir, "input.css");
   const output = join(dir, "output.css");
   writeFileSync(
@@ -129,10 +240,13 @@ const pixels = async (page, points) => {
   );
 };
 
+// `at` is one [x, y] point, or a list of them that must all match.
+const spots = (at) => (Array.isArray(at[0]) ? at : [at]);
+
 const probe = async (page, css) => {
   const cells = [
     ...TINCTURES.map((t) => `<div class="swatch ${t}" data-swatch="${t}"></div>`),
-    ...SHIELDS.map((s, i) => `<div class="escutcheon ${s}" data-shield="${i}"></div>`),
+    ...SHIELDS.map((s, i) => markup(s, ` data-shield="${i}"`)),
   ].join("\n");
   await page.setContent(grid(css, WIDTH, cells));
 
@@ -147,26 +261,30 @@ const probe = async (page, css) => {
 
   const points = [
     ...swatchBoxes.map((b) => [Math.round(b.x + b.width / 2), Math.round(b.y + b.height / 2)]),
-    ...PROBES.map(({ shield, at: [x, y] }) => {
-      const box = shieldBoxes[SHIELDS.indexOf(shield)];
-      return [
+    ...PROBES.flatMap((p) => {
+      const box = shieldBoxes[SHIELDS.findIndex((s) => key(s) === key(p))];
+      return spots(p.at).map(([x, y]) => [
         Math.round(box.x + (x * box.width) / 100),
         Math.round(box.y + (y * box.height) / 100),
-      ];
+      ]);
     }),
   ];
   const read = await pixels(page, points);
   const swatches = Object.fromEntries(swatchBoxes.map((b, i) => [b.swatch, read[i]]));
-  return PROBES.map((p, i) => ({ ...p, rgb: read[swatchBoxes.length + i], swatches }));
+  let next = swatchBoxes.length;
+  return PROBES.map((p) => {
+    const rgbs = spots(p.at).map(() => read[next++]);
+    return { ...p, rgbs, swatches };
+  });
 };
 
-const contactSheet = async (page, css, engine) => {
-  const cells = CONTACT.map(
-    (s) => `<figure><div class="escutcheon ${s}"></div><figcaption>${s}</figcaption></figure>`,
-  ).join("\n");
-  await page.setContent(grid(css, 150, cells).replace("repeat(6,", "repeat(9,"));
+const contactSheet = async (page, css, specs, columns, file) => {
+  const cells = specs
+    .map((s) => `<figure>${markup(s)}<figcaption>${caption(s)}</figcaption></figure>`)
+    .join("\n");
+  await page.setContent(grid(css, 150, cells).replace("repeat(6,", `repeat(${columns},`));
   mkdirSync(out, { recursive: true });
-  await page.screenshot({ path: join(out, `contact-${engine}.png`), fullPage: true });
+  await page.screenshot({ path: join(out, file), fullPage: true });
 };
 
 const dir = mkdtempSync(join(root, "test", ".tmp-"));
@@ -179,19 +297,23 @@ try {
     const browser = await engine.launch();
     try {
       const page = await browser.newPage({ deviceScaleFactor: 1 });
-      for (const { shield, at, expect, why, rgb, swatches } of await probe(page, css)) {
-        const got = nearest(rgb, swatches);
-        if (got === expect) {
-          console.log(`✓ ${name}: ${shield}: ${why}`);
+      for (const result of await probe(page, css)) {
+        const { at, expect, why, rgbs, swatches } = result;
+        const miss = spots(at).findIndex((_, i) => nearest(rgbs[i], swatches) !== expect);
+        if (miss === -1) {
+          console.log(`✓ ${name}: ${caption(result)}: ${why}`);
         } else {
           failures++;
-          const seen = got ?? `no tincture near (${rgb.join(", ")})`;
-          console.error(`✗ ${name}: ${shield}: ${why}`);
-          console.error(`    at ${at[0]}% ${at[1]}%: got ${seen}, expected ${expect}`);
+          const [x, y] = spots(at)[miss].map((v) => +v.toFixed(1));
+          const rgb = rgbs[miss];
+          const seen = nearest(rgb, swatches) ?? `no tincture near (${rgb.join(", ")})`;
+          console.error(`✗ ${name}: ${caption(result)}: ${why}`);
+          console.error(`    at ${x}% ${y}%: got ${seen}, expected ${expect}`);
         }
       }
       try {
-        await contactSheet(page, css, name);
+        await contactSheet(page, css, CONTACT, 9, `contact-${name}.png`);
+        await contactSheet(page, css, CHARGED, 8, `charges-${name}.png`);
       } catch (error) {
         console.error(`  (no contact sheet for ${name}: ${error.message})`);
       }
