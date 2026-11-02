@@ -37,3 +37,4 @@ jobs:
         with:
           name: contact-sheets
           path: test/.render/
+          include-hidden-files: true
