@@ -1,6 +1,10 @@
 # @grailwind/eslint-plugin
 
-ESLint rules for [Grailwind](https://pafirmin.github.io/grailwind/) markup in JSX and HTML.
+[![Test](https://github.com/pafirmin/grailwind/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/pafirmin/grailwind/actions/workflows/test.yml)
+[![npm](https://img.shields.io/npm/v/@grailwind/eslint-plugin/beta)](https://www.npmjs.com/package/@grailwind/eslint-plugin)
+[![License: MIT](https://img.shields.io/npm/l/@grailwind/eslint-plugin)](https://github.com/pafirmin/grailwind/blob/main/packages/eslint-plugin/LICENSE)
+
+ESLint rules for [Grailwind](https://grailwind.dev/) markup in JSX and HTML.
 
 > **Beta.** Rules, their options and the `recommended` config may change between releases.
 

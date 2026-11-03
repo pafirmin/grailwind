@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://grailwind.dev/sitemap.xml

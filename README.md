@@ -1,5 +1,10 @@
 # Grailwind CSS
 
+[![Test](https://github.com/pafirmin/grailwind/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/pafirmin/grailwind/actions/workflows/test.yml)
+[![npm](https://img.shields.io/npm/v/grailwind)](https://www.npmjs.com/package/grailwind)
+[![ESLint plugin](https://img.shields.io/npm/v/@grailwind/eslint-plugin/beta?label=eslint-plugin)](https://www.npmjs.com/package/@grailwind/eslint-plugin)
+[![License: MIT](https://img.shields.io/npm/l/grailwind)](https://github.com/pafirmin/grailwind/blob/main/LICENSE)
+
 ![Eight coats of arms drawn with Grailwind: chevrons, quarters, fleurs-de-lis, a saltire, gyronny, a chief, a bend and a bordure](https://grailwind.dev/preview.png)
 
 Heraldic blazon for [Tailwind CSS](https://tailwindcss.com). Draw coats of

@@ -16,7 +16,11 @@
     "tailwind",
     "heraldry",
     "blazon",
-    "css"
+    "css",
+    "coat-of-arms",
+    "coats-of-arms",
+    "tailwindcss-plugin",
+    "eslint"
   ],
   "author": "Paul Firmin",
   "license": "MIT",
