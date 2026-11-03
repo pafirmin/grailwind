@@ -169,6 +169,16 @@ export default plugin(({ addUtilities, matchUtilities }) => {
       "--charge-width": "var(--charge-size, var(--between-size))",
     };
   }
+  // The counts some ordinary overrides in BETWEEN's `counts` (see data.js).
+  for (const count of [2, 6]) {
+    for (let i = 1; i <= count; i++) {
+      between[`&${hasCount(count)} > :nth-child(${i})`] = {
+        left: `var(--between-${count}-${i}-x, var(--between-${i}-x))`,
+        top: `var(--between-${count}-${i}-y, var(--between-${i}-y))`,
+        "--charge-width": `var(--charge-size, var(--between-${count}-size, var(--between-size)))`,
+      };
+    }
+  }
   utilities[".between"] = between;
 
   // Falls back to the plain-field default when the ordinary has no points for this count.

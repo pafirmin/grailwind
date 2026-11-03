@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Six charges `between` a fess, bend, bend sinister, chevron or pale.
+
+### Fixed
+
+- Two charges `between` a fess, saltire or pall are placed one each side.
+
 ## [0.4.0] - 2026-11-03
 
 ### Added

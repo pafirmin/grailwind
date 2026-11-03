@@ -276,12 +276,21 @@ const shape = (vertices, line, scallop) => {
   return `shape(from ${at(start)}, ${commands.join(", ")}, close)`;
 };
 
-const betweenVars = ({ size, points }) => {
+const betweenVars = ({ size, points, counts = {} }) => {
   const vars = { "--between-size": `${size}%` };
   points.forEach(([left, top], i) => {
     vars[`--between-${i + 1}-x`] = `${left}%`;
     vars[`--between-${i + 1}-y`] = `${top}%`;
   });
+  for (const [count, override] of Object.entries(counts)) {
+    if (override.size !== undefined) {
+      vars[`--between-${count}-size`] = `${override.size}%`;
+    }
+    override.points.forEach(([left, top], i) => {
+      vars[`--between-${count}-${i + 1}-x`] = `${left}%`;
+      vars[`--between-${count}-${i + 1}-y`] = `${top}%`;
+    });
+  }
   return vars;
 };
 

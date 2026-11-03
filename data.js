@@ -74,16 +74,25 @@ export const POINTS = {
 export const ARRANGEMENTS = ["in-pale", "in-fess", "in-bend", "in-bend-sinister"];
 
 // Where charges go for "between", as [left%, top%], plus their size as % of width.
+// `counts` overrides the points (and optionally the size) for one number of charges.
 // prettier-ignore
 export const BETWEEN = {
-  pale: { size: 18, points: [[18, 42], [82, 42]] },
-  fess: { size: 20, points: [[30, 15], [70, 15], [50, 78]] },
-  bend: { size: 24, points: [[70, 26], [30, 68]] },
-  "bend-sinister": { size: 24, points: [[30, 26], [70, 68]] },
-  chevron: { size: 22, points: [[24, 22], [76, 22], [50, 70]] },
+  pale: { size: 18, points: [[18, 42], [82, 42]], counts: {
+    6: { size: 14, points: [[18, 18], [18, 45], [18, 70], [82, 18], [82, 45], [82, 70]] } } },
+  fess: { size: 20, points: [[30, 15], [70, 15], [50, 78]], counts: {
+    2: { points: [[50, 15], [50, 78]] },
+    6: { size: 14, points: [[20, 14], [50, 14], [80, 14], [32, 70], [68, 70], [50, 86]] } } },
+  bend: { size: 24, points: [[70, 26], [30, 68]], counts: {
+    6: { size: 14, points: [[48, 9], [76, 12], [84, 38], [9, 48], [18, 72], [38, 84]] } } },
+  "bend-sinister": { size: 24, points: [[30, 26], [70, 68]], counts: {
+    6: { size: 14, points: [[52, 9], [24, 12], [16, 38], [91, 48], [82, 72], [62, 84]] } } },
+  chevron: { size: 22, points: [[24, 22], [76, 22], [50, 70]], counts: {
+    6: { size: 12, points: [[18, 14], [50, 11], [82, 14], [38, 66], [62, 66], [50, 84]] } } },
   cross: { size: 18, points: [[20, 17], [80, 17], [24, 72], [76, 72]] },
-  saltire: { size: 16, points: [[50, 13], [14, 50], [86, 50], [50, 84]] },
-  pall: { size: 18, points: [[50, 11], [18, 56], [82, 56]] },
+  saltire: { size: 16, points: [[50, 13], [14, 50], [86, 50], [50, 84]], counts: {
+    2: { points: [[14, 50], [86, 50]] } } },
+  pall: { size: 18, points: [[50, 11], [18, 56], [82, 56]], counts: {
+    2: { points: [[18, 56], [82, 56]] } } },
 };
 
 // Where charges go for "on", along the ordinary's centre line, by number of charges.

@@ -62,6 +62,12 @@ const PATTERNS = {
     /\.on:has\( > :nth-child\(5\):last-child\) > :nth-child\(1\) \{\s*left: var\(--on-5-1-x, 27%\);/,
   "five charges default to 2, 1, 2":
     /\.charges \{[^]*?&:where\(:has\( > :nth-child\(5\):last-child\)\) > :where\(:nth-child\(3\)\) \{\s*left: 50%;\s*top: 42%;/,
+  "fess-or publishes between points by count": /\.fess-or \{[^}]*--between-2-1-x: 50%;/,
+  "fess-or publishes a size for six between": /\.fess-or \{[^}]*--between-6-size: 14%;/,
+  "two between read their count, then fall back by index":
+    /\.between:has\( > :nth-child\(2\):last-child\) > :nth-child\(1\) \{\s*left: var\(--between-2-1-x, var\(--between-1-x\)\);/,
+  "six between take their count's size":
+    /\.between:has\( > :nth-child\(6\):last-child\) > :nth-child\(6\) \{[^}]*--charge-width: var\(--charge-size, var\(--between-6-size, var\(--between-size\)\)\);/,
   "fimbriated-argent sets the fimbriation":
     /\.fimbriated-argent \{\s*--fimbriated: 1;\s*--fimbriation: var\(--color-argent\);/,
   "fimbriation vars don't inherit":
@@ -152,7 +158,7 @@ const DATA_CLASSES = [
 
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on counterchanged in-bend-sinister"></div>`,
+  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister"></div>`,
 );
 
 const build = (entry, { css = "", source = "index.html" } = {}) => {
