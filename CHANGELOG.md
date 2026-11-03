@@ -9,6 +9,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Six charges `between` a fess, bend, bend sinister, chevron or pale.
+- `inescutcheon`: a small shield at the centre of the arms, over everything
+  else, with its own field, ordinaries and charges. A bordure on it is a third
+  as wide.
 
 ### Fixed
 

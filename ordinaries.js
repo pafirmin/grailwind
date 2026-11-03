@@ -305,7 +305,31 @@ const onVars = ({ size, counts }) => {
   return vars;
 };
 
-export default plugin(({ addUtilities, theme }) => {
+// Every layout var an ordinary sets on its shield, for an inescutcheon to reset.
+const layoutVars = () => {
+  const allVars = [];
+
+  for (const division of Object.values(BETWEEN)) {
+    const vars = betweenVars(division);
+    allVars.push(...Object.keys(vars));
+  }
+
+  for (const division of Object.values(ON)) {
+    const vars = onVars(division);
+    allVars.push(...Object.keys(vars));
+  }
+
+  const chiefVars = ["--field-top", "--chief-points-y", "--chief-points-size"];
+  allVars.push(...chiefVars);
+
+  return [...new Set(allVars)];
+};
+
+export default plugin(({ addBase, addUtilities, theme }) => {
+  // Unset on an inescutcheon, so it can't inherit its shield's layout. In the base layer, so an
+  // ordinary on the inescutcheon itself still sets its own.
+  addBase({ ".inescutcheon": Object.fromEntries(layoutVars().map((name) => [name, "initial"])) });
+
   const utilities = {};
 
   for (const tincture of TINCTURES) {

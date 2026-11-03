@@ -55,6 +55,18 @@ const FUR_TILE = 100 / 6;
 const furSpot = (k, j) => [FUR_TILE * (k + 0.25), FUR_TILE * (j + 0.25) + FUR_TILE / 10];
 const furGround = (k, j) => [FUR_TILE * (k + 0.75), FUR_TILE * (j + 0.25)];
 const gap = (shield, charges, n) => ({ shield, charges, items: bezants(n), expect: "azure" });
+// An inescutcheon is a third of the shield with its top left at (33.5%, 28.5%), from grailwind.css.
+const INNER = 0.33;
+const onInner = ([x, y]) => [33.5 + INNER * x, 28.5 + INNER * y];
+// Like `charged`, for bezants on an inescutcheon `inner`; points and size are the inescutcheon's.
+const nested = (shield, inner, size, points, why) =>
+  points.map((point, i) => ({
+    shield,
+    inner: { ...inner, items: inner.items ?? bezants(points.length) },
+    at: ring(onInner(point), size * INNER),
+    expect: "or",
+    why: points.length > 1 ? `${why}, charge ${i + 1}` : why,
+  }));
 const atPoint = (name, at) => [
   {
     shield: "azure",
@@ -212,15 +224,40 @@ const PROBES = [
   { shield: "azure fimbriated-gules fess-ermine", at: [50, 29], expect: "azure", why: "a fur fess isn't fimbriated" },
   ...charged("azure fess-ermine", "on", 22, [[20, 45], [50, 45], [80, 45]], "on a fess ermine"),
   ...charged("azure fess-gules", "on", 22, [[27, 20], [73, 20], [50, 42], [32, 64], [68, 64]], "five on a fess fall back to the default"),
+
+  // Inescutcheon: `at` is still on the outer shield; onInner maps the inescutcheon's own points.
+  { shield: "azure", inner: { shield: "gules" }, at: [50, 45], expect: "gules", why: "an inescutcheon at the fess point" },
+  { shield: "azure", inner: { shield: "gules" }, at: [31, 45], expect: "azure", why: "the field beside an inescutcheon" },
+  { shield: "azure chief-or", inner: { shield: "gules" }, at: [50, 30], expect: "gules", why: "a chief doesn't move the inescutcheon" },
+  ...["fess-or", "fess-engrailed-or", "fess-ermine"].map((o) => (
+    { shield: `azure ${o}`, charges: "", items: bezants(1), inner: { shield: "vert" }, at: [50, 45], expect: "vert", why: "an inescutcheon over an ordinary and a charge" }
+  )),
+  { shield: "per-pale-or-gules fess-counterchanged", inner: { shield: "vert" }, at: [45, 45], expect: "vert", why: "an inescutcheon over a counterchanged fess" },
+  { shield: "azure fess-or", charges: "", items: bezants(1), first: true, inner: { shield: "vert" }, at: [50, 45], expect: "vert", why: "an inescutcheon before the charges still paints over them" },
+  ...nested("azure", { shield: "gules" }, 50, [[50, 45]], "a charge on an inescutcheon"),
+  ...nested("azure chief-or", { shield: "gules" }, 50, [[50, 45]], "a charge on an inescutcheon, on a shield with a chief"),
+  ...nested("azure chief-or", { shield: "gules", items: ["bezant in-chief"] }, 22, [[50, 15]], "in chief on an inescutcheon, on a shield with a chief"),
+  ...nested("azure fess-or", { shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on an inescutcheon, on a shield with a fess"),
+  ...nested("azure fess-or", { shield: "gules chevron-argent", charges: "on" }, 12, [[50, 24], [50, 66]], "two on a chevron on an inescutcheon, on a shield with a fess"),
+  { shield: "azure", inner: { shield: "per-pale-argent-gules", charges: "counterchanged", items: ["roundel"] }, at: onInner([40, 45]), expect: "gules", why: "a counterchanged charge on an inescutcheon, dexter half" },
+  { shield: "azure", inner: { shield: "per-pale-argent-gules", charges: "counterchanged", items: ["roundel"] }, at: onInner([60, 45]), expect: "argent", why: "a counterchanged charge on an inescutcheon, sinister half" },
+  { shield: "azure", inner: { shield: "gules cross-azure fimbriated-argent" }, at: onInner([38.5, 15]), expect: "argent", why: "a fimbriated cross on an inescutcheon" },
+  // A bordure is a border, so on the shield it moves the inescutcheon inside it, like the charges.
+  { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([2, 45]), expect: "or", why: "an inescutcheon's bordure" },
+  { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([8, 45]), expect: "gules", why: "an inescutcheon's bordure is a third as wide" },
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [2, 45], expect: "argent", why: "the shield's own bordure, with an inescutcheon" },
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [6, 45], expect: "azure", why: "the shield's own bordure keeps its width" },
 ];
 
 const LINES = ["", "-engrailed", "-invected"];
 const CONTACT = ORDINARIES.flatMap((o) =>
   LINES.map((line) => ({ shield: `azure ${o}${line}-or` })),
 );
-const key = ({ shield, charges, items }) => `${shield}|${charges}|${items}`;
+const key = ({ shield, charges, items, inner, first }) =>
+  `${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}`;
 const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
-const CHARGED = SHIELDS.filter((s) => s.items);
+const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
+const NESTED = SHIELDS.filter((s) => s.inner);
 const TINCTURE_MATCH_THRESHOLD = 12;
 
 const isWithinThreshold = (threshold, gotRgb, wantRgb) => {
@@ -237,14 +274,24 @@ const nearest = (rgb, swatches) => {
   return null;
 };
 
-const markup = ({ shield, charges, items }, attrs = "") => {
-  const inner = items
-    ? `<div class="charges ${charges}">${items.map((c) => `<i class="${c}"></i>`).join("")}</div>`
+const chargesOf = ({ charges, items }) =>
+  items
+    ? `<div class="charges ${charges ?? ""}">${items.map((c) => `<i class="${c}"></i>`).join("")}</div>`
     : "";
-  return `<div class="escutcheon ${shield}"${attrs}>${inner}</div>`;
+// `inner` is an inescutcheon, after the charges unless `first`.
+const markup = ({ shield, charges, items, inner, first }, attrs = "") => {
+  const nested = inner ? `<div class="inescutcheon ${inner.shield}">${chargesOf(inner)}</div>` : "";
+  const content = first
+    ? nested + chargesOf({ charges, items })
+    : chargesOf({ charges, items }) + nested;
+  return `<div class="escutcheon ${shield}"${attrs}>${content}</div>`;
 };
-const caption = ({ shield, charges, items }) =>
+const describeShield = ({ shield, charges, items }) =>
   items ? `${shield} · ${charges || "plain"} · ${items.join(", ")}` : shield;
+const caption = (spec) =>
+  spec.inner
+    ? `${describeShield(spec)} · on an inescutcheon${spec.first ? " (first)" : ""} ${describeShield(spec.inner)}`
+    : describeShield(spec);
 
 const build = (dir) => {
   const specs = [...SHIELDS, ...CONTACT];
@@ -363,6 +410,7 @@ try {
       try {
         await contactSheet(page, css, CONTACT, 9, `contact-${name}.png`);
         await contactSheet(page, css, CHARGED, 8, `charges-${name}.png`);
+        await contactSheet(page, css, NESTED, 6, `inescutcheons-${name}.png`);
       } catch (error) {
         console.error(`  (no contact sheet for ${name}: ${error.message})`);
       }

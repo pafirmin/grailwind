@@ -120,8 +120,25 @@
 /* Bordure: a border in a given tincture, e.g. `bordure-or`. */
 @utility bordure-* {
   border-style: solid;
-  border-width: 0.75rem;
+  border-width: var(--bordure-width, 0.75rem);
   border-color: --value(--color-*);
+}
+
+/* Inescutcheon: a shield a third as wide, centred on the fess point (50%, 45%),
+ * over everything else on the shield. As both are 5:6, it's a third as tall too. */
+@utility inescutcheon {
+  position: absolute;
+  z-index: 2;
+  width: 33%;
+  left: 33.5%;
+  top: 28.5%;
+  aspect-ratio: 5 / 6;
+  overflow: hidden;
+  border-radius: 0 0 50% 50% / 0 0 45% 45%;
+  box-shadow: 0 0 0 2px var(--color-sable);
+  contain: layout;
+  /* In proportion with the shield's own bordure. */
+  --bordure-width: 0.25rem;
 }
 
 /* ---------------------------------------------------------------------------
