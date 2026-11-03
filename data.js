@@ -11,6 +11,7 @@ export const DIVISIONS = [
   "per-fess",
   "per-bend",
   "per-bend-sinister",
+  "per-saltire",
   "quarterly",
   "gyronny",
 ];

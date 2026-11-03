@@ -25,6 +25,21 @@ const DIVISIONS = {
   // Line from sinister chief to dexter base: first in the upper half.
   "per-bend-sinister": (a, b) => layer(`linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`),
 
+  // Both diagonals, crossing at the centre like the saltire: first in chief and base.
+  // Gyronny's four tiles, with the top-right and bottom-left swapped.
+  "per-saltire": (a, b) => ({
+    "background-color": b,
+    "background-image": [
+      `linear-gradient(to bottom left, ${a} 50%, ${b} 50%)`,
+      `linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`,
+      `linear-gradient(to bottom left, ${b} 50%, ${a} 50%)`,
+      `linear-gradient(to bottom right, ${b} 50%, ${a} 50%)`,
+    ].join(", "),
+    "background-size": "50% 50%",
+    "background-position": "left top, right top, right bottom, left bottom",
+    "background-repeat": "no-repeat",
+  }),
+
   // Quarters 1 and 4 (dexter chief, sinister base) are the first tincture.
   // Linear gradients rather than conic, which render jagged edges in some browsers.
   // With a fur, the bands can't overlap, or the fur's transparent half shows the band below.
