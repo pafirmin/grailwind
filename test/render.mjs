@@ -115,6 +115,7 @@ const PROBES = [
   ...charged("azure", "", 30, [[50, 24], [50, 66]], "two charges"),
   ...charged("azure", "", 28, [[28, 25], [72, 25], [50, 64]], "three charges, 2 and 1"),
   ...charged("azure", "", 24, [[30, 24], [70, 24], [32, 60], [68, 60]], "four charges"),
+  ...charged("azure", "", 22, [[27, 20], [73, 20], [50, 42], [32, 64], [68, 64]], "five charges, in saltire"),
   ...charged("azure", "", 20, [[20, 18], [50, 18], [80, 18], [35, 42], [65, 42], [50, 66]], "six charges"),
   { ...gap("azure", "", 3), at: [50, 25], why: "three charges: a gap between the top two" },
 
@@ -210,6 +211,7 @@ const PROBES = [
   { shield: "azure chevron-engrailed-ermine", at: [20.6, 72.2], expect: "azure", why: "a bite in a fur engrailed chevron" },
   { shield: "azure fimbriated-gules fess-ermine", at: [50, 29], expect: "azure", why: "a fur fess isn't fimbriated" },
   ...charged("azure fess-ermine", "on", 22, [[20, 45], [50, 45], [80, 45]], "on a fess ermine"),
+  ...charged("azure fess-gules", "on", 22, [[27, 20], [73, 20], [50, 42], [32, 64], [68, 64]], "five on a fess fall back to the default"),
 ];
 
 const LINES = ["", "-engrailed", "-invected"];

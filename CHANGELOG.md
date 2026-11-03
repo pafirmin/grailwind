@@ -27,6 +27,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Five charges now default to 2, 1, 2 (in saltire). They were invisible on a
+  plain field, and piled up in a corner on an ordinary without five points.
 - An ordinary in a quarter no longer paints over the shield's own ordinary.
 
 ## [0.3.0] - 2026-11-01

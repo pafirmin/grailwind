@@ -58,6 +58,10 @@ const PATTERNS = {
   "bend-or publishes on points": /\.bend-or \{[^}]*--on-3-2-x: 50%;/,
   "on reads them, with a fallback":
     /\.on:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: var\(--on-3-1-x, 28%\);/,
+  "five on an ordinary fall back to the default":
+    /\.on:has\( > :nth-child\(5\):last-child\) > :nth-child\(1\) \{\s*left: var\(--on-5-1-x, 27%\);/,
+  "five charges default to 2, 1, 2":
+    /\.charges \{[^]*?&:where\(:has\( > :nth-child\(5\):last-child\)\) > :where\(:nth-child\(3\)\) \{\s*left: 50%;\s*top: 42%;/,
   "fimbriated-argent sets the fimbriation":
     /\.fimbriated-argent \{\s*--fimbriated: 1;\s*--fimbriation: var\(--color-argent\);/,
   "fimbriation vars don't inherit":
