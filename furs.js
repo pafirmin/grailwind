@@ -58,16 +58,21 @@ export const furLayers = (fur, theme) => {
   ];
 };
 
+// A fur on its own, as on the field or an ordinary.
+export const furBackground = (fur, theme) => ({
+  "background-color": `var(--color-${FURS[fur][0]})`,
+  "background-image": spots(fur, theme),
+  "background-size": FIELD.size,
+  "background-position": FIELD.position,
+  "background-repeat": "repeat",
+});
+
 export default plugin(({ addUtilities, theme }) => {
   const utilities = {};
 
-  for (const [fur, [ground]] of Object.entries(FURS)) {
+  for (const fur of Object.keys(FURS)) {
     utilities[`.${fur}`] = {
-      "background-color": `var(--color-${ground})`,
-      "background-image": spots(fur, theme),
-      "background-size": FIELD.size,
-      "background-position": FIELD.position,
-      "background-repeat": "repeat",
+      ...furBackground(fur, theme),
       // Two tiles across a charge, centred, so a whole spot sits in its middle.
       ".charges > &": {
         "background-size": "50% auto",

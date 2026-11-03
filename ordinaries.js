@@ -2,6 +2,7 @@
  * Grailwind CSS: ordinaries, e.g. `fess-or`.
  */
 import plugin from "tailwindcss/plugin";
+import { FURS, furBackground } from "./furs.js";
 
 const TINCTURES = ["or", "argent", "gules", "azure", "vert", "purpure", "sable"];
 
@@ -320,7 +321,7 @@ const onVars = ({ size, counts }) => {
   return vars;
 };
 
-export default plugin(({ addUtilities }) => {
+export default plugin(({ addUtilities, theme }) => {
   const utilities = {};
 
   for (const tincture of TINCTURES) {
@@ -396,6 +397,24 @@ export default plugin(({ addUtilities }) => {
         utilities[`.${ordinary}-${name}-${tincture}`] = ordinaryRules(ordinary, {
           inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
           "background-color": `var(--color-${tincture})`,
+          "clip-path": [polygon(vertices), shape(vertices, line, SCALLOPS[ordinary] ?? SCALLOP)],
+        });
+      }
+    }
+
+    // A plain polygon, without the fimbriation vars, so fimbriated-* can't reach a fur ordinary.
+    for (const fur of Object.keys(FURS)) {
+      const pseudo = {
+        inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
+        ...furBackground(fur, theme),
+      };
+      utilities[`.${ordinary}-${fur}`] = ordinaryRules(ordinary, {
+        ...pseudo,
+        "clip-path": polygon(vertices),
+      });
+      for (const [name, line] of Object.entries(LINES)) {
+        utilities[`.${ordinary}-${name}-${fur}`] = ordinaryRules(ordinary, {
+          ...pseudo,
           "clip-path": [polygon(vertices), shape(vertices, line, SCALLOPS[ordinary] ?? SCALLOP)],
         });
       }

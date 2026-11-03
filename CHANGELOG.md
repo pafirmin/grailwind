@@ -15,6 +15,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   straight edges.
 - Furs: `ermine`, `ermines`, `erminois` and `pean`, on the field, on a charge,
   or in a division (`per-pale-ermine-gules`).
+- Fur ordinaries, e.g. `chief-ermine` and `cross-engrailed-erminois`. They
+  aren't fimbriated.
 
 ### Fixed
 

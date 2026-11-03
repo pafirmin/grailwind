@@ -200,6 +200,16 @@ const PROBES = [
   { shield: "per-pale-ermine-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: furSpot(4, 2), expect: "sable", why: "a counterchanged charge on the gules half, on the field's spot grid" },
   { shield: "per-pale-ermine-gules fess-counterchanged", at: [25, 45], expect: "gules", why: "a counterchanged fess on the ermine half" },
   { shield: "per-pale-ermine-gules fess-counterchanged", at: furSpot(4, 2), expect: "sable", why: "a counterchanged fess on the gules half, on the field's spot grid" },
+  { shield: "azure fess-ermine", at: furSpot(1, 2), expect: "sable", why: "a spot on a fur fess, on the field's grid" },
+  { shield: "azure fess-ermine", at: furGround(1, 2), expect: "argent", why: "the ground of a fur fess" },
+  { shield: "azure fess-ermine", at: [50, 20], expect: "azure", why: "the field above a fur fess" },
+  { shield: "azure chief-ermine", at: furSpot(1, 0), expect: "sable", why: "a spot on a fur chief" },
+  { shield: "azure chief-ermine", at: furGround(1, 0), expect: "argent", why: "the ground of a fur chief" },
+  { shield: "azure chief-ermine", at: [50, 50], expect: "azure", why: "the field below a fur chief" },
+  { shield: "azure chevron-engrailed-ermine", at: [25, 60], expect: "argent", why: "the fur inside an engrailed chevron" },
+  { shield: "azure chevron-engrailed-ermine", at: [20.6, 72.2], expect: "azure", why: "a bite in a fur engrailed chevron" },
+  { shield: "azure fimbriated-gules fess-ermine", at: [50, 29], expect: "azure", why: "a fur fess isn't fimbriated" },
+  ...charged("azure fess-ermine", "on", 22, [[20, 45], [50, 45], [80, 45]], "on a fess ermine"),
 ];
 
 const LINES = ["", "-engrailed", "-invected"];

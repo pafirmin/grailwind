@@ -37,6 +37,9 @@ const CLASSES = [
   "per-pale-ermine-gules",
   "quarterly-azure-ermine",
   "per-pale-ermine-ermines",
+  "fess-ermine",
+  "chief-pean",
+  "cross-engrailed-erminois",
 ];
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -100,6 +103,12 @@ const PATTERNS = {
     /\.quarterly-azure-ermine \{[^}]*background-size: 100% 45%, 100% calc\(100% - 45%\), calc\(100% \/ 6\) auto, 100% 100%;/,
   "a fur division counterchanges":
     /\.per-pale-ermine-gules \{[^}]*--counterchange-image: linear-gradient\(to right, var\(--color-gules\) 50%, transparent 50%\), url\("data:/,
+  "a fur ordinary paints the fur":
+    /\.fess-ermine \{[^]*?&::before \{[^}]*background-color: var\(--color-argent\);[^}]*background-image: url\("data:[^"]*%23141414[^}]*clip-path: polygon\(0 30%, 100% 30%, 100% 60%, 0 60%\);/,
+  // [^{]* keeps the match inside .fess-ermine's own block.
+  "a fur ordinary isn't fimbriated": /\.fess-ermine \{[^{]*&::before \{(?:(?!fimbriat)[^}])*\}/,
+  "an engrailed fur ordinary falls back to a polygon":
+    /\.cross-engrailed-erminois \{[^]*?&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(/,
 };
 
 const EXPECTED = {
