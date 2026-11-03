@@ -141,6 +141,21 @@
   --bordure-width: 0.25rem;
 }
 
+/* Canton: a third of the shield each way in dexter chief, so a ninth of it, and
+ * 5:6 like the shield, so everything on it places as on a shield. Over every
+ * ordinary and charge, as a later addition to the arms. */
+@utility canton {
+  position: absolute;
+  z-index: 2;
+  width: 33.333%;
+  left: 0;
+  top: 0;
+  aspect-ratio: 5 / 6;
+  overflow: hidden;
+  contain: layout;
+  --bordure-width: 0.25rem;
+}
+
 /* ---------------------------------------------------------------------------
  * The shield itself
  * ------------------------------------------------------------------------- */

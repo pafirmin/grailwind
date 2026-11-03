@@ -327,7 +327,7 @@ const onVars = ({ size, counts }) => {
   return vars;
 };
 
-// Every layout var an ordinary sets on its shield, for an inescutcheon to reset.
+// Every layout var an ordinary sets on its shield, for an inescutcheon or canton to reset.
 const layoutVars = () => {
   const allVars = [];
 
@@ -348,9 +348,11 @@ const layoutVars = () => {
 };
 
 export default plugin(({ addBase, addUtilities, theme }) => {
-  // Unset on an inescutcheon, so it can't inherit its shield's layout. In the base layer, so an
-  // ordinary on the inescutcheon itself still sets its own.
-  addBase({ ".inescutcheon": Object.fromEntries(layoutVars().map((name) => [name, "initial"])) });
+  // Unset on an inescutcheon or canton, so it can't inherit its shield's layout. In the base
+  // layer, so an ordinary on it still sets its own.
+  addBase({
+    ".inescutcheon, .canton": Object.fromEntries(layoutVars().map((name) => [name, "initial"])),
+  });
 
   const utilities = {};
 

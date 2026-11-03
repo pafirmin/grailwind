@@ -62,15 +62,21 @@ const gap = (shield, charges, n) => ({ shield, charges, items: bezants(n), expec
 // An inescutcheon is a third of the shield with its top left at (33.5%, 28.5%), from grailwind.css.
 const INNER = 0.33;
 const onInner = ([x, y]) => [33.5 + INNER * x, 28.5 + INNER * y];
-// Like `charged`, for bezants on an inescutcheon `inner`; points and size are the inescutcheon's.
-const nested = (shield, inner, size, points, why) =>
-  points.map((point, i) => ({
+// A canton is a third of the shield each way, at its top left.
+const CANTON = 1 / 3;
+const onCanton = ([x, y]) => [CANTON * x, CANTON * y];
+const SUB = { inescutcheon: [INNER, onInner], canton: [CANTON, onCanton] };
+// Like `charged`, for bezants on an inescutcheon or canton `inner`; points and size are its own.
+const nested = (shield, inner, size, points, why) => {
+  const [scale, onSub] = SUB[inner.kind ?? "inescutcheon"];
+  return points.map((point, i) => ({
     shield,
     inner: { ...inner, items: inner.items ?? bezants(points.length) },
-    at: ring(onInner(point), size * INNER),
+    at: ring(onSub(point), size * scale),
     expect: "or",
     why: points.length > 1 ? `${why}, charge ${i + 1}` : why,
   }));
+};
 const atPoint = (name, at) => [
   {
     shield: "azure",
@@ -327,14 +333,35 @@ const PROBES = [
   { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([8, 45]), expect: "gules", why: "an inescutcheon's bordure is a third as wide" },
   { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [2, 45], expect: "argent", why: "the shield's own bordure, with an inescutcheon" },
   { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [6, 45], expect: "azure", why: "the shield's own bordure keeps its width" },
+
+  // Canton: `at` is on the outer shield; onCanton maps the canton's own points.
+  { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: [[16, 16], [2, 2], [31, 31]], expect: "gules", why: "a canton in dexter chief" },
+  { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: [[36, 16], [16, 36]], expect: "azure", why: "the field beside and below a canton" },
+  { shield: "azure bend-or", inner: { kind: "canton", shield: "gules" }, at: [10, 10], expect: "gules", why: "a canton over a bend" },
+  { shield: "azure bend-or", inner: { kind: "canton", shield: "gules" }, at: [50, 50], expect: "or", why: "the bend beyond the canton" },
+  { shield: "azure chief-or", inner: { kind: "canton", shield: "gules" }, at: [[16, 15], [16, 32]], expect: "gules", why: "a canton over a chief, and below it" },
+  { shield: "azure chief-or", inner: { kind: "canton", shield: "gules" }, at: [50, 15], expect: "or", why: "the chief beside a canton" },
+  // The bend's first charge, at (24, 24), is under the canton; the others show.
+  { shield: "azure bend-gules", charges: "on", items: bezants(3), inner: { kind: "canton", shield: "vert" }, at: [24, 24], expect: "vert", why: "a canton over a charge" },
+  { shield: "azure bend-gules", charges: "on", items: bezants(3), inner: { kind: "canton", shield: "vert" }, first: true, at: [24, 24], expect: "vert", why: "a canton before the charges still paints over them" },
+  { shield: "azure bend-gules", charges: "on", items: bezants(3), inner: { kind: "canton", shield: "vert" }, at: ring([50, 50], 18), expect: "or", why: "charges beyond the canton" },
+  { shield: "azure", inner: { kind: "canton", shield: "ermine" }, at: onCanton(furGround(0, 0)), expect: "argent", why: "a fur canton's ground (its spots are too small to probe)" },
+  { shield: "sable", inner: { kind: "canton", shield: "argent cross-gules" }, at: onCanton([50, 45]), expect: "gules", why: "a cross on a canton" },
+  { shield: "sable", inner: { kind: "canton", shield: "argent cross-gules" }, at: onCanton([20, 15]), expect: "argent", why: "the canton between the cross's arms" },
+  { shield: "azure", inner: { kind: "canton", shield: "per-bend-or-gules" }, at: onCanton([75, 20]), expect: "or", why: "a divided canton, above the line" },
+  { shield: "azure", inner: { kind: "canton", shield: "per-bend-or-gules" }, at: onCanton([20, 75]), expect: "gules", why: "a divided canton, below the line" },
+  ...nested("azure", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton"),
+  ...nested("azure chief-or", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton, on a shield with a chief"),
+  ...nested("azure fess-or", { kind: "canton", shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on a canton, on a shield with a fess"),
 ];
 
 const LINES = ["", "-engrailed", "-invected"];
 const CONTACT = ORDINARIES.flatMap((o) =>
   LINES.map((line) => ({ shield: `azure ${o}${line}-or` })),
 );
-const key = ({ shield, charges, items, inner, first }) =>
-  `${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}`;
+// `more` is a second charges container, as { charges, items }.
+const key = ({ kind, shield, charges, items, inner, first, more }) =>
+  `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}`;
 const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
 const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
 const NESTED = SHIELDS.filter((s) => s.inner);
@@ -358,19 +385,21 @@ const chargesOf = ({ charges, items }) =>
   items
     ? `<div class="charges ${charges ?? ""}">${items.map((c) => `<i class="${c}"></i>`).join("")}</div>`
     : "";
-// `inner` is an inescutcheon, after the charges unless `first`.
-const markup = ({ shield, charges, items, inner, first }, attrs = "") => {
-  const nested = inner ? `<div class="inescutcheon ${inner.shield}">${chargesOf(inner)}</div>` : "";
-  const content = first
-    ? nested + chargesOf({ charges, items })
-    : chargesOf({ charges, items }) + nested;
+// `inner` is an inescutcheon, or a canton by `kind`, after the charges unless `first`.
+const markup = ({ shield, charges, items, inner, first, more }, attrs = "") => {
+  const nested = inner
+    ? `<div class="${inner.kind ?? "inescutcheon"} ${inner.shield}">${chargesOf(inner)}</div>`
+    : "";
+  const own = chargesOf({ charges, items }) + (more ? chargesOf(more) : "");
+  const content = first ? nested + own : own + nested;
   return `<div class="escutcheon ${shield}"${attrs}>${content}</div>`;
 };
-const describeShield = ({ shield, charges, items }) =>
-  items ? `${shield} · ${charges || "plain"} · ${items.join(", ")}` : shield;
+const describeShield = ({ shield, charges, items, more }) =>
+  (items ? `${shield} · ${charges || "plain"} · ${items.join(", ")}` : shield) +
+  (more ? ` · and ${more.charges || "plain"} · ${more.items.join(", ")}` : "");
 const caption = (spec) =>
   spec.inner
-    ? `${describeShield(spec)} · on an inescutcheon${spec.first ? " (first)" : ""} ${describeShield(spec.inner)}`
+    ? `${describeShield(spec)} · ${spec.inner.kind ?? "inescutcheon"}${spec.first ? " (first)" : ""} ${describeShield(spec.inner)}`
     : describeShield(spec);
 
 const build = (dir) => {

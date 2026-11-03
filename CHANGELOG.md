@@ -15,6 +15,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `pile-*`: a wedge from the chief to a point. It takes lines, furs,
   fimbriation and counterchanged, one or three charges `on` it, and two
   `between`.
+- `canton`: a ninth of the shield in dexter chief, over every ordinary and
+  charge, with its own field, divisions, ordinaries and charges, like the
+  inescutcheon.
 - Six charges `between` a fess, bend, bend sinister, chevron or pale.
 - `inescutcheon`: a small shield at the centre of the arms, over everything
   else, with its own field, ordinaries and charges. A bordure on it is a third

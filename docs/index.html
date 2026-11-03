@@ -144,6 +144,7 @@
               <li><a href="#layout">Dividing for layout</a></li>
               <li><a href="#bordure">Bordure</a></li>
               <li><a href="#inescutcheon">Inescutcheon</a></li>
+              <li><a href="#canton">Canton</a></li>
             </ul>
           </li>
           <li>
@@ -570,6 +571,45 @@
               </div>
             </figure>
           </div>
+
+          <h3 id="canton">Canton</h3>
+          <p>
+            <code>canton</code> is a smaller field in dexter chief, a ninth of
+            the shield. It counts as a later addition to the arms, so it paints
+            over every ordinary and charge, a chief included. Like the
+            inescutcheon, it goes beside the <code>charges</code> container and
+            takes its own field, divisions, ordinaries and charges.
+          </p>
+          <div class="examples">
+            <figure data-blazon="Argent, a canton Sable">
+              <div class="escutcheon argent">
+                <div class="canton sable"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Sable, on a canton Argent a cross Gules">
+              <div class="escutcheon sable">
+                <div class="canton argent cross-gules"></div>
+              </div>
+            </figure>
+            <figure
+              data-blazon="Argent, a bend Azure, on a canton Gules three bezants"
+            >
+              <div class="escutcheon argent bend-azure">
+                <div class="canton gules">
+                  <div class="charges">
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                  </div>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Or, a chief Azure, a canton Ermine">
+              <div class="escutcheon or chief-azure">
+                <div class="canton ermine"></div>
+              </div>
+            </figure>
+          </div>
         </section>
 
         <section id="ordinaries">
@@ -677,7 +717,7 @@
 
           <h3 id="fimbriation">Fimbriation</h3>
           <p>
-            Fimbriation adds a thin stripe around an ordinary. It present, only
+            Fimbriation adds a thin stripe around an ordinary. At present, only
             plain ordinaries can be fimbriated. Fimbriation for engrailed and
             fur ordinaries may be supported in a future release.
           </p>
@@ -1378,6 +1418,26 @@
                 <i class="mullet ermines"></i>
                 <i class="mullet ermines"></i>
               </div>
+            </div>
+          </figure>
+          <figure
+            class="my-12"
+            data-blazon="Per saltire Or and Azure, a pile Gules fimbriated Argent between two mullets Or, on a canton Purpure a fleur-de-lis Or, over all an inescutcheon Ermine charged with three bars Azure"
+            data-size="w-72"
+          >
+            <div
+              class="escutcheon per-saltire-or-azure pile-gules fimbriated-argent"
+            >
+              <div class="charges between">
+                <i class="mullet or"></i>
+                <i class="mullet or"></i>
+              </div>
+              <div class="canton purpure">
+                <div class="charges">
+                  <i class="fleur-de-lis or"></i>
+                </div>
+              </div>
+              <div class="inescutcheon ermine three-bars-azure"></div>
             </div>
           </figure>
         </section>

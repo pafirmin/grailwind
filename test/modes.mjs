@@ -95,6 +95,8 @@ const PATTERNS = {
   "a counterchanged ordinary does too":
     /\.chevron-counterchanged \{[^]*?&::before \{[^}]*z-index: 1;/,
   "the chief stays under charges on it": /\.chief-or \{[^]*?&::after \{(?:(?!z-index)[^}])*\}/,
+  "a canton doesn't inherit its shield's layout":
+    /\.inescutcheon, \.canton \{[^}]*--field-top: initial;/,
   "in-bend-sinister runs from sinister chief":
     /\.in-bend-sinister:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: 78%;\s*top: 16%;/,
   "the escutcheon holds charges' fixed layers": /\.escutcheon \{[^}]*contain: layout;/,
@@ -158,7 +160,7 @@ const DATA_CLASSES = [
 
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister"></div>`,
+  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton"></div>`,
 );
 
 const build = (entry, { css = "", source = "index.html" } = {}) => {
