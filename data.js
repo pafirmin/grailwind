@@ -29,6 +29,7 @@ export const ORDINARIES = [
   "saltire",
   "pall",
   "chief",
+  "pile",
 ];
 
 export const CHARGES = [
@@ -97,6 +98,7 @@ export const BETWEEN = {
     2: { points: [[14, 50], [86, 50]] } } },
   pall: { size: 18, points: [[50, 11], [18, 56], [82, 56]], counts: {
     2: { points: [[18, 56], [82, 56]] } } },
+  pile: { size: 20, points: [[18, 55], [82, 55]] },
 };
 
 // Where charges go for "on", along the ordinary's centre line, by number of charges.
@@ -110,4 +112,5 @@ export const ON = {
   cross: { size: 15, counts: { 1: [[50, 45]], 5: [[50, 15], [18, 45], [50, 45], [82, 45], [50, 80]] } },
   saltire: { size: 14, counts: { 1: [[50, 50]], 5: [[22, 22], [78, 22], [50, 50], [22, 78], [78, 78]] } },
   pall: { size: 14, counts: { 1: [[50, 50]], 3: [[22, 22], [78, 22], [50, 75]] } },
+  pile: { size: 14, counts: { 1: [[50, 25]], 3: [[50, 14], [50, 34], [50, 54]] } },
 };

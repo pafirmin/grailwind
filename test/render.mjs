@@ -23,6 +23,7 @@ const ORDINARIES = [
   "saltire",
   "pall",
   "chief",
+  "pile",
 ];
 const WIDTH = 300;
 
@@ -151,6 +152,28 @@ const PROBES = [
   { shield: "per-pale-or-gules bar-counterchanged chief-azure", at: [25, 45], expect: "or", why: "nothing left of a counterchanged bar where it was" },
   { shield: "gules bar-ermine", at: furSpot(1, 2), expect: "sable", why: "a spot on a fur bar" },
   { shield: "gules bar-ermine", at: [50, 30], expect: "gules", why: "the field above a fur bar" },
+  // The pile's sides run from (20, 0) and (80, 0) to (50, 85), so at 40% down they're at 34.12 and 65.88.
+  { shield: "azure pile-or", at: [[50, 20], [50, 50], [50, 78], [35.62, 40], [64.38, 40]], expect: "or", why: "the pile is drawn, down to near its tip" },
+  { shield: "azure pile-or", at: [[20, 20], [80, 20], [32.62, 40], [67.38, 40], [50, 88]], expect: "azure", why: "the field either side and below the tip" },
+  // Eight scallops a side, each 4.6 units deep; the bite is half that in from the middle of the fifth from the tip.
+  { shield: "azure pile-engrailed-or", at: [[35.36, 36.64], [64.64, 36.64]], expect: "azure", why: "a bite in each side of the pile" },
+  { shield: "azure pile-engrailed-or", at: [[50, 20], [37.88, 41.79], [62.12, 41.79]], expect: "or", why: "the engrailed pile, by a cusp on each side" },
+  { shield: "azure pile-engrailed-or", at: [50, 84], expect: "azure", why: "no sliver below the engrailed pile's tip" },
+  // Fimbriated, each side moves out 3.13% across, and the tip down to 93.9%.
+  { shield: "gules pile-azure fimbriated-argent", at: [[32.62, 40], [67.38, 40], [50, 88]], expect: "argent", why: "the pile's fimbriation, on each side and below the tip" },
+  { shield: "gules pile-azure fimbriated-argent", at: [[35.62, 40], [64.38, 40], [50, 1], [50, 30], [50, 60], [50, 80]], expect: "azure", why: "the pile itself, just inside each side and down its centre line" },
+  { shield: "gules pile-azure fimbriated-argent", at: [[29.12, 40], [70.88, 40], [20, 80]], expect: "gules", why: "the field beyond the pile's fimbriation" },
+  // At an odd width the two tiles meet mid-pixel, at 152.5px: 49.8% and 50.2% read pixels 152 and 153.
+  // A multiple of 5, so the 5:6 shield's height stays whole and later rows stay on the pixel grid.
+  { shield: "gules pile-azure fimbriated-argent w-[305px]!", at: [[49.8, 20], [50.2, 20], [49.8, 50], [50.2, 50], [49.8, 75], [50.2, 75]], expect: "azure", why: "no seam down a fimbriated pile where its tiles meet" },
+  // Below a chief, the pile's y is 30 + 0.7y; across, it's unchanged.
+  { shield: "gules pile-azure fimbriated-argent chief-or", at: [[32.62, 58], [67.38, 58]], expect: "argent", why: "the fimbriation of a pile below a chief" },
+  { shield: "gules pile-azure fimbriated-argent chief-or", at: [[35.62, 58], [64.38, 58], [50, 40]], expect: "azure", why: "a fimbriated pile below a chief" },
+  { shield: "gules pile-azure fimbriated-argent chief-or", at: [[29.12, 58], [70.88, 58]], expect: "gules", why: "the field beside a fimbriated pile below a chief" },
+  { shield: "per-pale-or-gules pile-counterchanged", at: [45, 30], expect: "gules", why: "the counterchanged pile's dexter half" },
+  { shield: "per-pale-or-gules pile-counterchanged", at: [[55, 30], [20, 30]], expect: "or", why: "the counterchanged pile's sinister half, and the field beside it" },
+  { shield: "azure pile-ermine", at: [furSpot(2, 0), furSpot(3, 1)], expect: "sable", why: "spots on a fur pile" },
+  { shield: "azure pile-ermine", at: [[15, 20], [85, 20]], expect: "azure", why: "the field beside a fur pile" },
 
   ...charged("azure", "", 50, [[50, 45]], "one charge"),
   ...charged("azure", "", 30, [[50, 24], [50, 66]], "two charges"),
@@ -194,6 +217,8 @@ const PROBES = [
   ...charged("azure saltire-gules", "between", 16, [[50, 13], [14, 50], [86, 50], [50, 84]], "between a saltire"),
   ...charged("azure pall-gules", "between", 18, [[50, 11], [18, 56], [82, 56]], "between a pall"),
 
+  ...charged("azure pile-gules", "between", 20, [[18, 55], [82, 55]], "between a pile"),
+  ...charged("azure pile-gules chief-or", "between", 20, [[18, 68.5], [82, 68.5]], "between a pile below a chief"),
   ...charged("azure pale-gules", "on", 20, [[50, 18], [50, 45], [50, 72]], "on a pale"),
   ...charged("azure fess-gules", "on", 22, [[20, 45], [50, 45], [80, 45]], "on a fess"),
   ...charged("azure bend-gules", "on", 18, [[24, 24], [50, 50], [76, 76]], "on a bend"),
@@ -202,6 +227,12 @@ const PROBES = [
   ...charged("azure cross-gules", "on", 15, [[50, 15], [18, 45], [50, 45], [82, 45], [50, 80]], "on a cross"),
   ...charged("azure saltire-gules", "on", 14, [[22, 22], [78, 22], [50, 50], [22, 78], [78, 78]], "on a saltire"),
   ...charged("azure pall-gules", "on", 14, [[22, 22], [78, 22], [50, 75]], "on a pall"),
+  ...charged("azure pile-gules", "on", 14, [[50, 25]], "one on a pile"),
+  ...charged("azure pile-gules", "on", 14, [[50, 14], [50, 34], [50, 54]], "three on a pile"),
+  // The pile is 10.9% each side of its centre line at 54% down, and a roundel 6.4%.
+  { shield: "azure pile-gules", charges: "on", items: bezants(3), at: [[42.5, 54], [57.5, 54]], expect: "gules", why: "the lowest of three on a pile fits inside it" },
+  ...charged("azure pile-gules chief-or", "on", 14, [[50, 39.8], [50, 53.8], [50, 67.8]], "three on a pile below a chief"),
+  { shield: "azure pile-gules chief-or", charges: "on", items: bezants(3), at: [[42.5, 67.8], [57.5, 67.8]], expect: "gules", why: "the lowest of three on a pile fits inside it, below a chief" },
 
   { shield: "azure", charges: "", items: ["bezant"], at: [68, 45], expect: "or", why: "one charge is half the shield wide" },
   { shield: "azure", charges: "charge-size-20", items: ["bezant"], at: [68, 45], expect: "azure", why: "charge-size-20 shrinks it" },

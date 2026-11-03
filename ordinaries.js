@@ -32,6 +32,7 @@ const ORDINARIES = {
     [60, 55], [60, 100], [40, 100], [40, 55], [0, 15],
   ],
   chief: [[0, 0], [100, 0], [100, 30], [0, 30]],
+  pile: [[20, 0], [80, 0], [50, 85]],
 };
 
 const num = (v) => +v.toFixed(3);
@@ -111,6 +112,12 @@ const widenedPolygon = (vertices) => {
 const S = 12;
 const band = (kind, from, to, tile) => ({ kind, from, to, tile });
 const stripe = (kind, from, to, tile) => ({ kind, from, to, tile, stripe: true });
+// Half a tile, split on its diagonal, as gradient stops: 0–50% or 50–100%. The one diagonal band
+// a tile that isn't square can take, as its diagonal isn't a line of constant x ± y.
+const half = (kind, end, tile) => ({ kind, tile, stops: end === "start" ? [0, 50] : [50, 100] });
+// A 2px strip down the centre, from the top to `bottom`, where two tiles meet mid-pixel and
+// would let the fimbriation show between them. Unsoftened, as it lies on its own tincture.
+const seam = (bottom) => ({ kind: "x", tile: [0, 0, 100, bottom], seam: true });
 // prettier-ignore
 const BANDS = {
   pale: [band("x", 35, 65)],
@@ -137,6 +144,8 @@ const BANDS = {
     band("u+v", 85, 115),
     band("x", 40, 60, [0, 55, 100, 100]),
   ],
+  // Each slanted side is its tile's diagonal.
+  pile: [half("u-v", "end", [20, 0, 50, 85]), half("u+v", "start", [50, 0, 80, 85]), seam(83)],
 };
 
 const DIRECTION = {
@@ -165,14 +174,17 @@ const stop = ({ kind, tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }, value) => {
   }
 };
 
-// Soften each edge by a pixel, as hard gradient stops aren't antialiased.
+// Soften each edge by a pixel, as hard gradient stops aren't antialiased. A stop at 0 or 100% is
+// the tile's own edge, so it isn't softened.
 const gradient = (layer, colour) => {
-  const a = num(stop(layer, layer.from));
-  const b = num(stop(layer, layer.to));
-  return (
-    `linear-gradient(${DIRECTION[layer.kind]}, transparent calc(${a}% - 0.5px), ` +
-    `${colour} calc(${a}% + 0.5px) calc(${b}% - 0.5px), transparent calc(${b}% + 0.5px))`
-  );
+  if (layer.seam) {
+    return `linear-gradient(to right, transparent calc(50% - 1px), ${colour} 0 calc(50% + 1px), transparent 0)`;
+  }
+  const [a, b] = (layer.stops ?? [stop(layer, layer.from), stop(layer, layer.to)]).map(num);
+  const from =
+    a === 0 ? `${colour} 0` : `transparent calc(${a}% - 0.5px), ${colour} calc(${a}% + 0.5px)`;
+  const to = b === 100 ? "100%" : `calc(${b}% - 0.5px), transparent calc(${b}% + 0.5px)`;
+  return `linear-gradient(${DIRECTION[layer.kind]}, ${from} ${to})`;
 };
 
 const tilePosition = (start, size) => (size === 100 ? "0" : pct((start * 100) / (100 - size)));
