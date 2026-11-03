@@ -9,6 +9,8 @@ run("modifier-needs-target", rule, {
   valid: [
     `<div class="escutcheon per-pale-argent-gules chevron-counterchanged"></div>`,
     `<div class="escutcheon quarterly-or-gules chief-counterchanged"></div>`,
+    `<div class="escutcheon barry-argent-gules fess-counterchanged"></div>`,
+    `<div class="escutcheon paly-of-eight-or-azure"><div class="charges counterchanged"><i class="roundel"></i></div></div>`,
     `<div class="escutcheon gules cross-azure fimbriated-argent"></div>`,
     `<div class="escutcheon or chevron-sable chief-azure fimbriated-argent"></div>`,
     `<div class="escutcheon gules pile-azure fimbriated-argent"></div>`,

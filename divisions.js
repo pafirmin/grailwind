@@ -11,6 +11,17 @@ const FESS_POINT = "45%";
 // Each division maps (first, second) tincture colours to background rules.
 const layer = (image) => ({ "background-image": image });
 
+// Equal stripes, the first tincture at the top (barry) or on the dexter (paly): one pair, tiled.
+// The repeat must be explicit, as toLayers defaults to no-repeat for the fur variants.
+const stripes = (to, pieces) => (a, b) => {
+  const pair = `calc(200% / ${pieces})`;
+  return {
+    "background-image": `linear-gradient(to ${to}, ${a} 50%, ${b} 50%)`,
+    "background-size": to === "bottom" ? `100% ${pair}` : `${pair} 100%`,
+    "background-repeat": to === "bottom" ? "repeat-y" : "repeat-x",
+  };
+};
+
 const DIVISIONS = {
   // Vertical split: first on the dexter (viewer's left).
   "per-pale": (a, b) => layer(`linear-gradient(to right, ${a} 50%, ${b} 50%)`),
@@ -65,6 +76,13 @@ const DIVISIONS = {
     "background-position": "left top, right top, right bottom, left bottom",
     "background-repeat": "no-repeat",
   }),
+
+  // Across the whole height, not through the fess point, so the shield's point clips the last bar.
+  barry: stripes("bottom", 6),
+  "barry-of-eight": stripes("bottom", 8),
+  "barry-of-ten": stripes("bottom", 10),
+  paly: stripes("right", 6),
+  "paly-of-eight": stripes("right", 8),
 };
 
 // A division's background rules as one { image, size, position, repeat } per layer.

@@ -8,6 +8,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Striped fields: `barry-*` and `paly-*` (of six), `barry-of-eight-*`,
+  `barry-of-ten-*` and `paly-of-eight-*`. The first tincture is in chief or
+  on the dexter. They take furs and counterchanged, like the other divisions.
 - `per-saltire-*`: a field divided on both diagonals, the first tincture in
   chief and base.
 - Bars, named by count: `bar-*`, `two-bars-*` and `three-bars-*`. They take

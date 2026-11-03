@@ -14,6 +14,11 @@ export const DIVISIONS = [
   "per-saltire",
   "quarterly",
   "gyronny",
+  "barry",
+  "barry-of-eight",
+  "barry-of-ten",
+  "paly",
+  "paly-of-eight",
 ];
 
 export const ORDINARIES = [
