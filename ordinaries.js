@@ -9,6 +9,13 @@ import { furBackground } from "./furs.js";
 const ORDINARIES = {
   pale: [[35, 0], [65, 0], [65, 100], [35, 100]],
   fess: [[0, 30], [100, 30], [100, 60], [0, 60]],
+  // Bars that don't touch are one polygon, joined along the shield's dexter edge.
+  bar: [[0, 38], [100, 38], [100, 52], [0, 52]],
+  "two-bars": [[0, 27], [100, 27], [100, 39], [0, 39], [0, 51], [100, 51], [100, 63], [0, 63]],
+  "three-bars": [
+    [0, 20], [100, 20], [100, 30], [0, 30], [0, 40], [100, 40],
+    [100, 50], [0, 50], [0, 60], [100, 60], [100, 70], [0, 70],
+  ],
   bend: [[0, 0], [20, 0], [100, 80], [100, 100], [80, 100], [0, 20]],
   "bend-sinister": [[100, 0], [80, 0], [0, 80], [0, 100], [20, 100], [100, 20]],
   chevron: [[50, 25], [100, 75], [100, 95], [50, 45], [0, 95], [0, 75]],
@@ -108,6 +115,9 @@ const stripe = (kind, from, to, tile) => ({ kind, from, to, tile, stripe: true }
 const BANDS = {
   pale: [band("x", 35, 65)],
   fess: [band("y", 30, 60)],
+  bar: [band("y", 38, 52)],
+  "two-bars": [band("y", 27, 39), band("y", 51, 63)],
+  "three-bars": [band("y", 20, 30), band("y", 40, 50), band("y", 60, 70)],
   bend: [band("u-v", -20, 20)],
   "bend-sinister": [band("u+v", 80, 120)],
   chevron: [

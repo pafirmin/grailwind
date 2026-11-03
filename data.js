@@ -19,6 +19,9 @@ export const DIVISIONS = [
 export const ORDINARIES = [
   "pale",
   "fess",
+  "bar",
+  "two-bars",
+  "three-bars",
   "bend",
   "bend-sinister",
   "chevron",

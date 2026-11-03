@@ -10,6 +10,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `per-saltire-*`: a field divided on both diagonals, the first tincture in
   chief and base.
+- Bars, named by count: `bar-*`, `two-bars-*` and `three-bars-*`. They take
+  lines, furs, fimbriation and counterchanged, like the fess.
 - Six charges `between` a fess, bend, bend sinister, chevron or pale.
 - `inescutcheon`: a small shield at the centre of the arms, over everything
   else, with its own field, ordinaries and charges. A bordure on it is a third

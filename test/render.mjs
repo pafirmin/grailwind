@@ -13,6 +13,9 @@ const TINCTURES = ["or", "argent", "gules", "azure", "vert", "purpure", "sable"]
 const ORDINARIES = [
   "pale",
   "fess",
+  "bar",
+  "two-bars",
+  "three-bars",
   "bend",
   "bend-sinister",
   "chevron",
@@ -122,6 +125,32 @@ const PROBES = [
   { shield: "gules cross-azure fimbriated-argent", at: [50, 45], expect: "azure", why: "the fimbriated cross itself" },
   { shield: "per-pale-or-gules chevron-counterchanged", at: [25, 60], expect: "gules", why: "the counterchanged chevron's dexter half" },
   { shield: "per-pale-or-gules chevron-counterchanged", at: [75, 60], expect: "or", why: "the counterchanged chevron's sinister half" },
+
+  // Bars are one polygon joined along x = 0, so the gaps at the dexter edge must stay open.
+  { shield: "azure bar-or", at: [[50, 45], [2, 45]], expect: "or", why: "the bar is drawn" },
+  { shield: "azure bar-or", at: [[50, 35], [50, 55]], expect: "azure", why: "the field above and below the bar" },
+  { shield: "azure two-bars-or", at: [[50, 33], [50, 57], [2, 33], [2, 57]], expect: "or", why: "both bars are drawn" },
+  { shield: "azure two-bars-or", at: [[50, 45], [2, 45], [50, 22], [50, 68]], expect: "azure", why: "the field between, by the seam and around the bars" },
+  { shield: "azure three-bars-or", at: [[50, 25], [50, 45], [50, 65], [2, 25], [2, 45], [2, 65]], expect: "or", why: "all three bars are drawn" },
+  { shield: "azure three-bars-or", at: [[50, 35], [50, 55], [2, 35], [2, 55], [50, 15], [50, 75]], expect: "azure", why: "the field between, by the seam and around the bars" },
+  // Seven scallops across, so x = 50 is the middle of one and x = 300/7 a cusp, where no bite reaches.
+  { shield: "azure three-bars-engrailed-or", at: [[50, 22.1], [50, 27.9], [50, 42.1], [50, 47.9], [50, 62.1], [50, 67.9]], expect: "azure", why: "bites in each bar's edges" },
+  { shield: "azure three-bars-engrailed-or", at: [[42.86, 25], [42.86, 45], [42.86, 65], [2, 25]], expect: "or", why: "each engrailed bar is drawn" },
+  { shield: "azure three-bars-engrailed-or", at: [[2, 35], [2, 55]], expect: "azure", why: "the engrailed bars' seam stays open" },
+  { shield: "azure two-bars-invected-or", at: [[50, 24.9], [50, 41.1], [50, 48.9], [50, 65.1]], expect: "or", why: "bulges on each bar's edges" },
+  { shield: "azure two-bars-invected-or", at: [[42.86, 45], [2, 45]], expect: "azure", why: "the field between invected bars" },
+  { shield: "gules three-bars-azure fimbriated-argent", at: [[50, 18.75], [50, 31.25], [50, 51.25], [50, 58.75], [50, 71.25]], expect: "argent", why: "each bar's fimbriation" },
+  { shield: "gules three-bars-azure fimbriated-argent", at: [[50, 25], [50, 45], [50, 65], [2, 45]], expect: "azure", why: "the fimbriated bars themselves" },
+  { shield: "gules three-bars-azure fimbriated-argent", at: [[50, 35], [50, 55], [2, 35], [2, 55]], expect: "gules", why: "the field between fimbriated bars" },
+  // Below a chief, a bar's y is 30 + 0.7y.
+  { shield: "or three-bars-gules chief-azure", at: [[50, 47.5], [50, 61.5], [50, 75.5]], expect: "gules", why: "bars move below a chief" },
+  { shield: "or three-bars-gules chief-azure", at: [[50, 54.5], [50, 68.5], [2, 54.5]], expect: "or", why: "the field between bars below a chief" },
+  { shield: "per-pale-or-gules two-bars-counterchanged", at: [[25, 33], [25, 57]], expect: "gules", why: "counterchanged bars' dexter half" },
+  { shield: "per-pale-or-gules two-bars-counterchanged", at: [[75, 33], [75, 57], [25, 45]], expect: "or", why: "counterchanged bars' sinister half, and the field between" },
+  { shield: "per-pale-or-gules bar-counterchanged chief-azure", at: [25, 61.5], expect: "gules", why: "a counterchanged bar below a chief" },
+  { shield: "per-pale-or-gules bar-counterchanged chief-azure", at: [25, 45], expect: "or", why: "nothing left of a counterchanged bar where it was" },
+  { shield: "gules bar-ermine", at: furSpot(1, 2), expect: "sable", why: "a spot on a fur bar" },
+  { shield: "gules bar-ermine", at: [50, 30], expect: "gules", why: "the field above a fur bar" },
 
   ...charged("azure", "", 50, [[50, 45]], "one charge"),
   ...charged("azure", "", 30, [[50, 24], [50, 66]], "two charges"),
