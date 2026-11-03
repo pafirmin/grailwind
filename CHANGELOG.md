@@ -6,11 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-03
+
 ### Added
 
 - `grailwind/data` (experimental): the tinctures, metals and colours, furs,
   ordinaries and their lines, charges, arrangements and points as plain data,
-  for tooling such as `@grailwind/eslint-plugin`. Its shape may change in any minor release.
+  for tooling such as `@grailwind/eslint-plugin`. Its shape may change in any
+  minor release.
 - `@grailwind/eslint-plugin` 0.1.0-beta.0, a separate package: the rule of
   tincture and charge structure, for JSX and HTML. Install with
   `@grailwind/eslint-plugin@beta`. It knows engrailed, invected and fur
@@ -68,7 +71,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release: tinctures, divisions, ordinaries, charges, strict mode and
 custom SVG charges.
 
-[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/pafirmin/grailwind/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/pafirmin/grailwind/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/pafirmin/grailwind/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/pafirmin/grailwind/releases/tag/v0.1.0

@@ -45,8 +45,10 @@
     <link rel="stylesheet" href="site.css" />
   </head>
   <body class="argent text-sable font-serif text-lg">
-    <header class="azure text-argent sticky top-0 z-10 lg:static">
-      <div class="mx-auto max-w-6xl px-6 py-4 flex items-center gap-4">
+    <header
+      class="azure text-argent sticky top-0 z-10 flex flex-col max-h-dvh lg:static"
+    >
+      <div class="w-full mx-auto max-w-6xl px-6 py-4 flex items-center gap-4">
         <div class="escutcheon w-9 gyronny-or-gules" aria-hidden="true"></div>
         <a href="#" class="text-2xl no-underline text-or hover:text-argent"
           >Grailwind CSS</a
@@ -102,7 +104,7 @@
       </div>
       <nav
         id="mobile-nav"
-        class="lg:hidden border-t border-argent/30"
+        class="lg:hidden border-t border-argent/30 overflow-y-auto overscroll-contain"
         aria-label="Sections"
         hidden
       >
@@ -165,6 +167,7 @@
           <li><a href="#your-own">Your own charges</a></li>
           <li><a href="#together">All together</a></li>
           <li><a href="#accessibility">Accessibility</a></li>
+          <li><a href="#linting">Linting (beta)</a></li>
         </ul>
       </nav>
 
@@ -339,11 +342,7 @@
             Even medieval heralds had visual contrast requirements. Never put a
             metal on a metal or a colour on a colour, so the design can be read
             from a distance. The
-            <a
-              href="https://github.com/pafirmin/grailwind/tree/main/packages/eslint-plugin"
-              >ESLint plugin</a
-            >
-            can flag this for you.
+            <a href="#linting">ESLint plugin</a> can flag this for you.
           </p>
           <div class="examples">
             <figure
@@ -1318,6 +1317,94 @@
             ordinary is drawn with straight edges instead.
           </p>
         </section>
+
+        <section id="linting">
+          <h2>Linting (beta)</h2>
+          <p>
+            Some mistakes render quietly wrong.
+            <a
+              href="https://github.com/pafirmin/grailwind/tree/main/packages/eslint-plugin"
+              ><code>@grailwind/eslint-plugin</code></a
+            >
+            catches them in JSX and HTML:
+          </p>
+          <ul class="list-disc pl-6 space-y-1 max-w-prose">
+            <li>
+              Metal on metal or colour on colour, including charges on an
+              ordinary, and furs.
+            </li>
+            <li>A charge outside a <code>charges</code> container.</li>
+            <li>
+              <code>between</code> or <code>on</code> with no ordinary to place
+              the charges.
+            </li>
+            <li>
+              Two ordinaries on one shield, or two arrangements on one
+              container.
+            </li>
+            <li>
+              <code>counterchanged</code> or <code>fimbriated-*</code> with
+              nothing to apply to.
+            </li>
+          </ul>
+          <div class="relative max-w-prose mt-4">
+            <pre class="pr-12">
+npm install -D @grailwind/eslint-plugin@beta</pre>
+            <button
+              type="button"
+              class="copy group cursor-pointer absolute right-1 top-1/2 -translate-y-1/2 p-2 text-sable/60 hover:text-gules"
+              aria-label="Copy to clipboard"
+            >
+              <svg
+                class="size-4 group-data-copied:hidden"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="9" y="9" width="12" height="12" rx="2" />
+                <path
+                  d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"
+                />
+              </svg>
+              <svg
+                class="size-4 hidden group-data-copied:block text-vert"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12l5 5L20 7" />
+              </svg>
+              <span class="sr-only" aria-live="polite"></span>
+            </button>
+          </div>
+          <p class="mt-4">Then turn on its rules, here for JSX:</p>
+          <pre data-lang="js">
+// eslint.config.js
+import grailwind from "@grailwind/eslint-plugin";
+
+export default [
+  {
+    files: ["**/*.{jsx,tsx}"],
+    languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
+  },
+  grailwind.configs.recommended,
+];</pre>
+          <p class="mt-4">
+            HTML setup, each rule and its options are in the
+            <a
+              href="https://github.com/pafirmin/grailwind/tree/main/packages/eslint-plugin#readme"
+              >plugin's README</a
+            >. It's a beta, so rules and options may change between releases.
+          </p>
+        </section>
       </main>
     </div>
 
@@ -1359,6 +1446,7 @@
       const grammars = {
         html: /(?<punct><\/?|>|=)|(?<=<\/?)(?<tag>[\w-]+)|(?<attr>[\w-]+)(?==)|(?<string>"[^"]*")/g,
         css: /(?<at>@[\w-]+)|(?<string>"[^"]*")|(?<punct>;)/g,
+        js: /(?<punct>\/\/.*)|(?<at>\b(?:import|from|export|default)\b)|(?<string>"[^"]*")/g,
       };
 
       // Wraps each token of a <pre> in a span coloured with a tincture class.
