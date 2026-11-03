@@ -40,6 +40,33 @@ run("rule-of-tincture", rule, {
     `<div class="escutcheon gules chevron-azure chief-or fimbriated-argent"></div>`,
     // `on` with no ordinary falls back to the field.
     `<div class="escutcheon azure"><div class="charges on"><i class="mullet or"></i></div></div>`,
+    `<div class="escutcheon azure fess-engrailed-or"></div>`,
+    `<div class="escutcheon azure chief-invected-argent"></div>`,
+    // Furs count by their ground: ermine and erminois as metals, ermines and pean as colours.
+    `<div class="escutcheon ermines fess-argent"></div>`,
+    `<div class="escutcheon azure chief-ermine"></div>`,
+    `<div class="escutcheon gules cross-engrailed-erminois"></div>`,
+    `<div class="escutcheon pean bend-or"></div>`,
+    `<div class="escutcheon gules"><div class="charges"><i class="mullet ermine"></i></div></div>`,
+    `<div class="escutcheon azure fess-ermine"><div class="charges on"><i class="mullet gules"></i></div></div>`,
+    `<div class="escutcheon per-pale-ermine-gules fess-or"></div>`,
+    // Engrailed and fur ordinaries aren't fimbriated, so the fimbriation touches nothing.
+    `<div class="escutcheon gules fess-ermine fimbriated-gules"></div>`,
+    `<div class="escutcheon azure fess-engrailed-or fimbriated-azure"></div>`,
+    { code: `<div class="escutcheon ermine fess-argent"></div>`, options: [{ furs: "exempt" }] },
+    {
+      code: `<div class="escutcheon ermine fess-argent"></div>`,
+      options: [{ furs: { ermine: "colour" } }],
+    },
+    {
+      code: `<div class="escutcheon erminois fess-or"></div>`,
+      options: [{ furs: { erminois: "exempt" } }],
+    },
+    // Two exempt furs aren't the same kind as each other.
+    {
+      code: `<div class="escutcheon ermine fess-erminois"></div>`,
+      options: [{ furs: { ermine: "exempt", erminois: "exempt" } }],
+    },
   ],
   invalid: [
     {
@@ -102,6 +129,92 @@ run("rule-of-tincture", rule, {
     {
       code: `<div class="per-pale"><div class="or fess-argent"></div><div class="gules"></div></div>`,
       errors: [error("`fess-argent` puts a fess Argent on Or: metal on metal")],
+    },
+
+    {
+      code: `<div class="escutcheon or fess-engrailed-argent"></div>`,
+      errors: [error("`fess-engrailed-argent` puts a fess engrailed Argent on Or: metal on metal")],
+    },
+    {
+      code: `<div class="escutcheon argent chief-invected-or"></div>`,
+      errors: [error("`chief-invected-or` puts a chief invected Or on Argent: metal on metal")],
+    },
+    {
+      // Not fimbriated, so checked against the field.
+      code: `<div class="escutcheon or fess-engrailed-argent fimbriated-gules"></div>`,
+      errors: [error("`fess-engrailed-argent` puts a fess engrailed Argent on Or: metal on metal")],
+    },
+    {
+      code: `<div class="escutcheon ermine fess-argent"></div>`,
+      errors: [
+        error(
+          "`fess-argent` puts a fess Argent on Ermine: metal on metal (ermine counts as a metal)",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon or fess-ermine"></div>`,
+      errors: [
+        error("`fess-ermine` puts a fess Ermine on Or: metal on metal (ermine counts as a metal)"),
+      ],
+    },
+    {
+      code: `<div class="escutcheon azure chief-pean"></div>`,
+      errors: [
+        error(
+          "`chief-pean` puts a chief Pean on Azure: colour on colour (pean counts as a colour)",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon ermine fess-engrailed-erminois"></div>`,
+      errors: [
+        error(
+          "`fess-engrailed-erminois` puts a fess engrailed Erminois on Ermine: metal on metal (ermine and erminois count as metals)",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon gules"><div class="charges"><i class="mullet ermines"></i></div></div>`,
+      errors: [
+        error(
+          "`ermines` puts a mullet Ermines on Gules: colour on colour (ermines counts as a colour)",
+        ),
+      ],
+    },
+    {
+      // Against the fur fess, not the field.
+      code: `<div class="escutcheon azure fess-ermine"><div class="charges on"><i class="mullet argent"></i></div></div>`,
+      errors: [
+        error("`argent` puts a mullet Argent on Ermine: metal on metal (ermine counts as a metal)"),
+      ],
+    },
+    {
+      // Charges on an engrailed ordinary.
+      code: `<div class="escutcheon azure bend-engrailed-or"><div class="charges on"><i class="mullet argent"></i></div></div>`,
+      errors: [error("`argent` puts a mullet Argent on Or: metal on metal")],
+    },
+    {
+      code: `<div class="escutcheon pean fess-sable"></div>`,
+      options: [{ furs: "ground" }],
+      errors: [
+        error("`fess-sable` puts a fess Sable on Pean: colour on colour (pean counts as a colour)"),
+      ],
+    },
+    {
+      // A fur missing from the map counts by its ground.
+      code: `<div class="escutcheon ermine fess-argent"></div>`,
+      options: [{ furs: { erminois: "exempt" } }],
+      errors: [{ messageId: "violation" }],
+    },
+    {
+      code: `<div class="escutcheon ermine fess-azure"></div>`,
+      options: [{ furs: { ermine: "colour" } }],
+      errors: [
+        error(
+          "`fess-azure` puts a fess Azure on Ermine: colour on colour (ermine counts as a colour)",
+        ),
+      ],
     },
   ],
   jsxOnly: {

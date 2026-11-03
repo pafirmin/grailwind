@@ -9,6 +9,10 @@ run("one-ordinary", rule, {
     `<div class="charges between"></div>`,
     // Only a `charges` container is arranged.
     `<div class="between on"></div>`,
+    `<div class="escutcheon or fess-engrailed-gules chief-ermine"></div>`,
+    // Pointed charges on their own, or in their own container.
+    `<div class="charges"><i class="mullet in-dexter-chief"></i><i class="mullet in-sinister-chief"></i></div>`,
+    `<div class="escutcheon azure"><div class="charges"><i class="mullet"></i><i class="mullet"></i></div><div class="charges"><i class="crescent in-dexter-chief"></i></div></div>`,
   ],
   invalid: [
     {
@@ -32,6 +36,33 @@ run("one-ordinary", rule, {
     {
       code: `<div class="charges on in-fess"></div>`,
       errors: [{ messageId: "arrangements" }],
+    },
+
+    {
+      code: `<div class="escutcheon or fess-engrailed-azure chevron-gules"></div>`,
+      errors: [{ messageId: "ordinaries" }],
+    },
+    {
+      code: `<div class="escutcheon azure fess-ermine bend-invected-or"></div>`,
+      errors: [{ messageId: "ordinaries" }],
+    },
+    {
+      code: `<div class="escutcheon or chief-ermine chief-azure"></div>`,
+      errors: [{ messageId: "chiefs" }],
+    },
+    {
+      // Three mullets, in dexter chief a crescent: the crescent makes it four.
+      code: `<div class="charges"><i class="mullet"></i><i class="mullet"></i><i class="mullet"></i><i class="crescent in-dexter-chief"></i></div>`,
+      errors: [
+        {
+          message:
+            "`in-dexter-chief` sets this charge apart from the others in its container; give it a `charges` container of its own",
+        },
+      ],
+    },
+    {
+      code: `<div class="charges between"><i class="crescent in-chief"></i><i class="mullet"></i><i class="mullet"></i></div>`,
+      errors: [{ messageId: "pointed" }],
     },
   ],
 });

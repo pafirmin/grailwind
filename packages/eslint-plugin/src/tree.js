@@ -7,12 +7,10 @@ export const UNKNOWN = Symbol("unknown parent");
 
 const cache = new WeakMap();
 
-// Variants (`md:`, `*:`), arbitrary values and modifiers can't be Grailwind classes,
-// except image charges written `charge-[url(…)]`.
-const STATIC = /^[a-z0-9-]+$/;
-
+// Variants (`md:`, `*:`) apply only sometimes, so they're ignored. `charge-[url(…)]` has a
+// colon, but no variant.
 export const parseClasses = (value) =>
-  new Set(value.split(/\s+/).filter((c) => STATIC.test(c) || c.startsWith("charge-[")));
+  new Set(value.split(/\s+/).filter((c) => c && (!c.includes(":") || c.startsWith("charge-["))));
 
 export function getElements(sourceCode) {
   let elements = cache.get(sourceCode.ast);

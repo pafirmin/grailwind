@@ -2,8 +2,8 @@
  * Grailwind CSS: ordinaries, e.g. `fess-or`.
  */
 import plugin from "tailwindcss/plugin";
-import { BETWEEN, ON, TINCTURES } from "./data.js";
-import { FURS, furBackground } from "./furs.js";
+import { BETWEEN, FURS, ON, TINCTURES } from "./data.js";
+import { furBackground } from "./furs.js";
 
 // prettier-ignore
 const ORDINARIES = {

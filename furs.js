@@ -2,14 +2,7 @@
  * Grailwind CSS: furs, as a tiled pattern of spots over a ground tincture.
  */
 import plugin from "tailwindcss/plugin";
-
-// Each fur's [ground, spot] tinctures.
-export const FURS = {
-  ermine: ["argent", "sable"],
-  ermines: ["sable", "argent"],
-  erminois: ["or", "sable"],
-  pean: ["sable", "or"],
-};
+import { FURS } from "./data.js";
 
 const SPOT = [
   `<circle cx='0' cy='-8.5' r='1.9'/><circle cx='-3.4' cy='-5.6' r='1.9'/><circle cx='3.4' cy='-5.6' r='1.9'/>`,

@@ -1,5 +1,8 @@
 import { getElements, UNKNOWN } from "../tree.js";
-import { fimbriationOf, isDivided, ordinariesOf } from "../blazon.js";
+import { fimbriationOf, isDivided, isFimbriable, ordinariesOf } from "../blazon.js";
+
+// Any transform makes a charge the containing block for its fixed, swapped layer.
+const TRANSFORM = /^-?(rotate|scale|skew|translate)(-|$)/;
 
 export default {
   meta: {
@@ -11,7 +14,10 @@ export default {
     schema: [],
     messages: {
       noDivision: "`{{cls}}` needs a divided field to swap, e.g. `per-pale-argent-gules`",
-      noOrdinary: "`{{cls}}` needs a tinctured ordinary other than a chief",
+      noOrdinary:
+        "`{{cls}}` needs a plain tinctured ordinary to edge: a chief, and an engrailed, invected, fur or counterchanged ordinary, aren't fimbriated",
+      transformed:
+        "`{{cls}}` breaks `counterchanged`: a transformed charge shows its own small copy of the field",
     },
   },
 
@@ -34,8 +40,23 @@ export default {
           }
 
           const fimbriation = fimbriationOf(el.classes);
-          if (fimbriation && !ordinaries.some((o) => !o.counterchanged)) {
+          if (fimbriation && !ordinaries.some(isFimbriable)) {
             report(el.reportNode, "noOrdinary", fimbriation.cls);
+          }
+
+          if (el.classes.has("charges")) {
+            for (const charge of el.children) {
+              if (!charge.classes) {
+                continue;
+              }
+              const transform = [...charge.classes].find((cls) => TRANSFORM.test(cls));
+              if (
+                transform &&
+                (el.classes.has("counterchanged") || charge.classes.has("counterchanged"))
+              ) {
+                report(charge.reportNode, "transformed", transform);
+              }
+            }
           }
 
           // Counterchanged charges get the swap from the container's parent only.

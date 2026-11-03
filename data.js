@@ -46,6 +46,30 @@ export const ROUNDELS = {
   pellet: "sable",
 };
 
+// Lines of partition for an ordinary's edge, e.g. `fess-engrailed-or`.
+export const LINES = ["engrailed", "invected"];
+
+// Each fur's [ground, spot] tinctures.
+export const FURS = {
+  ermine: ["argent", "sable"],
+  ermines: ["sable", "argent"],
+  erminois: ["or", "sable"],
+  pean: ["sable", "or"],
+};
+
+// The points of the shield, as [left%, top%], for placing a single charge, e.g. `in-dexter-chief`.
+export const POINTS = {
+  "dexter-chief": [25, 17],
+  chief: [50, 15],
+  "sinister-chief": [75, 17],
+  "honour-point": [50, 30],
+  "fess-point": [50, 45],
+  "nombril-point": [50, 60],
+  "dexter-base": [30, 72],
+  base: [50, 84],
+  "sinister-base": [70, 72],
+};
+
 // Plain-field arrangements of a `charges` container, besides `between` and `on`.
 export const ARRANGEMENTS = ["in-pale", "in-fess", "in-bend", "in-bend-sinister"];
 

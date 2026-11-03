@@ -9,6 +9,9 @@ run("arrangement-needs-ordinary", rule, {
     `<div class="escutcheon azure bend-or chief-argent"><div class="charges on"></div></div>`,
     `<div class="escutcheon azure"><div class="charges in-pale"></div></div>`,
     `<div class="charges between"></div>`,
+    `<div class="escutcheon azure fess-engrailed-or"><div class="charges between"></div></div>`,
+    `<div class="escutcheon gules chevron-ermine"><div class="charges on"></div></div>`,
+    `<div class="escutcheon gules bend-invected-erminois"><div class="charges on"></div></div>`,
   ],
   invalid: [
     {

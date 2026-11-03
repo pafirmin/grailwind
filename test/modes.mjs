@@ -3,7 +3,17 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ARRANGEMENTS, CHARGES, DIVISIONS, ORDINARIES, ROUNDELS, TINCTURES } from "../data.js";
+import {
+  ARRANGEMENTS,
+  CHARGES,
+  DIVISIONS,
+  FURS,
+  LINES,
+  ORDINARIES,
+  POINTS,
+  ROUNDELS,
+  TINCTURES,
+} from "../data.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const cli = join(root, "node_modules/.bin/tailwindcss");
@@ -129,6 +139,11 @@ const DATA_CLASSES = [
   ...ORDINARIES.map((o) => `${o}-counterchanged`),
   ...TINCTURES.map((t) => `fimbriated-${t}`),
   "counterchanged",
+  ...Object.keys(FURS),
+  ...Object.keys(FURS).map((f) => `fess-${f}`),
+  ...Object.keys(FURS).map((f) => `per-pale-${f}-gules`),
+  ...LINES.flatMap((l) => ORDINARIES.map((o) => `${o}-${l}-or`)),
+  ...Object.keys(POINTS).map((p) => `in-${p}`),
 ];
 
 writeFileSync(

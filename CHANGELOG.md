@@ -8,12 +8,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- `grailwind/data` (experimental): the tinctures, metals and colours,
-  ordinaries, charges and arrangement points as plain data, for tooling such as
-  `@grailwind/eslint-plugin`. Its shape may change in any minor release.
+- `grailwind/data` (experimental): the tinctures, metals and colours, furs,
+  ordinaries and their lines, charges, arrangements and points as plain data,
+  for tooling such as `@grailwind/eslint-plugin`. Its shape may change in any minor release.
 - `@grailwind/eslint-plugin` 0.1.0-beta.0, a separate package: the rule of
   tincture and charge structure, for JSX and HTML. Install with
-  `@grailwind/eslint-plugin@beta`.
+  `@grailwind/eslint-plugin@beta`. It knows engrailed, invected and fur
+  ordinaries, and counts furs by their ground (configurable).
 - `in-bend-sinister`: two or three charges in a line from sinister chief to
   dexter base.
 - Engrailed and invected ordinaries, e.g. `fess-engrailed-or` and

@@ -1,5 +1,5 @@
 import { getElements } from "../tree.js";
-import { arrangementsOf, ordinariesOf } from "../blazon.js";
+import { arrangementsOf, ordinariesOf, pointOf } from "../blazon.js";
 
 const quote = (names) => names.map((n) => `\`${n}\``).join(" and ");
 
@@ -16,6 +16,8 @@ export default {
       ordinaries: "{{classes}} both draw an ordinary; only one will show.",
       chiefs: "{{classes}} both draw a chief; only one will show",
       arrangements: "{{classes}} both place these charges",
+      pointed:
+        "`{{cls}}` sets this charge apart from the others in its container; give it a `charges` container of its own",
     },
   },
 
@@ -46,6 +48,18 @@ export default {
             const arrangements = arrangementsOf(el.classes);
             if (arrangements.length > 1) {
               report("arrangements", arrangements);
+            }
+            // A pointed charge still counts towards, and shifts, the others' positions.
+            const charges = el.children.filter((child) => child.classes);
+            const pointed = charges.filter((child) => pointOf(child.classes));
+            if (pointed.length && pointed.length < charges.length) {
+              for (const charge of pointed) {
+                context.report({
+                  node: charge.reportNode,
+                  messageId: "pointed",
+                  data: { cls: pointOf(charge.classes) },
+                });
+              }
             }
           }
         }

@@ -6,51 +6,101 @@ import {
   CHARGES,
   COLOURS,
   DIVISIONS,
+  FURS,
+  LINES,
   METALS,
   ORDINARIES,
+  POINTS,
   ROUNDELS,
   TINCTURES,
 } from "grailwind/data";
 
 const METAL = new Set(METALS);
 const COLOUR = new Set(COLOURS);
-const TINCTURE = new Set(TINCTURES);
+const FUR = new Set(Object.keys(FURS));
+// Anything a field, ordinary or charge can be painted in.
+const TINCTURE = new Set([...TINCTURES, ...FUR]);
 const CHARGE = new Set([...CHARGES, ...Object.keys(ROUNDELS)]);
 const FIMBRIATIONS = new Set(TINCTURES.map((t) => `fimbriated-${t}`));
 const CHIEF_POINTS = new Set(["in-dexter-chief", "in-chief", "in-sinister-chief"]);
+const POINT_CLASSES = new Set(Object.keys(POINTS).map((point) => `in-${point}`));
 export const ALL_ARRANGEMENTS = ["between", "on", ...ARRANGEMENTS];
 
-// Every `{ordinary}-{tincture}`, `{ordinary}-counterchanged` and `bordure-{tincture}` class,
-// mapped to its parts. A counterchanged ordinary has no tincture of its own.
+// Every ordinary class, e.g. `fess-or`, `fess-engrailed-ermine`, `fess-counterchanged` and
+// `bordure-or`, mapped to its parts. A counterchanged ordinary has no tincture of its own.
 const ORDINARY_CLASSES = new Map();
-for (const ordinary of [...ORDINARIES, "bordure"]) {
-  for (const tincture of TINCTURES) {
-    ORDINARY_CLASSES.set(`${ordinary}-${tincture}`, { ordinary, tincture });
-  }
-}
 for (const ordinary of ORDINARIES) {
+  for (const tincture of TINCTURE) {
+    const fur = FUR.has(tincture);
+    ORDINARY_CLASSES.set(`${ordinary}-${tincture}`, { ordinary, tincture, fur });
+    for (const line of LINES) {
+      ORDINARY_CLASSES.set(`${ordinary}-${line}-${tincture}`, { ordinary, tincture, fur, line });
+    }
+  }
   ORDINARY_CLASSES.set(`${ordinary}-counterchanged`, {
     ordinary,
     tincture: null,
     counterchanged: true,
   });
 }
+for (const tincture of TINCTURES) {
+  ORDINARY_CLASSES.set(`bordure-${tincture}`, { ordinary: "bordure", tincture });
+}
 
+// Two furs in one division aren't generated.
 const DIVISION_CLASSES = new Set();
 for (const division of DIVISIONS) {
-  for (const a of TINCTURES) {
-    for (const b of TINCTURES) {
-      if (a !== b) {
+  for (const a of TINCTURE) {
+    for (const b of TINCTURE) {
+      if (a !== b && !(FUR.has(a) && FUR.has(b))) {
         DIVISION_CLASSES.add(`${division}-${a}-${b}`);
       }
     }
   }
 }
 
-export const kind = (tincture) =>
-  METAL.has(tincture) ? "metal" : COLOUR.has(tincture) ? "colour" : null;
+// Only a plain, tinctured ordinary is fimbriated (see ordinaries.js).
+export const isFimbriable = (o) => !o.counterchanged && !o.line && !o.fur;
 
-export const sameKind = (a, b) => a && b && kind(a) && kind(a) === kind(b);
+export const isFur = (tincture) => FUR.has(tincture);
+
+const groundKind = (fur) => kind(FURS[fur][0]);
+
+// What the rule's `furs` option makes of one fur: "metal", "colour" or "exempt". The rule's
+// schema has already checked the option.
+const furChoice = (fur, option) => {
+  if (option === "ground") {
+    return groundKind(fur);
+  }
+  if (option === "exempt") {
+    return "exempt";
+  }
+  // A map: a fur left out counts by its ground.
+  return option[fur] ?? groundKind(fur);
+};
+
+// Each fur's kind for kind() and sameKind(). Exempt is null, which they treat as "no check".
+export function furKinds(option = "ground") {
+  const kinds = {};
+  for (const fur of Object.keys(FURS)) {
+    const choice = furChoice(fur, option);
+    kinds[fur] = choice === "exempt" ? null : choice;
+  }
+  return kinds;
+}
+
+// `furs` is the map from furKinds().
+export const kind = (tincture, furs) => {
+  if (FUR.has(tincture)) {
+    return furs[tincture];
+  }
+  return METAL.has(tincture) ? "metal" : COLOUR.has(tincture) ? "colour" : null;
+};
+
+export const sameKind = (a, b, furs) => {
+  const k = a && b && kind(a, furs);
+  return Boolean(k) && k === kind(b, furs);
+};
 
 // The ordinaries on an element, as { cls, ordinary, tincture }, by kind.
 export function ordinariesOf(classes) {
@@ -105,6 +155,8 @@ export const chargeName = (classes) =>
   ([...classes].some((cls) => cls.startsWith("charge-[")) ? "charge" : null);
 
 export const isCharge = (classes) => chargeName(classes) !== null;
+
+export const pointOf = (classes) => [...classes].find((cls) => POINT_CLASSES.has(cls));
 
 export const atChiefPoint = (classes) => [...classes].some((cls) => CHIEF_POINTS.has(cls));
 

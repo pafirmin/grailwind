@@ -3,6 +3,7 @@ import { run } from "./run.js";
 
 const noDivision = (cls) => ({ messageId: "noDivision", data: { cls } });
 const noOrdinary = (cls) => ({ messageId: "noOrdinary", data: { cls } });
+const transformed = (cls) => ({ messageId: "transformed", data: { cls } });
 
 run("modifier-needs-target", rule, {
   valid: [
@@ -16,6 +17,12 @@ run("modifier-needs-target", rule, {
     `<div class="escutcheon azure"><div class="charges"><i class="mullet or"></i></div></div>`,
     // The top level of a file may be inside a divided field elsewhere.
     `<div class="charges counterchanged"><i class="roundel"></i></div>`,
+    // A fur division is divided.
+    `<div class="escutcheon per-pale-ermine-gules chevron-counterchanged"></div>`,
+    `<div class="escutcheon quarterly-azure-ermine"><div class="charges counterchanged"><i class="roundel"></i></div></div>`,
+    // A transform is fine on a charge that isn't counterchanged, and variants are ignored.
+    `<div class="escutcheon per-pale-or-gules"><div class="charges"><i class="mullet azure rotate-45"></i></div></div>`,
+    `<div class="escutcheon per-pale-or-gules"><div class="charges"><i class="mullet counterchanged hover:rotate-45"></i></div></div>`,
   ],
   invalid: [
     {
@@ -42,7 +49,12 @@ run("modifier-needs-target", rule, {
     },
     {
       code: `<div class="escutcheon azure fimbriated-argent"></div>`,
-      errors: [{ message: "`fimbriated-argent` needs a tinctured ordinary other than a chief" }],
+      errors: [
+        {
+          message:
+            "`fimbriated-argent` needs a plain tinctured ordinary to edge: a chief, and an engrailed, invected, fur or counterchanged ordinary, aren't fimbriated",
+        },
+      ],
     },
     {
       code: `<div class="escutcheon azure chief-or fimbriated-argent"></div>`,
@@ -51,6 +63,41 @@ run("modifier-needs-target", rule, {
     {
       code: `<div class="escutcheon per-pale-or-gules chevron-counterchanged fimbriated-argent"></div>`,
       errors: [noOrdinary("fimbriated-argent")],
+    },
+
+    {
+      code: `<div class="escutcheon gules fess-engrailed-or fimbriated-argent"></div>`,
+      errors: [noOrdinary("fimbriated-argent")],
+    },
+    {
+      code: `<div class="escutcheon gules fess-ermine fimbriated-argent"></div>`,
+      errors: [noOrdinary("fimbriated-argent")],
+    },
+    {
+      // A fur field isn't divided.
+      code: `<div class="escutcheon ermine chevron-counterchanged"></div>`,
+      errors: [noDivision("chevron-counterchanged")],
+    },
+    {
+      code: `<div class="escutcheon per-pale-or-gules"><div class="charges"><i class="mullet counterchanged rotate-45"></i></div></div>`,
+      errors: [
+        {
+          message:
+            "`rotate-45` breaks `counterchanged`: a transformed charge shows its own small copy of the field",
+        },
+      ],
+    },
+    {
+      code: `<div class="escutcheon per-pale-or-gules"><div class="charges counterchanged"><i class="mullet -rotate-12"></i><i class="mullet scale-x-75"></i><i class="mullet"></i></div></div>`,
+      errors: [transformed("-rotate-12"), transformed("scale-x-75")],
+    },
+    {
+      code: `<div class="escutcheon per-pale-or-gules"><div class="charges counterchanged"><i class="mullet translate-x-1/2"></i><i class="mullet rotate-[10deg]"></i><i class="mullet skew-y-3"></i></div></div>`,
+      errors: [
+        transformed("translate-x-1/2"),
+        transformed("rotate-[10deg]"),
+        transformed("skew-y-3"),
+      ],
     },
   ],
   jsxOnly: {

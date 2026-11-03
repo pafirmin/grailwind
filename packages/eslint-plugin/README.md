@@ -53,7 +53,8 @@ export default [
 No metal (`or`, `argent`) on metal, and no colour on colour.
 
 - An ordinary, chief or bordure is checked against the field on the same element:
-  `escutcheon or fess-argent` is metal on metal.
+  `escutcheon or fess-argent` is metal on metal. So are engrailed and invected ones
+  (`fess-engrailed-argent`).
 - A fimbriated ordinary is checked against its fimbriation, and the fimbriation against the
   field: `or chevron-sable fimbriated-argent` is metal on metal (Argent on Or).
 - Charges in a `charges` container are checked against the field.
@@ -64,6 +65,19 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
 A divided field (`per-pale-or-gules`) has no single tincture, so nothing is checked against it.
 Neither are `<img>` charges, charges with no tincture, or `bordure-*` with a non-heraldic colour.
 Counterchanged ordinaries and charges take the field's tinctures swapped, so they're skipped too.
+
+Furs count by their ground: `ermine` and `erminois` as metals, `ermines` and `pean` as colours.
+`ermine fess-argent` is metal on metal. Authorities differ, so the `furs` option changes this:
+
+```js
+"grailwind/rule-of-tincture": ["error", { furs: "ground" }]   // the default
+"grailwind/rule-of-tincture": ["error", { furs: "exempt" }]   // furs go with anything
+"grailwind/rule-of-tincture": ["error", {
+  furs: { ermine: "metal", erminois: "exempt", ermines: "colour", pean: "colour" },
+}]
+```
+
+A fur left out of the map counts by its ground.
 
 ### `charges-in-container`
 
@@ -80,7 +94,12 @@ one, other than a chief, they have nowhere to go.
 An element draws one ordinary plus, optionally, a chief. With two, such as
 `fess-azure chevron-gules`, only one shows. Two chiefs are flagged too. A `charges` container
 takes one arrangement: `between`, `on`, `in-pale`, `in-fess`, `in-bend` or `in-bend-sinister`.
-Counterchanged ordinaries count as ordinaries.
+Counterchanged, engrailed, invected and fur ordinaries count as ordinaries.
+
+A charge at a named point (`in-dexter-chief` and so on) is a separate group in the blazon, so it
+goes in its own `charges` container. Among other charges, it still counts towards their number
+and shifts their positions: _three mullets, in dexter chief a crescent_ in one container lays
+the mullets out as four.
 
 ### `modifier-needs-target`
 
@@ -90,8 +109,10 @@ Modifiers that would otherwise do nothing:
   element, e.g. `per-pale-argent-gules`.
 - `counterchanged` on `charges`, or on a charge, needs a divided field on the shield that holds
   the container.
-- `fimbriated-*` needs a tinctured ordinary other than a chief. A chief or a counterchanged
-  ordinary isn't fimbriated.
+- `fimbriated-*` needs a plain tinctured ordinary. A chief, and an engrailed, invected, fur or
+  counterchanged ordinary, aren't fimbriated.
+- `counterchanged` doesn't work on a charge with a transform (`rotate-*`, `scale-*`, `skew-*`,
+  `translate-*`): the charge shows its own small copy of the field instead.
 
 ## Exceptions
 
@@ -119,3 +140,13 @@ The rules read static class strings only: `class="…"`, `className="…"`, or a
 with no `${…}`. Anything dynamic, such as `clsx(…)` or a spread of props, is skipped rather than
 guessed at. So are elements inside a component (`<Shield>…</Shield>`) or an expression
 (`{items.map(…)}`), and classes with a variant (`md:gules`).
+
+Two field tinctures on one element are a conflict, which this plugin leaves to
+`better-tailwindcss/no-conflicting-classes`. It catches `or azure` and `ermine pean`, but not a
+fur with a plain tincture (`ermine gules`) or with a division (`per-pale-ermine-gules
+per-fess-or-azure`): their CSS properties differ, so it doesn't see them as conflicting
+(eslint-plugin-better-tailwindcss 4.10.0).
+
+The transform check knows Tailwind's transform utilities only. Other things that break
+`counterchanged` the same way, such as `filter`, `perspective` or `will-change: transform`,
+aren't flagged.

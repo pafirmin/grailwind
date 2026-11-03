@@ -2,7 +2,7 @@
  * Grailwind CSS: charges and their arrangement.
  */
 import plugin from "tailwindcss/plugin";
-import { ROUNDELS } from "./data.js";
+import { POINTS, ROUNDELS } from "./data.js";
 
 const star = (cx, cy, r, points = 5) => {
   const coords = [];
@@ -42,18 +42,6 @@ const DEFAULTS = {
   6: { size: 20, points: [[20, 18], [50, 18], [80, 18], [35, 42], [65, 42], [50, 66]] },
 };
 
-// The points of the shield, for placing a single charge, e.g. `in-dexter-chief`.
-const POINTS = {
-  "dexter-chief": [25, 17],
-  chief: [50, 15],
-  "sinister-chief": [75, 17],
-  "honour-point": [50, 30],
-  "fess-point": [50, 45],
-  "nombril-point": [50, 60],
-  "dexter-base": [30, 72],
-  base: [50, 84],
-  "sinister-base": [70, 72],
-};
 const POINT_SIZE = 22;
 
 // With a chief on the shield, these points sit on it (see ordinaries.js).
