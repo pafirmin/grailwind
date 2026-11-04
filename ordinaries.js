@@ -42,7 +42,7 @@ const polygon = (vertices) => `polygon(${vertices.map(point).join(", ")})`;
 
 const PSEUDO = { chief: "&::after" };
 
-// The chief surmounts a bordure. 
+// The chief surmounts a bordure.
 const INSET = "var(--bordure-inset)";
 const OVER_BORDURE = {
   "--bordure-inset": "inherit",

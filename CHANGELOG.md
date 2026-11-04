@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-04
+
 ### Added
 
 - `in-chief` and `in-base`: one to three charges along the chief or base. On a
@@ -39,6 +41,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `in-base-point`, like the honour, fess and nombril points.
 - The canton and the chief surmount a bordure, as in heraldry. The canton is
   still a third of the whole shield, and the chief's lower edge doesn't move.
+- `@grailwind/eslint-plugin` 0.1.0-beta.1 needs `grailwind` 0.5.x, for the
+  renamed points.
 
 ### Fixed
 
@@ -109,7 +113,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release: tinctures, divisions, ordinaries, charges, strict mode and
 custom SVG charges.
 
-[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/pafirmin/grailwind/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/pafirmin/grailwind/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/pafirmin/grailwind/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/pafirmin/grailwind/compare/v0.1.0...v0.2.0
