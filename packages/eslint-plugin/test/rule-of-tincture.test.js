@@ -23,9 +23,12 @@ run("rule-of-tincture", rule, {
     `<div class="escutcheon azure md:gules fess-or"></div>`,
     `<div class="escutcheon azure bend-or"><div class="charges on"><i class="lozenge gules"></i></div></div>`,
     // A charge at a chief point sits on the chief, not the field.
-    `<div class="escutcheon or chief-azure"><div class="charges"><i class="mullet argent in-chief"></i></div></div>`,
+    `<div class="escutcheon or chief-azure"><div class="charges"><i class="mullet argent in-chief-point"></i></div></div>`,
+    // So do charges arranged in chief.
+    `<div class="escutcheon or chief-azure"><div class="charges in-chief"><i class="mullet argent"></i><i class="mullet argent"></i></div></div>`,
     // Charges at other points stay on the field.
-    `<div class="escutcheon gules chief-or"><div class="charges"><i class="mullet or in-base"></i></div></div>`,
+    `<div class="escutcheon gules chief-or"><div class="charges"><i class="mullet or in-base-point"></i></div></div>`,
+    `<div class="escutcheon gules chief-or"><div class="charges in-base"><i class="mullet or"></i></div></div>`,
     // Counterchanged ordinaries and charges have no tincture of their own.
     `<div class="escutcheon per-pale-argent-gules chevron-counterchanged"></div>`,
     `<div class="escutcheon per-pale-or-argent bend-counterchanged"><div class="charges on"><i class="mullet or"></i></div></div>`,
@@ -125,7 +128,11 @@ run("rule-of-tincture", rule, {
       errors: [error("`argent` puts a lozenge Argent on Or: metal on metal")],
     },
     {
-      code: `<div class="escutcheon or chief-azure"><div class="charges"><i class="mullet gules in-chief"></i></div></div>`,
+      code: `<div class="escutcheon or chief-azure"><div class="charges"><i class="mullet gules in-chief-point"></i></div></div>`,
+      errors: [error("`gules` puts a mullet Gules on Azure: colour on colour")],
+    },
+    {
+      code: `<div class="escutcheon or chief-azure"><div class="charges in-chief"><i class="mullet gules"></i></div></div>`,
       errors: [error("`gules` puts a mullet Gules on Azure: colour on colour")],
     },
     {

@@ -72,18 +72,25 @@ export const FURS = {
 // The points of the shield, as [left%, top%], for placing a single charge, e.g. `in-dexter-chief`.
 export const POINTS = {
   "dexter-chief": [25, 17],
-  chief: [50, 15],
+  "chief-point": [50, 15],
   "sinister-chief": [75, 17],
   "honour-point": [50, 30],
   "fess-point": [50, 45],
   "nombril-point": [50, 60],
   "dexter-base": [30, 72],
-  base: [50, 84],
+  "base-point": [50, 84],
   "sinister-base": [70, 72],
 };
 
 // Plain-field arrangements of a `charges` container, besides `between` and `on`.
-export const ARRANGEMENTS = ["in-pale", "in-fess", "in-bend", "in-bend-sinister"];
+export const ARRANGEMENTS = [
+  "in-pale",
+  "in-fess",
+  "in-bend",
+  "in-bend-sinister",
+  "in-chief",
+  "in-base",
+];
 
 // Where charges go for "between", as [left%, top%], plus their size as % of width.
 // `counts` overrides the points (and optionally the size) for one number of charges.

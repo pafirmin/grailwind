@@ -8,6 +8,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `in-chief` and `in-base`: one to three charges along the chief or base. On a
+  chief, they sit on it. The ESLint plugin reports an arrangement put on a
+  charge rather than its container.
 - `-of-the-first`: the field's first tincture, as in a blazon, e.g.
   `pale-of-the-first`. The ESLint plugin checks it.
 - Striped fields: `barry-*` and `paly-*` (of six), `barry-of-eight-*`,
@@ -29,6 +32,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   as wide.
 - The ESLint plugin checks a plain canton or inescutcheon against the field it
   lies on. One with anything on it counts as arms of its own.
+
+### Changed
+
+- The `in-chief` and `in-base` points are now `in-chief-point` and
+  `in-base-point`, like the honour, fess and nombril points.
 
 ### Fixed
 

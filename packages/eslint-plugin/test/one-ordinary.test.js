@@ -5,7 +5,7 @@ run("one-ordinary", rule, {
   valid: [
     `<div class="escutcheon or chevron-gules chief-azure"></div>`,
     `<div class="escutcheon or fess-gules bordure-azure"></div>`,
-    `<div class="charges in-pale"><i class="mullet in-chief"></i></div>`,
+    `<div class="charges in-pale"><i class="mullet in-chief-point"></i></div>`,
     `<div class="charges between"></div>`,
     // Only a `charges` container is arranged.
     `<div class="between on"></div>`,
@@ -37,6 +37,10 @@ run("one-ordinary", rule, {
       code: `<div class="charges on in-fess"></div>`,
       errors: [{ messageId: "arrangements" }],
     },
+    {
+      code: `<div class="charges in-chief in-pale"></div>`,
+      errors: [{ message: "`in-pale` and `in-chief` both place these charges" }],
+    },
 
     {
       code: `<div class="escutcheon or fess-engrailed-azure chevron-gules"></div>`,
@@ -61,7 +65,7 @@ run("one-ordinary", rule, {
       ],
     },
     {
-      code: `<div class="charges between"><i class="crescent in-chief"></i><i class="mullet"></i><i class="mullet"></i></div>`,
+      code: `<div class="charges between"><i class="crescent in-chief-point"></i><i class="mullet"></i><i class="mullet"></i></div>`,
       errors: [{ messageId: "pointed" }],
     },
   ],

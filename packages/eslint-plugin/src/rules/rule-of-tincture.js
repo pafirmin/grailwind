@@ -1,7 +1,6 @@
 import { FURS, OF_THE_FIRST } from "grailwind/data";
 import { getElements, UNKNOWN } from "../tree.js";
 import {
-  atChiefPoint,
   chargeName,
   chargeTincture,
   describe,
@@ -9,6 +8,7 @@ import {
   fimbriationOf,
   firstOf,
   furKinds,
+  inChief,
   isFimbriable,
   isFur,
   isPlain,
@@ -165,7 +165,7 @@ export default {
               let ground = field;
               if (container.classes.has("on") && ordinaries.length) {
                 ground = ordinaries[0].tincture;
-              } else if (chiefs.length && atChiefPoint(charge.classes)) {
+              } else if (chiefs.length && inChief(container, charge)) {
                 ground = chiefs[0].tincture;
               }
 

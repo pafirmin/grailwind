@@ -2,6 +2,7 @@ import rule from "../src/rules/charges-in-container.js";
 import { run } from "./run.js";
 
 const outside = (charge) => ({ messageId: "outside", data: { charge } });
+const arranged = (message) => ({ message });
 
 run("charges-in-container", rule, {
   valid: [
@@ -11,6 +12,9 @@ run("charges-in-container", rule, {
     `<div class="escutcheon azure"><div class="charge-size-20"></div></div>`,
     // The top level of a file may be rendered inside a container elsewhere.
     `<i class="mullet or"></i>`,
+    `<div class="escutcheon azure"><div class="charges in-chief"><i class="mullet or in-chief-point"></i></div></div>`,
+    // Only a charge in a `charges` container is checked.
+    `<div class="escutcheon azure in-chief"></div>`,
   ],
   invalid: [
     {
@@ -24,6 +28,26 @@ run("charges-in-container", rule, {
     {
       code: `<div class="escutcheon azure"><div class="charges"><span><i class="fleur-de-lis or"></i></span></div></div>`,
       errors: [outside("fleur-de-lis")],
+    },
+    {
+      code: `<div class="escutcheon azure"><div class="charges"><i class="mullet or in-chief"></i></div></div>`,
+      errors: [
+        arranged(
+          "`in-chief` arranges a `charges` container, not a charge; to place one charge, use `in-chief-point`",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon azure"><div class="charges"><i class="mullet or in-base"></i></div></div>`,
+      errors: [
+        arranged(
+          "`in-base` arranges a `charges` container, not a charge; to place one charge, use `in-base-point`",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon azure"><div class="charges"><i class="mullet or in-pale"></i></div></div>`,
+      errors: [arranged("`in-pale` arranges a `charges` container, not a charge")],
     },
   ],
   jsxOnly: {

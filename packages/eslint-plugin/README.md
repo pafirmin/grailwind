@@ -63,8 +63,8 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
   field: `or chevron-sable fimbriated-argent` is metal on metal (Argent on Or).
 - Charges in a `charges` container are checked against the field.
 - Charges in a `charges on` container are checked against the ordinary they lie on.
-- Charges at `in-dexter-chief`, `in-chief` or `in-sinister-chief` are checked against the chief,
-  if there is one.
+- Charges at `in-dexter-chief`, `in-chief-point` or `in-sinister-chief`, or in a
+  `charges in-chief` container, are checked against the chief, if there is one.
 - A plain canton or inescutcheon, one with nothing on it, is checked against the field it lies
   on. One with charges, an ordinary or a division counts as arms of its own and is exempt.
 
@@ -91,6 +91,8 @@ A fur left out of the map counts by its ground.
 
 Charges (`mullet`, `bezant`, `charge-[…]` and so on) must be direct children of a `charges`
 container.
+
+An arrangement (`in-chief`, `in-pale`, `between` and so on) goes on the container, not a charge.
 
 ### `arrangement-needs-ordinary`
 

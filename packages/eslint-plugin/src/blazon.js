@@ -26,7 +26,7 @@ const TINCTURE = new Set([...TINCTURES, ...FUR]);
 const PAINT = new Set([...TINCTURE, OF_THE_FIRST]);
 const CHARGE = new Set([...CHARGES, ...Object.keys(ROUNDELS)]);
 const FIMBRIATIONS = new Set([...TINCTURES, OF_THE_FIRST].map((t) => `fimbriated-${t}`));
-const CHIEF_POINTS = new Set(["in-dexter-chief", "in-chief", "in-sinister-chief"]);
+const CHIEF_POINTS = new Set(["in-dexter-chief", "in-chief-point", "in-sinister-chief"]);
 const POINT_CLASSES = new Set(Object.keys(POINTS).map((point) => `in-${point}`));
 export const ALL_ARRANGEMENTS = ["between", "on", ...ARRANGEMENTS];
 
@@ -211,7 +211,11 @@ export const isCharge = (classes) => chargeName(classes) !== null;
 
 export const pointOf = (classes) => [...classes].find((cls) => POINT_CLASSES.has(cls));
 
-export const atChiefPoint = (classes) => [...classes].some((cls) => CHIEF_POINTS.has(cls));
+const atChiefPoint = (classes) => [...classes].some((cls) => CHIEF_POINTS.has(cls));
+
+// A charge on the chief, if the shield has one: at a chief point, or arranged `in-chief`.
+export const inChief = (container, charge) =>
+  atChiefPoint(charge.classes) || container.classes.has("in-chief");
 
 export const arrangementsOf = (classes) => ALL_ARRANGEMENTS.filter((name) => classes.has(name));
 

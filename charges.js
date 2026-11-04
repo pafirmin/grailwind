@@ -46,7 +46,22 @@ const DEFAULTS = {
 const POINT_SIZE = 22;
 
 // With a chief on the shield, these points sit on it (see ordinaries.js).
-const CHIEF_POINTS = new Set(["dexter-chief", "chief", "sinister-chief"]);
+const CHIEF_POINTS = new Set(["dexter-chief", "chief-point", "sinister-chief"]);
+
+// Arrangements along the chief or base, by the points each count of charges takes.
+// prettier-ignore
+const ALONG = {
+  "in-chief": {
+    1: ["chief-point"],
+    2: ["dexter-chief", "sinister-chief"],
+    3: ["dexter-chief", "chief-point", "sinister-chief"],
+  },
+  "in-base": {
+    1: ["base-point"],
+    2: ["dexter-base", "sinister-base"],
+    3: ["dexter-base", "base-point", "sinister-base"],
+  },
+};
 
 // prettier-ignore
 const ARRANGEMENTS = {
@@ -107,6 +122,18 @@ const counterchanged = {
   },
 };
 
+// A charge at one of the shield's points. The chief's points sit on a chief when there is one.
+const atPoint = (name) => {
+  const [left, top] = POINTS[name];
+  return CHIEF_POINTS.has(name)
+    ? {
+        left: `${left}%`,
+        top: `var(--chief-points-y, ${top}%)`,
+        "--charge-width": `var(--charge-size, var(--chief-points-size, ${POINT_SIZE}%))`,
+      }
+    : place([left, top], POINT_SIZE);
+};
+
 const hasCount = (n) => `:has(> :nth-child(${n}):last-child)`;
 
 export default plugin(({ addUtilities, matchUtilities }) => {
@@ -160,6 +187,16 @@ export default plugin(({ addUtilities, matchUtilities }) => {
     utilities[`.${name}`] = arrangement;
   }
 
+  for (const [name, counts] of Object.entries(ALONG)) {
+    const arrangement = {};
+    for (const [count, points] of Object.entries(counts)) {
+      points.forEach((point, i) => {
+        arrangement[`&${hasCount(count)} > :nth-child(${i + 1})`] = atPoint(point);
+      });
+    }
+    utilities[`.${name}`] = arrangement;
+  }
+
   // Positions come from the ordinary on the shield (see ordinaries.js).
   const between = {};
   for (let i = 1; i <= 4; i++) {
@@ -201,16 +238,8 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   }
   utilities[".on"] = on;
 
-  for (const [name, [left, top]] of Object.entries(POINTS)) {
-    utilities[`.in-${name}`] = {
-      ".charges > &": CHIEF_POINTS.has(name)
-        ? {
-            left: `${left}%`,
-            top: `var(--chief-points-y, ${top}%)`,
-            "--charge-width": `var(--charge-size, var(--chief-points-size, ${POINT_SIZE}%))`,
-          }
-        : place([left, top], POINT_SIZE),
-    };
+  for (const name of Object.keys(POINTS)) {
+    utilities[`.in-${name}`] = { ".charges > &": atPoint(name) };
   }
 
   // On a charge, or on `charges` for all of them.

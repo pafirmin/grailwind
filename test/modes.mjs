@@ -100,6 +100,8 @@ const PATTERNS = {
     /\.inescutcheon, \.canton \{[^}]*--field-top: initial;/,
   "in-bend-sinister runs from sinister chief":
     /\.in-bend-sinister:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: 78%;\s*top: 16%;/,
+  "in-chief takes the chief's points":
+    /\.in-chief:has\( > :nth-child\(3\):last-child\) > :nth-child\(2\) \{\s*left: 50%;\s*top: var\(--chief-points-y, 15%\);/,
   "the escutcheon holds charges' fixed layers": /\.escutcheon \{[^}]*contain: layout;/,
   "the escutcheon starts the count of the first":
     /\.escutcheon \{[^}]*--the-first: var\(--field-first\);/,

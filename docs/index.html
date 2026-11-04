@@ -1211,31 +1211,33 @@
                 class="charges charge-size-11 *:flex *:items-center *:justify-center *:rounded-full *:argent *:text-xs"
               >
                 <span class="in-dexter-chief">1</span>
-                <span class="in-chief">2</span>
+                <span class="in-chief-point">2</span>
                 <span class="in-sinister-chief">3</span>
                 <span class="in-honour-point">4</span>
                 <span class="in-fess-point">5</span>
                 <span class="in-nombril-point">6</span>
                 <span class="in-dexter-base">7</span>
-                <span class="in-base">8</span>
+                <span class="in-base-point">8</span>
                 <span class="in-sinister-base">9</span>
               </div>
             </div>
             <ol class="mt-8 md:mt-0 space-y-1 list-decimal pl-6">
               <li><code>in-dexter-chief</code> dexter chief</li>
-              <li><code>in-chief</code> middle chief</li>
+              <li><code>in-chief-point</code> chief point</li>
               <li><code>in-sinister-chief</code> sinister chief</li>
               <li><code>in-honour-point</code> honour point</li>
               <li><code>in-fess-point</code> fess point</li>
               <li><code>in-nombril-point</code> nombril point</li>
               <li><code>in-dexter-base</code> dexter base</li>
-              <li><code>in-base</code> middle base</li>
+              <li><code>in-base-point</code> base point</li>
               <li><code>in-sinister-base</code> sinister base</li>
             </ol>
           </div>
           <p>
             Points work alongside ordinaries and other charges. With a chief on
             the shield, the three chief points sit on the chief.
+            <code>in-chief</code> and <code>in-base</code> arrange a container's
+            charges along the chief or base.
           </p>
           <div class="examples">
             <figure
@@ -1252,16 +1254,16 @@
             >
               <div class="escutcheon or chevron-gules">
                 <div class="charges">
-                  <i class="fleur-de-lis azure in-base"></i>
+                  <i class="fleur-de-lis azure in-base-point"></i>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Or, on a chief Azure three mullets Argent">
               <div class="escutcheon or chief-azure">
-                <div class="charges">
-                  <i class="mullet argent in-dexter-chief"></i>
-                  <i class="mullet argent in-chief"></i>
-                  <i class="mullet argent in-sinister-chief"></i>
+                <div class="charges in-chief">
+                  <i class="mullet argent"></i>
+                  <i class="mullet argent"></i>
+                  <i class="mullet argent"></i>
                 </div>
               </div>
             </figure>
@@ -1274,10 +1276,10 @@
                   <i class="crescent azure"></i>
                   <i class="crescent azure"></i>
                 </div>
-                <div class="charges">
-                  <i class="mullet argent in-dexter-chief"></i>
-                  <i class="mullet argent in-chief"></i>
-                  <i class="mullet argent in-sinister-chief"></i>
+                <div class="charges in-chief">
+                  <i class="mullet argent"></i>
+                  <i class="mullet argent"></i>
+                  <i class="mullet argent"></i>
                 </div>
               </div>
             </figure>
@@ -1383,14 +1385,10 @@
                 <img src="charges/rose.svg" alt="" />
                 <img src="charges/rose.svg" alt="" />
               </div>
-              <div class="charges">
-                <i
-                  class="charge-[url(charges/heart.svg)] gules in-dexter-chief"
-                ></i>
-                <i class="fleur-de-lis azure in-chief"></i>
-                <i
-                  class="charge-[url(charges/heart.svg)] gules in-sinister-chief"
-                ></i>
+              <div class="charges in-chief">
+                <i class="charge-[url(charges/heart.svg)] gules"></i>
+                <i class="fleur-de-lis azure"></i>
+                <i class="charge-[url(charges/heart.svg)] gules"></i>
               </div>
             </div>
           </figure>
@@ -1407,10 +1405,10 @@
                 <i class="mullet"></i>
                 <i class="mullet"></i>
               </div>
-              <div class="charges">
-                <i class="bezant in-dexter-chief"></i>
-                <i class="bezant in-chief"></i>
-                <i class="bezant in-sinister-chief"></i>
+              <div class="charges in-chief">
+                <i class="bezant"></i>
+                <i class="bezant"></i>
+                <i class="bezant"></i>
               </div>
             </div>
           </figure>

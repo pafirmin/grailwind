@@ -200,19 +200,33 @@ const PROBES = [
   ...charged("azure", "in-bend-sinister", 22, [[78, 16], [50, 45], [22, 74]], "three in bend sinister"),
 
   ...atPoint("dexter-chief", [25, 17]),
-  ...atPoint("chief", [50, 15]),
+  ...atPoint("chief-point", [50, 15]),
   ...atPoint("sinister-chief", [75, 17]),
   ...atPoint("honour-point", [50, 30]),
   ...atPoint("fess-point", [50, 45]),
   ...atPoint("nombril-point", [50, 60]),
   ...atPoint("dexter-base", [30, 72]),
-  ...atPoint("base", [50, 84]),
+  ...atPoint("base-point", [50, 84]),
   ...atPoint("sinister-base", [70, 72]),
 
-  { shield: "azure chief-gules", charges: "", items: ["bezant in-chief"], at: ring([50, 15], 18), expect: "or", why: "a charge in chief sits on the chief" },
+  { shield: "azure chief-gules", charges: "", items: ["bezant in-chief-point"], at: ring([50, 15], 18), expect: "or", why: "a charge at the chief point sits on the chief" },
   { shield: "azure chief-gules", charges: "", items: ["bezant in-fess-point"], at: ring([50, 61.5], 22), expect: "or", why: "the fess point moves below a chief" },
   { shield: "azure chief-gules", charges: "", items: ["bezant in-fess-point"], at: [50, 45], expect: "azure", why: "nothing left at the old fess point" },
   ...charged("azure chief-gules", "", 28, [[28, 47.5], [72, 47.5], [50, 74.8]], "three charges below a chief"),
+
+  ...charged("azure", "in-chief", 22, [[50, 15]], "one in chief"),
+  ...charged("azure", "in-chief", 22, [[25, 17], [75, 17]], "two in chief"),
+  ...charged("azure", "in-chief", 22, [[25, 17], [50, 15], [75, 17]], "three in chief"),
+  ...charged("azure chief-gules", "in-chief", 18, [[50, 15]], "one in chief, on a chief"),
+  ...charged("azure chief-gules", "in-chief", 18, [[25, 15], [75, 15]], "two in chief, on a chief"),
+  ...charged("azure chief-gules", "in-chief", 18, [[25, 15], [50, 15], [75, 15]], "three in chief, on a chief"),
+  ...charged("azure", "in-base", 22, [[50, 84]], "one in base"),
+  ...charged("azure", "in-base", 22, [[30, 72], [70, 72]], "two in base"),
+  ...charged("azure", "in-base", 22, [[30, 72], [50, 84], [70, 72]], "three in base"),
+  // Three in chief paint the same points as three charges at the chief points.
+  ...[["in-chief", bezants(3)], ["", ["bezant in-dexter-chief", "bezant in-chief-point", "bezant in-sinister-chief"]]].map(([charges, items]) => (
+    { shield: "azure chief-gules", charges, items, at: [[25, 15], [50, 15], [75, 15]].flatMap((p) => ring(p, 18)), expect: "or", why: `three ${charges || "at the chief points"}, on a chief` }
+  )),
 
   ...charged("azure pale-gules", "between", 18, [[18, 42], [82, 42]], "between a pale"),
   ...charged("azure fess-gules", "between", 20, [[30, 15], [70, 15], [50, 78]], "between a fess"),
@@ -341,7 +355,9 @@ const PROBES = [
   { shield: "azure fess-or", charges: "", items: bezants(1), first: true, inner: { shield: "vert" }, at: [50, 45], expect: "vert", why: "an inescutcheon before the charges still paints over them" },
   ...nested("azure", { shield: "gules" }, 50, [[50, 45]], "a charge on an inescutcheon"),
   ...nested("azure chief-or", { shield: "gules" }, 50, [[50, 45]], "a charge on an inescutcheon, on a shield with a chief"),
-  ...nested("azure chief-or", { shield: "gules", items: ["bezant in-chief"] }, 22, [[50, 15]], "in chief on an inescutcheon, on a shield with a chief"),
+  ...nested("azure chief-or", { shield: "gules", items: ["bezant in-chief-point"] }, 22, [[50, 15]], "at the chief point on an inescutcheon, on a shield with a chief"),
+  ...nested("azure chief-or", { shield: "gules", charges: "in-chief" }, 22, [[25, 17], [50, 15], [75, 17]], "three in chief on an inescutcheon, on a shield with a chief"),
+  ...nested("azure chief-or", { shield: "gules chief-azure", charges: "in-chief" }, 18, [[25, 15], [50, 15], [75, 15]], "three in chief on an inescutcheon's chief"),
   ...nested("azure fess-or", { shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on an inescutcheon, on a shield with a fess"),
   ...nested("azure fess-or", { shield: "gules chevron-argent", charges: "on" }, 12, [[50, 24], [50, 66]], "two on a chevron on an inescutcheon, on a shield with a fess"),
   { shield: "azure", inner: { shield: "per-pale-argent-gules", charges: "counterchanged", items: ["roundel"] }, at: onInner([40, 45]), expect: "gules", why: "a counterchanged charge on an inescutcheon, dexter half" },
