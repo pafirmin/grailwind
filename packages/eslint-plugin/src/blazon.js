@@ -136,6 +136,37 @@ export function fieldTincture(classes) {
   return tinctures.length === 1 ? tinctures[0] : null;
 }
 
+const isEmptyNode = (node) => {
+  switch (node.type) {
+    case "Comment": {
+      return true;
+    }
+    case "JSXExpressionContainer": {
+      return node.expression.type === "JSXEmptyExpression";
+    }
+    case "Text":
+    case "JSXText": {
+      return node.value.trim() === "";
+    }
+    default: {
+      return false;
+    }
+  }
+};
+
+// A canton or inescutcheon with nothing on it. Cantons/inescutcheons with their
+// own arms are exempt from rule-of-tincture.
+export function isPlain(el) {
+  const { ordinaries, chiefs, bordures } = ordinariesOf(el.classes);
+  return (
+    fieldTincture(el.classes) !== null &&
+    !ordinaries.length &&
+    !chiefs.length &&
+    !bordures.length &&
+    (el.node.children ?? []).every(isEmptyNode)
+  );
+}
+
 // A field's first tincture: its bare tincture, or its division's first.
 const fieldFirst = (classes) => {
   const division = [...classes].find((cls) => DIVISION_CLASSES.has(cls));

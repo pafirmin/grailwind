@@ -76,7 +76,19 @@ run("rule-of-tincture", rule, {
     `<div class="escutcheon quarterly"><div class="gules fess-argent"><div class="charges on"><i class="mullet of-the-first"></i></div></div><div class="or"></div></div>`,
     // A fur first is that fur, as in the blazon.
     `<div class="escutcheon per-pale-ermine-azure"><div class="charges"><i class="mullet of-the-first"></i></div></div>`,
-    `<div class="escutcheon ermine"><div class="canton of-the-first"></div></div>`,
+    `<div class="escutcheon ermine"><div class="canton of-the-first"><div class="charges"><i class="mullet gules"></i></div></div></div>`,
+    // A canton or inescutcheon with anything on it looks like arms of its own.
+    `<div class="escutcheon argent"><div class="canton or"><div class="charges"><i class="mullet gules"></i></div></div></div>`,
+    `<div class="escutcheon argent"><div class="canton argent cross-gules"></div></div>`,
+    `<div class="escutcheon argent"><div class="canton per-pale-or-gules"></div></div>`,
+    // A divided field has no single tincture to lie on.
+    `<div class="escutcheon per-pale-or-azure"><div class="canton argent"></div></div>`,
+    // The ground is the field, not a chief under the canton's corner.
+    `<div class="escutcheon argent chief-azure"><div class="canton gules"></div></div>`,
+    {
+      code: `<div class="escutcheon argent"><div class="canton ermine"></div></div>`,
+      options: [{ furs: "exempt" }],
+    },
   ],
   invalid: [
     {
@@ -253,6 +265,68 @@ run("rule-of-tincture", rule, {
         ),
       ],
     },
+    {
+      code: `<div class="escutcheon azure"><div class="canton gules"></div></div>`,
+      errors: [
+        error(
+          "`gules` puts a plain canton Gules on Azure: colour on colour. Change its tincture, or give it arms of its own",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon or"><div class="inescutcheon argent"></div></div>`,
+      errors: [
+        error(
+          "`argent` puts a plain inescutcheon Argent on Or: metal on metal. Change its tincture, or give it arms of its own",
+        ),
+      ],
+    },
+    {
+      // Whitespace is nothing on it.
+      code: `<div class="escutcheon or"><div class="inescutcheon argent">
+  </div></div>`,
+      errors: [{ messageId: "plain" }],
+    },
+    {
+      code: `<div class="escutcheon or"><div class="canton of-the-first"></div></div>`,
+      errors: [
+        error(
+          "`of-the-first` puts a plain canton of the first on Or, its own tincture: it can't be seen",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon ermine"><div class="canton of-the-first"></div></div>`,
+      errors: [
+        error(
+          "`of-the-first` puts a plain canton of the first on Ermine, its own tincture: it can't be seen",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon azure chief-or"><div class="canton gules"></div></div>`,
+      errors: [
+        error(
+          "`gules` puts a plain canton Gules on Azure: colour on colour. Change its tincture, or give it arms of its own",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon quarterly"><div class="azure"><div class="canton gules"></div></div><div class="or"></div></div>`,
+      errors: [
+        error(
+          "`gules` puts a plain canton Gules on Azure: colour on colour. Change its tincture, or give it arms of its own",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon argent"><div class="canton ermine"></div></div>`,
+      errors: [
+        error(
+          "`ermine` puts a plain canton Ermine on Argent: metal on metal (ermine counts as a metal). Change its tincture, or give it arms of its own",
+        ),
+      ],
+    },
   ],
   jsxOnly: {
     valid: [
@@ -265,6 +339,8 @@ run("rule-of-tincture", rule, {
       // A canton without its shield: the first can't be known.
       `<div className="canton gules"><div className="charges"><i className="mullet of-the-first" /></div></div>`,
       `<div className="escutcheon or"><div className="charges">{items.map(() => <i className="mullet argent" />)}</div></div>`,
+      // Its content is unknown, so it may be arms.
+      `<div className="escutcheon azure"><div className="canton gules">{children}</div></div>`,
     ],
     invalid: [
       {
@@ -275,6 +351,10 @@ run("rule-of-tincture", rule, {
         // Fragments don't render an element.
         code: `<div className="escutcheon azure"><div className="charges"><><i className="mullet gules" /></></div></div>`,
         errors: [error("`gules` puts a mullet Gules on Azure: colour on colour")],
+      },
+      {
+        code: `<div className="escutcheon azure"><div className="canton gules">{/* empty */}</div></div>`,
+        errors: [{ messageId: "plain" }],
       },
     ],
   },

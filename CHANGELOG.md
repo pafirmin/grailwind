@@ -27,6 +27,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `inescutcheon`: a small shield at the centre of the arms, over everything
   else, with its own field, ordinaries and charges. A bordure on it is a third
   as wide.
+- The ESLint plugin checks a plain canton or inescutcheon against the field it
+  lies on. One with anything on it counts as arms of its own.
 
 ### Fixed
 

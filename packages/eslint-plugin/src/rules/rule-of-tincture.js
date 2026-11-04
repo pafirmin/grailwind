@@ -1,5 +1,5 @@
 import { FURS, OF_THE_FIRST } from "grailwind/data";
-import { getElements } from "../tree.js";
+import { getElements, UNKNOWN } from "../tree.js";
 import {
   atChiefPoint,
   chargeName,
@@ -11,6 +11,7 @@ import {
   furKinds,
   isFimbriable,
   isFur,
+  isPlain,
   kind,
   ordinariesOf,
   sameKind,
@@ -67,13 +68,15 @@ export default {
         "`{{cls}}` puts {{thing}} {{tincture}} on {{ground}}: {{kind}} on {{kind}}{{note}}",
       invisible:
         "`{{cls}}` puts {{thing}} of the first on {{ground}}, its own tincture: it can't be seen",
+      plain:
+        "`{{cls}}` puts {{thing}} {{tincture}} on {{ground}}: {{kind}} on {{kind}}{{note}}. Change its tincture, or give it arms of its own",
     },
   },
 
   create(context) {
     const furs = furKinds(context.options[0]?.furs);
     // `el` is the element whose field or ordinary it is, for resolving `of-the-first`.
-    const check = (el, node, cls, thing, painted, ground) => {
+    const check = (el, node, cls, thing, painted, ground, messageId = "violation") => {
       const first = [painted, ground].includes(OF_THE_FIRST) ? firstOf(el) : null;
       const tincture = painted === OF_THE_FIRST ? first : painted;
       if (ground === OF_THE_FIRST) {
@@ -92,7 +95,7 @@ export default {
       }
       context.report({
         node,
-        messageId: "violation",
+        messageId,
         data: {
           cls,
           thing: article(thing),
@@ -113,6 +116,13 @@ export default {
           const field = fieldTincture(el.classes);
           const { ordinaries, chiefs, bordures } = ordinariesOf(el.classes);
           const fimbriation = fimbriationOf(el.classes);
+
+          // A plain sub-shield lies on its parent's field. A charged or divided one is arms.
+          const sub = ["canton", "inescutcheon"].find((c) => el.classes.has(c));
+          if (sub && isPlain(el) && el.parent !== UNKNOWN && el.parent.classes) {
+            const ground = fieldTincture(el.parent.classes);
+            check(el, el.reportNode, field, `plain ${sub}`, field, ground, "plain");
+          }
           const isFimbriated = fimbriation && ordinaries.some(isFimbriable);
 
           if (isFimbriated) {

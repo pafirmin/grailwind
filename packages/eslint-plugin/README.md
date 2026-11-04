@@ -65,6 +65,8 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
 - Charges in a `charges on` container are checked against the ordinary they lie on.
 - Charges at `in-dexter-chief`, `in-chief` or `in-sinister-chief` are checked against the chief,
   if there is one.
+- A plain canton or inescutcheon, one with nothing on it, is checked against the field it lies
+  on. One with charges, an ordinary or a division counts as arms of its own and is exempt.
 
 A divided field (`per-pale-or-gules`) has no single tincture, so nothing is checked against it.
 Neither are `<img>` charges, charges with no tincture, or `bordure-*` with a non-heraldic colour.
