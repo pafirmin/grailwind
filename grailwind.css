@@ -48,6 +48,13 @@
   syntax: "*";
   inherits: false;
 }
+/* A field's own bordure width, 0 without one. The shield copies it to --outer-inset, which
+ * inherits, so a canton can step out over the shield's bordure and not its own. */
+@property --bordure-inset {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
 
 /* ---------------------------------------------------------------------------
  * Tinctures
@@ -132,6 +139,7 @@
   /* Each quarter is a coat of its own, so it starts its own count. */
   & > * {
     --the-first: var(--field-first);
+    --outer-inset: 0px;
   }
 }
 
@@ -144,11 +152,13 @@
   border-style: solid;
   border-width: var(--bordure-width, 0.75rem);
   border-color: --value(--color-*);
+  --bordure-inset: var(--bordure-width, 0.75rem);
 }
 @utility bordure-of-the-first {
   border-style: solid;
   border-width: var(--bordure-width, 0.75rem);
   border-color: var(--the-first, transparent);
+  --bordure-inset: var(--bordure-width, 0.75rem);
 }
 
 /* Inescutcheon: a shield a third as wide, centred on the fess point (50%, 45%),
@@ -160,25 +170,29 @@
   left: 33.5%;
   top: 28.5%;
   aspect-ratio: 5 / 6;
-  overflow: hidden;
+  overflow: clip;
+  overflow-clip-margin: border-box;
   border-radius: 0 0 50% 50% / 0 0 45% 45%;
   box-shadow: 0 0 0 2px var(--color-sable);
   contain: layout;
   /* In proportion with the shield's own bordure. */
   --bordure-width: 0.25rem;
+  --outer-inset: var(--bordure-inset);
 }
 
 /* Canton: a third of the shield each way in dexter chief, so a ninth of it, and
  * 5:6 like the shield, so everything on it places as on a shield. Over every
- * ordinary and charge, as a later addition to the arms. */
+ * ordinary and charge, as a later addition to the arms, and over the bordure. */
 @utility canton {
   position: absolute;
   z-index: 2;
-  width: 33.333%;
-  left: 0;
-  top: 0;
+  width: calc((100% + 2 * var(--outer-inset, 0px)) / 3);
+  left: calc(-1 * var(--outer-inset, 0px));
+  top: calc(-1 * var(--outer-inset, 0px));
   aspect-ratio: 5 / 6;
-  overflow: hidden;
+  /* Like the shield, so a chief on it surmounts its own bordure. */
+  overflow: clip;
+  overflow-clip-margin: border-box;
   contain: layout;
   --bordure-width: 0.25rem;
 }
@@ -191,12 +205,15 @@
 @utility escutcheon {
   position: relative;
   aspect-ratio: 5 / 6;
-  overflow: hidden;
+  /* At the border's edge, so a canton or chief can surmount the bordure. */
+  overflow: clip;
+  overflow-clip-margin: border-box;
   border-radius: 0 0 50% 50% / 0 0 45% 45%;
   box-shadow: 0 0 0 2px var(--color-sable);
   /* The containing block for counterchanged charges' fixed layers. */
   contain: layout;
   --the-first: var(--field-first);
+  --outer-inset: var(--bordure-inset);
 }
 
 /* ---------------------------------------------------------------------------

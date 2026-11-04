@@ -26,6 +26,8 @@ const ORDINARIES = [
   "pile",
 ];
 const WIDTH = 300;
+// A point in px on the 300 × 360 shield, as %.
+const px = (x, y) => [(x * 100) / WIDTH, (y * 100) / (WIDTH * 1.2)];
 
 const bezants = (n) => Array.from({ length: n }, () => "bezant");
 
@@ -388,6 +390,33 @@ const PROBES = [
   ...nested("azure", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton"),
   ...nested("azure chief-or", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton, on a shield with a chief"),
   ...nested("azure fess-or", { kind: "canton", shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on a canton, on a shield with a fess"),
+  // The canton and the chief surmount a bordure, which is 12px. The canton is still 100 × 120px.
+  { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: [px(4, 4), px(4, 60), px(60, 4), px(95, 115), px(98, 118)], expect: "gules", why: "a canton over the bordure" },
+  { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: [px(102, 60), px(110, 60), px(60, 122)], expect: "azure", why: "a canton over the bordure is a third of the whole shield" },
+  { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: px(4, 200), expect: "or", why: "the bordure below a canton" },
+  { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: px(98, 118), expect: "gules", why: "a canton without a bordure" },
+  { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: [px(102, 60), px(60, 122)], expect: "azure", why: "a canton without a bordure is a third of the shield" },
+  // The canton's own bordure is 4px, and its chief reaches 4 + 0.3 × 112 ≈ 37.6px down.
+  { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: [px(2, 60), px(98, 60), px(50, 118)], expect: "or", why: "a canton's own bordure, over the shield's" },
+  { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: px(50, 20), expect: "gules", why: "a chief on a canton with a bordure" },
+  { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: [px(2, 2), px(50, 2), px(98, 20)], expect: "gules", why: "a chief on a canton surmounts the canton's bordure" },
+  { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: px(50, 60), expect: "vert", why: "a canton's field below its chief" },
+  // An inescutcheon is at (104.5, 107.8)px and 91 × 109px in a bordured shield; its canton is 30 × 36px.
+  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [px(106.5, 109.8), px(132.5, 125.8), px(119.5, 141.8)], expect: "or", why: "a canton on an inescutcheon doesn't move by the shield's bordure" },
+  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [px(137.5, 125.8), px(119.5, 146.8)], expect: "gules", why: "an inescutcheon beside and below its canton" },
+  // A quarter isn't positioned, so its canton is placed on the shield's field, inside the bordure.
+  { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: [px(6, 60), px(60, 6)], expect: "argent", why: "a canton in a quarter doesn't move over the bordure" },
+  { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: px(20, 20), expect: "or", why: "a canton in a quarter" },
+  { shield: "azure bordure-or chief-gules", at: [px(4, 4), px(150, 4), px(296, 40), px(150, 110)], expect: "gules", why: "a chief over the bordure" },
+  { shield: "azure bordure-or chief-gules", at: px(150, 116), expect: "azure", why: "a chief's lower edge stays at 30% of the field" },
+  { shield: "azure bordure-or chief-gules", at: [px(4, 116), px(4, 200)], expect: "or", why: "the bordure below a chief" },
+  { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: px(146, 50), expect: "gules", why: "a counterchanged chief with a bordure, dexter of the pale line" },
+  { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: px(154, 50), expect: "or", why: "a counterchanged chief with a bordure, sinister of the pale line" },
+  { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: [px(4, 4), px(296, 4), px(4, 100), px(296, 100)], expect: "argent", why: "a counterchanged chief leaves the bordure's strips unpainted" },
+  // Seven scallops across the 276px field: bites at its middle and its first and last, 105.9px down.
+  { shield: "azure bordure-argent chief-engrailed-or", at: [px(150, 105.9), px(31.7, 105.9), px(268.3, 105.9)], expect: "azure", why: "an engrailed chief's bites stay on the field" },
+  { shield: "azure bordure-argent chief-engrailed-or", at: [px(4, 4), px(296, 4), px(4, 108), px(296, 108), px(150, 60)], expect: "or", why: "an engrailed chief's corners over the bordure" },
+  { shield: "azure bordure-argent chief-engrailed-or", at: px(4, 200), expect: "argent", why: "the bordure below an engrailed chief" },
   // Of the first: the shield's first tincture, wherever it's painted.
   { shield: "per-pale-or-azure bend-of-the-first", at: [70, 70], expect: "or", why: "a bend of the first over the second tincture" },
   { shield: "per-pale-or-azure bend-of-the-first", at: [85, 40], expect: "azure", why: "the field beside a bend of the first" },
@@ -408,7 +437,7 @@ const CONTACT = ORDINARIES.flatMap((o) =>
 );
 // `more` is a second charges container, as { charges, items }.
 const key = ({ kind, shield, charges, items, inner, first, more, quarters }) =>
-  `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ?? ""}`;
+  `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ? JSON.stringify(quarters) : ""}`;
 const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
 const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
 const NESTED = SHIELDS.filter((s) => s.inner);
@@ -432,16 +461,21 @@ const chargesOf = ({ charges, items }) =>
   items
     ? `<div class="charges ${charges ?? ""}">${items.map((c) => `<i class="${c}"></i>`).join("")}</div>`
     : "";
-// `inner` is an inescutcheon, or a canton by `kind`, after the charges unless `first`.
-// `quarters` is each quarter's classes, for a `quarterly` shield.
-const markup = ({ shield, charges, items, inner, first, more, quarters }, attrs = "") => {
-  const nested = inner
-    ? `<div class="${inner.kind ?? "inescutcheon"} ${inner.shield}">${chargesOf(inner)}</div>`
+// `inner` is an inescutcheon, or a canton by `kind`, after the charges unless `first`. It can
+// hold an `inner` of its own.
+const nestedOf = (inner) =>
+  inner
+    ? `<div class="${inner.kind ?? "inescutcheon"} ${inner.shield}">${chargesOf(inner)}${nestedOf(inner.inner)}</div>`
     : "";
+// `quarters` is each quarter's classes, for a `quarterly` shield, or { shield, inner }.
+const quarterOf = (q) =>
+  typeof q === "string"
+    ? `<div class="${q}"></div>`
+    : `<div class="${q.shield}">${nestedOf(q.inner)}</div>`;
+const markup = ({ shield, charges, items, inner, first, more, quarters }, attrs = "") => {
+  const nested = nestedOf(inner);
   const own = chargesOf({ charges, items }) + (more ? chargesOf(more) : "");
-  const content =
-    (quarters ?? []).map((q) => `<div class="${q}"></div>`).join("") +
-    (first ? nested + own : own + nested);
+  const content = (quarters ?? []).map(quarterOf).join("") + (first ? nested + own : own + nested);
   return `<div class="escutcheon ${shield}"${attrs}>${content}</div>`;
 };
 const describeShield = ({ shield, charges, items, more }) =>

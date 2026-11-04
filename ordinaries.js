@@ -42,6 +42,20 @@ const polygon = (vertices) => `polygon(${vertices.map(point).join(", ")})`;
 
 const PSEUDO = { chief: "&::after" };
 
+// The chief surmounts a bordure. 
+const INSET = "var(--bordure-inset)";
+const OVER_BORDURE = {
+  "--bordure-inset": "inherit",
+  inset: `calc(-1 * ${INSET}) calc(-1 * ${INSET}) 0`,
+  padding: `${INSET} ${INSET} 0`,
+  "background-origin": "content-box",
+};
+// A vertex on the shield's top or side edges, moved out to the bordure's outer edge.
+const outer = ([x, y]) => {
+  const ox = x === 0 ? `calc(-1 * ${INSET})` : x === 100 ? `calc(100% + ${INSET})` : pct(x);
+  return `${ox} ${y === 0 ? `calc(-1 * ${INSET})` : pct(y)}`;
+};
+
 // A y in % of the field, as % of the whole shield when a chief takes the top of it.
 const belowChief = (y) =>
   y === 100 ? "100%" : `calc(${num(y)}% + var(--field-top, 0%) * ${num(1 - y / 100)})`;
@@ -256,14 +270,14 @@ const crossing = (a, v, b, first, second) => {
     : null;
 };
 
-const shape = (vertices, line, scallop) => {
+// `extend` moves the sides on the shield's edge out, as `outer` does; the lined sides stay put.
+const shape = (vertices, line, scallop, extend) => {
   const inward = signedArea(vertices) > 0 ? "ccw" : "cw";
   const pts = vertices.map(real);
+  const straight = vertices.map((v, i) => onShieldEdge(v, vertices[(i + 1) % vertices.length]));
   const edges = pts.map((a, i) => {
     const j = (i + 1) % pts.length;
-    return onShieldEdge(vertices[i], vertices[j])
-      ? [{ to: pts[j] }]
-      : line(a, pts[j], scallop, inward);
+    return straight[i] ? [{ to: pts[j] }] : line(a, pts[j], scallop, inward);
   });
 
   // Where arcs cross at a corner, e.g. a chevron engrailed's peak, end both at the
@@ -286,14 +300,24 @@ const shape = (vertices, line, scallop) => {
     }
   });
 
-  const commands = edges
-    .flat()
-    .map(({ to, r, sweep }) =>
+  const commands = edges.flatMap((edge, i) => {
+    const segments = edge.map(({ to, r, sweep }) =>
       r
         ? `arc to ${at(to)} of ${pct((r / W) * 100)} ${pct((r / H) * 100)} ${sweep}`
         : `line to ${at(to)}`,
     );
-  return `shape(from ${at(start)}, ${commands.join(", ")}, close)`;
+    if (!extend) {
+      return segments;
+    }
+    const outside = straight.at(i - 1);
+    if (straight[i]) {
+      const out = `line to ${extend(vertices[(i + 1) % vertices.length])}`;
+      return outside ? [out] : [`line to ${extend(vertices[i])}`, out];
+    }
+    return outside ? [`line to ${at(pts[i])}`, ...segments] : segments;
+  });
+  const from = extend ? extend(vertices[0]) : at(start);
+  return `shape(from ${from}, ${commands.join(", ")}, close)`;
 };
 
 const betweenVars = ({ size, points, counts = {} }) => {
@@ -390,10 +414,23 @@ export default plugin(({ addBase, addUtilities, theme }) => {
   });
 
   for (const [ordinary, vertices] of Object.entries(ORDINARIES)) {
+    const chief = ordinary === "chief";
+    const placed = chief ? OVER_BORDURE : { inset: "var(--field-top, 0%) 0 0" };
+    const plain = chief
+      ? `polygon(${vertices.map(outer).join(", ")}) content-box`
+      : polygon(vertices);
+    // Browsers without shape() keep the straight polygon.
+    const lined = (line) => [
+      plain,
+      chief
+        ? `${shape(vertices, line, SCALLOP, outer)} content-box`
+        : shape(vertices, line, SCALLOPS[ordinary] ?? SCALLOP),
+    ];
+
     // Covers the whole shield, so the swapped field lines up with the real one,
     // and the clip moves the ordinary below any chief instead.
     utilities[`.${ordinary}-counterchanged`] = ordinaryRules(ordinary, {
-      inset: "0",
+      ...(chief ? OVER_BORDURE : { inset: "0" }),
       // Registered not to inherit, so a shield inside another can't pick up its swap.
       ...Object.fromEntries(
         ["color", "image", "size", "position", "repeat"].map((n) => [
@@ -406,15 +443,16 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       "background-size": "var(--counterchange-size, auto)",
       "background-position": "var(--counterchange-position, 0 0)",
       "background-repeat": "var(--counterchange-repeat, repeat)",
-      "clip-path":
-        ordinary === "chief"
-          ? polygon(vertices)
-          : `polygon(${vertices.map(([x, y]) => `${pct(x)} ${belowChief(y)}`).join(", ")})`,
+      // The swapped field's tiles would wrap into the bordure's strips, so the bordure shows there.
+      ...(chief && { "background-clip": "content-box" }),
+      "clip-path": chief
+        ? plain
+        : `polygon(${vertices.map(([x, y]) => `${pct(x)} ${belowChief(y)}`).join(", ")})`,
     });
 
     for (const [tincture, colour] of PAINTS) {
       utilities[`.${ordinary}-${tincture}`] = ordinaryRules(ordinary, {
-        inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
+        ...placed,
         ...(BANDS[ordinary]
           ? {
               "--fimbriated": "inherit",
@@ -425,33 +463,30 @@ export default plugin(({ addBase, addUtilities, theme }) => {
             }
           : {
               "background-color": colour,
-              "clip-path": polygon(vertices),
+              "clip-path": plain,
             }),
       });
-      // Not fimbriated. Browsers without shape() keep the straight polygon.
+      // Not fimbriated.
       for (const [name, line] of Object.entries(LINES)) {
         utilities[`.${ordinary}-${name}-${tincture}`] = ordinaryRules(ordinary, {
-          inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
+          ...placed,
           "background-color": colour,
-          "clip-path": [polygon(vertices), shape(vertices, line, SCALLOPS[ordinary] ?? SCALLOP)],
+          "clip-path": lined(line),
         });
       }
     }
 
     // A plain polygon, without the fimbriation vars, so fimbriated-* can't reach a fur ordinary.
     for (const fur of Object.keys(FURS)) {
-      const pseudo = {
-        inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
-        ...furBackground(fur, theme),
-      };
+      const pseudo = { ...placed, ...furBackground(fur, theme) };
       utilities[`.${ordinary}-${fur}`] = ordinaryRules(ordinary, {
         ...pseudo,
-        "clip-path": polygon(vertices),
+        "clip-path": plain,
       });
       for (const [name, line] of Object.entries(LINES)) {
         utilities[`.${ordinary}-${name}-${fur}`] = ordinaryRules(ordinary, {
           ...pseudo,
-          "clip-path": [polygon(vertices), shape(vertices, line, SCALLOPS[ordinary] ?? SCALLOP)],
+          "clip-path": lined(line),
         });
       }
     }

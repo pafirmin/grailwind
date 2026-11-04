@@ -37,6 +37,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - The `in-chief` and `in-base` points are now `in-chief-point` and
   `in-base-point`, like the honour, fess and nombril points.
+- The canton and the chief surmount a bordure, as in heraldry. The canton is
+  still a third of the whole shield, and the chief's lower edge doesn't move.
 
 ### Fixed
 

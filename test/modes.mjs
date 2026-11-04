@@ -107,6 +107,15 @@ const PATTERNS = {
     /\.escutcheon \{[^}]*--the-first: var\(--field-first\);/,
   "each quarter starts its own":
     /\.quarterly \{[^}]*& > \* \{\s*--the-first: var\(--field-first\);/,
+  "a field's bordure width doesn't inherit":
+    /@property --bordure-inset \{\s*syntax: "<length>";\s*inherits: false;\s*initial-value: 0px;/,
+  "a bordure publishes its width":
+    /\.bordure-of-the-first \{[^}]*--bordure-inset: var\(--bordure-width, 0\.75rem\);/,
+  "the escutcheon passes its bordure width down":
+    /\.escutcheon \{[^}]*--outer-inset: var\(--bordure-inset\);/,
+  "a quarter has no bordure to surmount": /\.quarterly \{[^}]*& > \* \{[^}]*--outer-inset: 0px;/,
+  "the chief pulls its own element's bordure width":
+    /\.chief-or \{[^]*?&::after \{[^}]*--bordure-inset: inherit;[^}]*clip-path: polygon\(calc\(-1 \* var\(--bordure-inset\)\)[^;]*\) content-box;/,
   "a field's first doesn't inherit":
     /@property --field-first \{\s*syntax: "\*";\s*inherits: false;/,
   "a bare tincture is a field's first": /\.gules \{[^}]*--field-first: var\(--color-gules\);/,
@@ -126,7 +135,7 @@ const PATTERNS = {
   "fess-engrailed-or falls back to a polygon":
     /\.fess-engrailed-or \{[^}]*&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(from 0 30%, arc to [^;]* ccw/,
   "chief-invected-azure bulges out":
-    /\.chief-invected-azure \{[^}]*&::after \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\([^;]*line to 100% 30%, arc to [^;]* cw,/,
+    /\.chief-invected-azure \{[^}]*&::after \{[^}]*clip-path: polygon\([^;]*\) content-box;\s*clip-path: shape\([^;]*line to 100% 30%, arc to [^;]* cw,[^;]*\) content-box;/,
   "chevron-engrailed-or peaks where its arcs cross":
     /\.chevron-engrailed-or \{[^}]*&::before \{[^}]*clip-path: shape\(from 50% (?!25%)[\d.]+%,/,
   "ermine has an argent ground and sable spots":
