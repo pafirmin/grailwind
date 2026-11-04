@@ -1,6 +1,7 @@
 /*
  * Reading heraldry from a set of class names.
  */
+import { UNKNOWN } from "./tree.js";
 import {
   ARRANGEMENTS,
   CHARGES,
@@ -9,6 +10,7 @@ import {
   FURS,
   LINES,
   METALS,
+  OF_THE_FIRST,
   ORDINARIES,
   POINTS,
   ROUNDELS,
@@ -20,8 +22,10 @@ const COLOUR = new Set(COLOURS);
 const FUR = new Set(Object.keys(FURS));
 // Anything a field, ordinary or charge can be painted in.
 const TINCTURE = new Set([...TINCTURES, ...FUR]);
+// What a class can paint in: a tincture, or the field's first.
+const PAINT = new Set([...TINCTURE, OF_THE_FIRST]);
 const CHARGE = new Set([...CHARGES, ...Object.keys(ROUNDELS)]);
-const FIMBRIATIONS = new Set(TINCTURES.map((t) => `fimbriated-${t}`));
+const FIMBRIATIONS = new Set([...TINCTURES, OF_THE_FIRST].map((t) => `fimbriated-${t}`));
 const CHIEF_POINTS = new Set(["in-dexter-chief", "in-chief", "in-sinister-chief"]);
 const POINT_CLASSES = new Set(Object.keys(POINTS).map((point) => `in-${point}`));
 export const ALL_ARRANGEMENTS = ["between", "on", ...ARRANGEMENTS];
@@ -30,7 +34,7 @@ export const ALL_ARRANGEMENTS = ["between", "on", ...ARRANGEMENTS];
 // `bordure-or`, mapped to its parts. A counterchanged ordinary has no tincture of its own.
 const ORDINARY_CLASSES = new Map();
 for (const ordinary of ORDINARIES) {
-  for (const tincture of TINCTURE) {
+  for (const tincture of PAINT) {
     const fur = FUR.has(tincture);
     ORDINARY_CLASSES.set(`${ordinary}-${tincture}`, { ordinary, tincture, fur });
     for (const line of LINES) {
@@ -43,17 +47,17 @@ for (const ordinary of ORDINARIES) {
     counterchanged: true,
   });
 }
-for (const tincture of TINCTURES) {
+for (const tincture of [...TINCTURES, OF_THE_FIRST]) {
   ORDINARY_CLASSES.set(`bordure-${tincture}`, { ordinary: "bordure", tincture });
 }
 
-// Two furs in one division aren't generated.
-const DIVISION_CLASSES = new Set();
+// Each division class, mapped to its first tincture. Two furs in one division aren't generated.
+const DIVISION_CLASSES = new Map();
 for (const division of DIVISIONS) {
   for (const a of TINCTURE) {
     for (const b of TINCTURE) {
       if (a !== b && !(FUR.has(a) && FUR.has(b))) {
-        DIVISION_CLASSES.add(`${division}-${a}-${b}`);
+        DIVISION_CLASSES.set(`${division}-${a}-${b}`, a);
       }
     }
   }
@@ -128,8 +132,26 @@ export function fieldTincture(classes) {
   if (isDivided(classes)) {
     return null;
   }
-  const tinctures = [...classes].filter((cls) => TINCTURE.has(cls));
+  const tinctures = [...classes].filter((cls) => PAINT.has(cls));
   return tinctures.length === 1 ? tinctures[0] : null;
+}
+
+// A field's first tincture: its bare tincture, or its division's first.
+const fieldFirst = (classes) => {
+  const division = [...classes].find((cls) => DIVISION_CLASSES.has(cls));
+  return division ? DIVISION_CLASSES.get(division) : fieldTincture(classes);
+};
+
+// `of-the-first` on an element: the nearest escutcheon's or quarter's first (not a canton's).
+// Null if the shield can't be seen.
+export function firstOf(el) {
+  for (let node = el; node && node !== UNKNOWN; node = node.parent) {
+    if (node.classes?.has("escutcheon") || node.parent?.classes?.has("quarterly")) {
+      const first = fieldFirst(node.classes);
+      return first === OF_THE_FIRST ? null : first;
+    }
+  }
+  return null;
 }
 
 // A charge's tincture, and the class that gives it, e.g. `bezant` → or.
@@ -138,7 +160,7 @@ export function chargeTincture(classes) {
   if (roundel) {
     return { cls: roundel, tincture: ROUNDELS[roundel] };
   }
-  const tinctures = [...classes].filter((cls) => TINCTURE.has(cls));
+  const tinctures = [...classes].filter((cls) => PAINT.has(cls));
   return tinctures.length === 1 ? { cls: tinctures[0], tincture: tinctures[0] } : null;
 }
 

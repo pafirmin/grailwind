@@ -1,4 +1,4 @@
-import { FURS } from "grailwind/data";
+import { FURS, OF_THE_FIRST } from "grailwind/data";
 import { getElements } from "../tree.js";
 import {
   atChiefPoint,
@@ -7,6 +7,7 @@ import {
   describe,
   fieldTincture,
   fimbriationOf,
+  firstOf,
   furKinds,
   isFimbriable,
   isFur,
@@ -64,12 +65,28 @@ export default {
     messages: {
       violation:
         "`{{cls}}` puts {{thing}} {{tincture}} on {{ground}}: {{kind}} on {{kind}}{{note}}",
+      invisible:
+        "`{{cls}}` puts {{thing}} of the first on {{ground}}, its own tincture: it can't be seen",
     },
   },
 
   create(context) {
     const furs = furKinds(context.options[0]?.furs);
-    const check = (node, cls, thing, tincture, ground) => {
+    // `el` is the element whose field or ordinary it is, for resolving `of-the-first`.
+    const check = (el, node, cls, thing, painted, ground) => {
+      const first = [painted, ground].includes(OF_THE_FIRST) ? firstOf(el) : null;
+      const tincture = painted === OF_THE_FIRST ? first : painted;
+      if (ground === OF_THE_FIRST) {
+        ground = first;
+      }
+      if (painted === OF_THE_FIRST && tincture && tincture === ground) {
+        context.report({
+          node,
+          messageId: "invisible",
+          data: { cls, thing: article(thing), ground: titleCase(ground) },
+        });
+        return;
+      }
       if (!sameKind(tincture, ground, furs)) {
         return;
       }
@@ -79,7 +96,7 @@ export default {
         data: {
           cls,
           thing: article(thing),
-          tincture: titleCase(tincture),
+          tincture: titleCase(tincture) + (painted === OF_THE_FIRST ? " (of the first)" : ""),
           ground: titleCase(ground),
           kind: kind(tincture, furs),
           note: furNote([ground, tincture], kind(tincture, furs)),
@@ -99,11 +116,12 @@ export default {
           const isFimbriated = fimbriation && ordinaries.some(isFimbriable);
 
           if (isFimbriated) {
-            check(el.reportNode, fimbriation.cls, "fimbriation", fimbriation.tincture, field);
+            check(el, el.reportNode, fimbriation.cls, "fimbriation", fimbriation.tincture, field);
           }
 
           for (const o of ordinaries) {
             check(
+              el,
               el.reportNode,
               o.cls,
               name(o),
@@ -114,7 +132,7 @@ export default {
 
           // An ordinary abuts the chief rather than lying on it, so both are checked against the field.
           for (const o of [...chiefs, ...bordures]) {
-            check(el.reportNode, o.cls, name(o), o.tincture, field);
+            check(el, el.reportNode, o.cls, name(o), o.tincture, field);
           }
 
           for (const container of el.children) {
@@ -142,7 +160,7 @@ export default {
               }
 
               const thing = describe(chargeName(charge.classes) ?? "charge");
-              check(charge.reportNode, found.cls, thing, found.tincture, ground);
+              check(el, charge.reportNode, found.cls, thing, found.tincture, ground);
             }
           }
         }

@@ -70,6 +70,8 @@ A divided field (`per-pale-or-gules`) has no single tincture, so nothing is chec
 Neither are `<img>` charges, charges with no tincture, or `bordure-*` with a non-heraldic colour.
 Counterchanged ordinaries and charges take the field's tinctures swapped, so they're skipped too.
 
+`of-the-first` is checked as the shield's first tincture, and reported if it can't be seen.
+
 Furs count by their ground: `ermine` and `erminois` as metals, `ermines` and `pean` as colours.
 `ermine fess-argent` is metal on metal. Authorities differ, so the `furs` option changes this:
 

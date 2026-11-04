@@ -67,6 +67,16 @@ run("rule-of-tincture", rule, {
       code: `<div class="escutcheon ermine fess-erminois"></div>`,
       options: [{ furs: { ermine: "exempt", erminois: "exempt" } }],
     },
+    // Of the first: the shield's first tincture, not a canton's own field.
+    `<div class="escutcheon argent"><div class="canton gules"><div class="charges"><i class="mullet of-the-first"></i></div></div></div>`,
+    `<div class="escutcheon per-pale-or-azure bend-of-the-first"></div>`,
+    `<div class="escutcheon per-pale-or-azure bend-of-the-first"><div class="charges on"><i class="mullet azure"></i></div></div>`,
+    `<div class="escutcheon gules fess-or"><div class="charges on"><i class="mullet of-the-first"></i></div></div>`,
+    // Each quarter starts its own count.
+    `<div class="escutcheon quarterly"><div class="gules fess-argent"><div class="charges on"><i class="mullet of-the-first"></i></div></div><div class="or"></div></div>`,
+    // A fur first is that fur, as in the blazon.
+    `<div class="escutcheon per-pale-ermine-azure"><div class="charges"><i class="mullet of-the-first"></i></div></div>`,
+    `<div class="escutcheon ermine"><div class="canton of-the-first"></div></div>`,
   ],
   invalid: [
     {
@@ -216,6 +226,33 @@ run("rule-of-tincture", rule, {
         ),
       ],
     },
+    {
+      code: `<div class="escutcheon or bend-of-the-first"></div>`,
+      errors: [
+        error(
+          "`bend-of-the-first` puts a bend of the first on Or, its own tincture: it can't be seen",
+        ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon argent"><div class="canton or"><div class="charges"><i class="mullet of-the-first"></i></div></div></div>`,
+      errors: [error("`of-the-first` puts a mullet Argent (of the first) on Or: metal on metal")],
+    },
+    {
+      // Against the quarter's own first, gules, not the shield's.
+      code: `<div class="escutcheon quarterly"><div class="per-pale-gules-or fess-azure"><div class="charges on"><i class="mullet of-the-first"></i></div></div><div class="or"></div></div>`,
+      errors: [
+        error("`of-the-first` puts a mullet Gules (of the first) on Azure: colour on colour"),
+      ],
+    },
+    {
+      code: `<div class="escutcheon ermine bend-of-the-first"></div>`,
+      errors: [
+        error(
+          "`bend-of-the-first` puts a bend of the first on Ermine, its own tincture: it can't be seen",
+        ),
+      ],
+    },
   ],
   jsxOnly: {
     valid: [
@@ -225,6 +262,8 @@ run("rule-of-tincture", rule, {
       `<div {...props} className="escutcheon or fess-argent" />`,
       // Charges inside a component, or an expression, can't be seen.
       `<Shield className="escutcheon or"><div className="charges"><i className="mullet argent" /></div></Shield>`,
+      // A canton without its shield: the first can't be known.
+      `<div className="canton gules"><div className="charges"><i className="mullet of-the-first" /></div></div>`,
       `<div className="escutcheon or"><div className="charges">{items.map(() => <i className="mullet argent" />)}</div></div>`,
     ],
     invalid: [

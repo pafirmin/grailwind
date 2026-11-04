@@ -9,6 +9,7 @@ import {
   DIVISIONS,
   FURS,
   LINES,
+  OF_THE_FIRST,
   ORDINARIES,
   POINTS,
   ROUNDELS,
@@ -100,6 +101,18 @@ const PATTERNS = {
   "in-bend-sinister runs from sinister chief":
     /\.in-bend-sinister:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: 78%;\s*top: 16%;/,
   "the escutcheon holds charges' fixed layers": /\.escutcheon \{[^}]*contain: layout;/,
+  "the escutcheon starts the count of the first":
+    /\.escutcheon \{[^}]*--the-first: var\(--field-first\);/,
+  "each quarter starts its own":
+    /\.quarterly \{[^}]*& > \* \{\s*--the-first: var\(--field-first\);/,
+  "a field's first doesn't inherit":
+    /@property --field-first \{\s*syntax: "\*";\s*inherits: false;/,
+  "a bare tincture is a field's first": /\.gules \{[^}]*--field-first: var\(--color-gules\);/,
+  "a division's first is its first tincture":
+    /\.per-pale-or-gules \{[^}]*--field-first: var\(--color-or\);/,
+  "of the first doesn't set a field's first": /\.of-the-first \{(?:(?!--field-first)[^}])*\}/,
+  "a bend of the first":
+    /\.bend-of-the-first \{[^]*?&::before \{[^}]*background-color: var\(--fimbriation, var\(--the-first, transparent\)\);/,
   "charges are centred with margins, not translate":
     /\.charges \{[^]*?& > \* \{(?:(?!translate)[^}])*margin: calc\(var\(--charge-width\) \/ -2\) 0 0 calc\(var\(--charge-width\) \/ -2\);/,
   "charges pass the swap down": /\.charges \{[^}]*--counterchange-image: inherit;/,
@@ -156,11 +169,16 @@ const DATA_CLASSES = [
   ...Object.keys(FURS).map((f) => `per-pale-${f}-gules`),
   ...LINES.flatMap((l) => ORDINARIES.map((o) => `${o}-${l}-or`)),
   ...Object.keys(POINTS).map((p) => `in-${p}`),
+  OF_THE_FIRST,
+  ...ORDINARIES.map((o) => `${o}-${OF_THE_FIRST}`),
+  ...LINES.flatMap((l) => ORDINARIES.map((o) => `${o}-${l}-${OF_THE_FIRST}`)),
+  `fimbriated-${OF_THE_FIRST}`,
+  `bordure-${OF_THE_FIRST}`,
 ];
 
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton"></div>`,
+  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly"></div>`,
 );
 
 const build = (entry, { css = "", source = "index.html" } = {}) => {

@@ -2,7 +2,7 @@
  * Grailwind CSS: ordinaries, e.g. `fess-or`.
  */
 import plugin from "tailwindcss/plugin";
-import { BETWEEN, FURS, ON, TINCTURES } from "./data.js";
+import { BETWEEN, FURS, OF_THE_FIRST, ON, TINCTURES } from "./data.js";
 import { furBackground } from "./furs.js";
 
 // prettier-ignore
@@ -189,11 +189,9 @@ const gradient = (layer, colour) => {
 
 const tilePosition = (start, size) => (size === 100 ? "0" : pct((start * 100) / (100 - size)));
 
-const bands = (layers, tincture) => ({
+const bands = (layers, colour) => ({
   "background-image": layers
-    .map((l) =>
-      gradient(l, l.stripe ? "var(--fimbriation, transparent)" : `var(--color-${tincture})`),
-    )
+    .map((l) => gradient(l, l.stripe ? "var(--fimbriation, transparent)" : colour))
     .join(", "),
   "background-size": layers
     .map(({ tile: [x0, y0, x1, y1] = [0, 0, 100, 100] }) => `${pct(x1 - x0)} ${pct(y1 - y0)}`)
@@ -347,6 +345,12 @@ const layoutVars = () => {
   return [...new Set(allVars)];
 };
 
+// Each tincture's class suffix and colour, and "of the first" (see --the-first in grailwind.css).
+const PAINTS = [
+  ...TINCTURES.map((tincture) => [tincture, `var(--color-${tincture})`]),
+  [OF_THE_FIRST, "var(--the-first, transparent)"],
+];
+
 export default plugin(({ addBase, addUtilities, theme }) => {
   // Unset on an inescutcheon or canton, so it can't inherit its shield's layout. In the base
   // layer, so an ordinary on it still sets its own.
@@ -356,10 +360,10 @@ export default plugin(({ addBase, addUtilities, theme }) => {
 
   const utilities = {};
 
-  for (const tincture of TINCTURES) {
+  for (const [tincture, colour] of PAINTS) {
     utilities[`.fimbriated-${tincture}`] = {
       "--fimbriated": "1",
-      "--fimbriation": `var(--color-${tincture})`,
+      "--fimbriation": colour,
     };
   }
 
@@ -408,19 +412,19 @@ export default plugin(({ addBase, addUtilities, theme }) => {
           : `polygon(${vertices.map(([x, y]) => `${pct(x)} ${belowChief(y)}`).join(", ")})`,
     });
 
-    for (const tincture of TINCTURES) {
+    for (const [tincture, colour] of PAINTS) {
       utilities[`.${ordinary}-${tincture}`] = ordinaryRules(ordinary, {
         inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
         ...(BANDS[ordinary]
           ? {
               "--fimbriated": "inherit",
               "--fimbriation": "inherit",
-              "background-color": `var(--fimbriation, var(--color-${tincture}))`,
-              ...bands(BANDS[ordinary], tincture),
+              "background-color": `var(--fimbriation, ${colour})`,
+              ...bands(BANDS[ordinary], colour),
               "clip-path": widenedPolygon(vertices),
             }
           : {
-              "background-color": `var(--color-${tincture})`,
+              "background-color": colour,
               "clip-path": polygon(vertices),
             }),
       });
@@ -428,7 +432,7 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       for (const [name, line] of Object.entries(LINES)) {
         utilities[`.${ordinary}-${name}-${tincture}`] = ordinaryRules(ordinary, {
           inset: ordinary === "chief" ? "0" : "var(--field-top, 0%) 0 0",
-          "background-color": `var(--color-${tincture})`,
+          "background-color": colour,
           "clip-path": [polygon(vertices), shape(vertices, line, SCALLOPS[ordinary] ?? SCALLOP)],
         });
       }

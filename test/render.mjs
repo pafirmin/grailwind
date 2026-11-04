@@ -372,6 +372,18 @@ const PROBES = [
   ...nested("azure", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton"),
   ...nested("azure chief-or", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton, on a shield with a chief"),
   ...nested("azure fess-or", { kind: "canton", shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on a canton, on a shield with a fess"),
+  // Of the first: the shield's first tincture, wherever it's painted.
+  { shield: "per-pale-or-azure bend-of-the-first", at: [70, 70], expect: "or", why: "a bend of the first over the second tincture" },
+  { shield: "per-pale-or-azure bend-of-the-first", at: [85, 40], expect: "azure", why: "the field beside a bend of the first" },
+  { shield: "per-pale-ermine-azure bend-of-the-first", at: [70, 70], expect: "azure", why: "of the first after a fur paints nothing" },
+  { shield: "per-pale-or-azure chief-engrailed-of-the-first", at: [75, 10], expect: "or", why: "an engrailed chief of the first" },
+  { shield: "per-pale-or-azure bordure-of-the-first", at: [98, 45], expect: "or", why: "a bordure of the first" },
+  { shield: "per-fess-azure-gules cross-or fimbriated-of-the-first", at: [38.5, 80], expect: "azure", why: "a fimbriation of the first" },
+  { shield: "argent", inner: { kind: "canton", shield: "gules", items: ["roundel of-the-first"] }, at: ring(onCanton([50, 45]), 50 * CANTON), expect: "argent", why: "a charge of the first on a canton takes the shield's first" },
+  { shield: "argent", inner: { kind: "canton", shield: "of-the-first", items: ["roundel gules"] }, at: onCanton([10, 10]), expect: "argent", why: "a canton of the first" },
+  // Each quarter starts its own count: a pale of the first in quarter 2 is gules, over its argent half.
+  { shield: "quarterly", quarters: ["or", "per-pale-gules-argent pale-of-the-first", "azure", "vert"], at: [80, 25], expect: "gules", why: "a quarter's own first" },
+  { shield: "quarterly", quarters: ["or", "per-pale-gules-argent pale-of-the-first", "azure", "vert"], at: [92, 25], expect: "argent", why: "beside a pale of the first in a quarter" },
 ];
 
 const LINES = ["", "-engrailed", "-invected"];
@@ -379,8 +391,8 @@ const CONTACT = ORDINARIES.flatMap((o) =>
   LINES.map((line) => ({ shield: `azure ${o}${line}-or` })),
 );
 // `more` is a second charges container, as { charges, items }.
-const key = ({ kind, shield, charges, items, inner, first, more }) =>
-  `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}`;
+const key = ({ kind, shield, charges, items, inner, first, more, quarters }) =>
+  `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ?? ""}`;
 const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
 const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
 const NESTED = SHIELDS.filter((s) => s.inner);
@@ -405,12 +417,15 @@ const chargesOf = ({ charges, items }) =>
     ? `<div class="charges ${charges ?? ""}">${items.map((c) => `<i class="${c}"></i>`).join("")}</div>`
     : "";
 // `inner` is an inescutcheon, or a canton by `kind`, after the charges unless `first`.
-const markup = ({ shield, charges, items, inner, first, more }, attrs = "") => {
+// `quarters` is each quarter's classes, for a `quarterly` shield.
+const markup = ({ shield, charges, items, inner, first, more, quarters }, attrs = "") => {
   const nested = inner
     ? `<div class="${inner.kind ?? "inescutcheon"} ${inner.shield}">${chargesOf(inner)}</div>`
     : "";
   const own = chargesOf({ charges, items }) + (more ? chargesOf(more) : "");
-  const content = first ? nested + own : own + nested;
+  const content =
+    (quarters ?? []).map((q) => `<div class="${q}"></div>`).join("") +
+    (first ? nested + own : own + nested);
   return `<div class="escutcheon ${shield}"${attrs}>${content}</div>`;
 };
 const describeShield = ({ shield, charges, items, more }) =>

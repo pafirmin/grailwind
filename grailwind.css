@@ -42,6 +42,12 @@
   syntax: "*";
   inherits: false;
 }
+/* A field's first tincture. The escutcheon copies it to --the-first, which inherits,
+ * so a canton's own field can't change it. */
+@property --field-first {
+  syntax: "*";
+  inherits: false;
+}
 
 /* ---------------------------------------------------------------------------
  * Tinctures
@@ -67,24 +73,35 @@
  * ------------------------------------------------------------------------- */
 @utility or {
   background-color: var(--color-or);
+  --field-first: var(--color-or);
 }
 @utility argent {
   background-color: var(--color-argent);
+  --field-first: var(--color-argent);
 }
 @utility gules {
   background-color: var(--color-gules);
+  --field-first: var(--color-gules);
 }
 @utility azure {
   background-color: var(--color-azure);
+  --field-first: var(--color-azure);
 }
 @utility vert {
   background-color: var(--color-vert);
+  --field-first: var(--color-vert);
 }
 @utility purpure {
   background-color: var(--color-purpure);
+  --field-first: var(--color-purpure);
 }
 @utility sable {
   background-color: var(--color-sable);
+  --field-first: var(--color-sable);
+}
+/* The field's first tincture, for charges and for a canton or inescutcheon field. */
+@utility of-the-first {
+  background-color: var(--the-first, transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -111,6 +128,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
+
+  /* Each quarter is a coat of its own, so it starts its own count. */
+  & > * {
+    --the-first: var(--field-first);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -122,6 +144,11 @@
   border-style: solid;
   border-width: var(--bordure-width, 0.75rem);
   border-color: --value(--color-*);
+}
+@utility bordure-of-the-first {
+  border-style: solid;
+  border-width: var(--bordure-width, 0.75rem);
+  border-color: var(--the-first, transparent);
 }
 
 /* Inescutcheon: a shield a third as wide, centred on the fess point (50%, 45%),
@@ -169,6 +196,7 @@
   box-shadow: 0 0 0 2px var(--color-sable);
   /* The containing block for counterchanged charges' fixed layers. */
   contain: layout;
+  --the-first: var(--field-first);
 }
 
 /* ---------------------------------------------------------------------------

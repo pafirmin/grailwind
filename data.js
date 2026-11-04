@@ -5,6 +5,8 @@
 export const METALS = ["or", "argent"];
 export const COLOURS = ["gules", "azure", "vert", "purpure", "sable"];
 export const TINCTURES = [...METALS, ...COLOURS];
+// Paints in the field's first tincture, as "of the first" in a blazon.
+export const OF_THE_FIRST = "of-the-first";
 
 export const DIVISIONS = [
   "per-pale",

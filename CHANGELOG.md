@@ -8,6 +8,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `-of-the-first`: the field's first tincture, as in a blazon, e.g.
+  `pale-of-the-first`. The ESLint plugin checks it.
 - Striped fields: `barry-*` and `paly-*` (of six), `barry-of-eight-*`,
   `barry-of-ten-*` and `paly-of-eight-*`. The first tincture is in chief or
   on the dexter. They take furs and counterchanged, like the other divisions.

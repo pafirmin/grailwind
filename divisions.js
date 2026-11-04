@@ -141,6 +141,7 @@ export default plugin(({ addUtilities, theme }) => {
         utilities[`.${division}-${first}-${second}`] = {
           ...background(a, b),
           ...counterchange(background(b, a)),
+          "--field-first": a,
         };
       }
     }
@@ -154,9 +155,11 @@ export default plugin(({ addUtilities, theme }) => {
           [fur, tincture],
           [tincture, fur],
         ]) {
+          // Only a tincture can be "of the first"; a fur first leaves it unset.
           utilities[`.${division}-${first}-${second}`] = {
             ...withFur(division, first, second, theme),
             ...counterchange(withFur(division, second, first, theme)),
+            ...(!FURS[first] && { "--field-first": `var(--color-${first})` }),
           };
         }
       }
