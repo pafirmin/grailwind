@@ -14,6 +14,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `semy`: a semé, one built-in charge strewn across the field, e.g. bezanty or
   crusilly.
 
+### Fixed
+
+- Charges, a canton or an inescutcheon in a quarter (or a half of `per-pale` or
+  `per-fess`) are placed and counterchanged within it, under the shield's own
+  ordinary, rather than against the whole shield.
+
 ## [0.5.0] - 2026-11-04
 
 ### Added

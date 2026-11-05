@@ -97,7 +97,11 @@ const PATTERNS = {
     /\.chevron-counterchanged \{[^]*?&::before \{[^}]*z-index: 1;/,
   "the chief stays under charges on it": /\.chief-or \{[^]*?&::after \{(?:(?!z-index)[^}])*\}/,
   "a canton doesn't inherit its shield's layout":
-    /\.inescutcheon, \.canton \{[^}]*--field-top: initial;/,
+    /\.inescutcheon, \.canton[,\s][^{]*\{[^}]*--field-top: initial;/,
+  "a part of a divided shield doesn't inherit its shield's layout":
+    /:is\(\.quarterly, \.per-pale, \.per-fess\) > \* \{[^}]*--field-top: initial;/,
+  "a part is contained only on a shield, not in a page layout":
+    /\.per-pale \{[^}]*&:is\(\.escutcheon, \.escutcheon \*\) > \* \{[^}]*contain: layout;/,
   "in-bend-sinister runs from sinister chief":
     /\.in-bend-sinister:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: 78%;\s*top: 16%;/,
   "in-chief takes the chief's points":
@@ -189,7 +193,7 @@ const DATA_CLASSES = [
 
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly"></div>`,
+  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly per-pale"></div>`,
 );
 
 const build = (entry, { css = "", source = "index.html" } = {}) => {
