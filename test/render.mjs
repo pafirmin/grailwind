@@ -31,6 +31,21 @@ const px = (x, y) => [(x * 100) / WIDTH, (y * 100) / (WIDTH * 1.2)];
 
 const bezants = (n) => Array.from({ length: n }, () => "bezant");
 
+const CROSSES = [
+  "cross-couped",
+  "cross-potent",
+  "cross-pattee",
+  "maltese-cross",
+  "cross-crosslet",
+  "cross-moline",
+  "cross-fleury",
+  "shakefork",
+];
+// Box points inside the shape where the centre isn't: the Maltese arms meet at a point.
+const SOLID = { "maltese-cross": [50, 35], shakefork: [50, 80] };
+// A point in a lone charge's 100 × 100 box, on the shield: the charge is 50% wide at [50, 45].
+const lone = ([bx, by]) => [50 + (bx - 50) * 0.5, 45 + ((by - 50) * 0.5 * 5) / 6];
+
 // A charge's centre, plus four points at 0.8 of its radius, so that a charge moved by more than
 // a fifth of its radius leaves one of them uncovered. A roundel's radius is 0.46 of its width.
 const ring = ([x, y], size) => {
@@ -229,6 +244,12 @@ const PROBES = [
   ...[["in-chief", bezants(3)], ["", ["bezant in-dexter-chief", "bezant in-chief-point", "bezant in-sinister-chief"]]].map(([charges, items]) => (
     { shield: "azure chief-gules", charges, items, at: [[25, 15], [50, 15], [75, 15]].flatMap((p) => ring(p, 18)), expect: "or", why: `three ${charges || "at the chief points"}, on a chief` }
   )),
+
+  ...CROSSES.flatMap((name) => [
+    { shield: "azure", charges: "", items: [`${name} or`], at: lone(SOLID[name] ?? [50, 50]), expect: "or", why: `${name}: drawn` },
+    { shield: "azure", charges: "", items: [`${name} or`], at: lone([12, 88]), expect: "azure", why: `${name}: a corner of its box is empty` },
+  ]),
+  { shield: "azure fess-gules", charges: "between", items: Array(3).fill("cross-crosslet or"), at: [[30, 15], [70, 15], [50, 78]].flatMap((p) => ring(p, 20)), expect: "or", why: "three crosses crosslet between a fess" },
 
   ...charged("azure pale-gules", "between", 18, [[18, 42], [82, 42]], "between a pale"),
   ...charged("azure fess-gules", "between", 20, [[30, 15], [70, 15], [50, 78]], "between a fess"),

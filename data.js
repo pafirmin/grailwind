@@ -47,6 +47,14 @@ export const CHARGES = [
   "billet",
   "crescent",
   "fleur-de-lis",
+  "cross-couped",
+  "cross-potent",
+  "cross-pattee",
+  "maltese-cross",
+  "cross-crosslet",
+  "cross-moline",
+  "cross-fleury",
+  "shakefork",
 ];
 
 // Roundels have their own names by tincture.

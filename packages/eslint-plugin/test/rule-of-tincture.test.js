@@ -123,6 +123,10 @@ run("rule-of-tincture", rule, {
       errors: [error("`sable` puts an annulet Sable on Azure: colour on colour")],
     },
     {
+      code: `<div class="escutcheon argent"><div class="charges"><i class="cross-potent or"></i></div></div>`,
+      errors: [error("`or` puts a cross potent Or on Argent: metal on metal")],
+    },
+    {
       // Against the bend, not the field.
       code: `<div class="escutcheon azure bend-or"><div class="charges on"><i class="lozenge argent"></i></div></div>`,
       errors: [error("`argent` puts a lozenge Argent on Or: metal on metal")],

@@ -14,6 +14,20 @@ const star = (cx, cy, r, points = 5) => {
   return `<polygon points="${coords.join(" ")}"/>`;
 };
 
+// One arm drawn upward from the centre, repeated x times evenly about (50, 50).
+const rotateX = (d, x) => {
+  const path = (d, deg) => `<path d="${d}" transform="rotate(${deg} 50 50)" />`;
+
+  const paths = [];
+  const rotation = 360 / x;
+  let curr = 0;
+  for (let i = 0; i < x; i++) {
+    paths.push(path(d, curr));
+    curr += rotation;
+  }
+  return paths.join("");
+};
+
 const SHAPES = {
   roundel: `<circle cx="50" cy="50" r="46"/>`,
   annulet: `<circle cx="50" cy="50" r="39" fill="none" stroke="#000" stroke-width="14"/>`,
@@ -29,6 +43,20 @@ const SHAPES = {
     <path d="M45 65H55C55 74 53 82 50 90C47 82 45 74 45 65Z"/>
     <path d="M58 65C62 74 72 80 84 78C80 88 64 90 56 74Z"/>
     <path d="M42 65C38 74 28 80 16 78C20 88 36 90 44 74Z"/>`,
+  "cross-couped": rotateX("M39 50V2H61V50Z", 4),
+  "cross-potent": rotateX("M43 50V16H31V2H69V16H57V50Z", 4),
+  "cross-pattee": rotateX("M40 50V40Q36 20 22 2H78Q64 20 60 40V50Z", 4),
+  "maltese-cross": rotateX("M50 50L30 2L50 18L70 2Z", 4),
+  "cross-crosslet": rotateX("M43 50V25H32V13H43V2H57V13H68V25H57V50Z", 4),
+  "cross-moline": rotateX(
+    "M43 50V18C42 12 38 11 33 16C31 6 40 -1 50 7C60 -1 69 6 67 16C62 11 58 12 57 18V50Z",
+    4,
+  ),
+  "cross-fleury": rotateX(
+    "M43 50V21C41 17 37 16 33 20C30 12 37 8 45 13C45 8 47 5 50 2C53 5 55 8 55 13C63 8 70 12 67 20C63 16 59 17 57 21V50Z",
+    4,
+  ),
+  shakefork: `<polygon points="50,96 39,85 39,43 12.6,20.9 11.3,5.4 26.8,4 50,23.5 73.2,4 88.7,5.4 87.4,20.9 61,43 61,85"/>`,
 };
 
 // Points as [left%, top%] of the shield, plus a charge size as % of its width.

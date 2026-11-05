@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Crosses and the shakefork as charges: `cross-couped`, `cross-potent`,
+  `cross-pattee`, `maltese-cross`, `cross-crosslet`, `cross-moline`,
+  `cross-fleury` and `shakefork`.
+
 ## [0.5.0] - 2026-11-04
 
 ### Added

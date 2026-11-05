@@ -64,7 +64,7 @@ tinctures replace Tailwind's colours entirely.
   `fess-engrailed-or` and the like for an engrailed or invected edge,
   `chief-ermine` and the like in a fur, or `chevron-counterchanged` and the like
   on a divided field.
-- **Charges:** `mullet`, `fleur-de-lis`, `bezant` and more, arranged by
+- **Charges:** `mullet`, `fleur-de-lis`, `bezant`, crosses and more, arranged by
   number, `in-pale`, `in-fess`, `in-bend`, `in-bend-sinister`, `on` or `between`
   the ordinary, or placed at a named point such as `in-dexter-chief`, sized
   with `charge-size-*`, and `counterchanged` on a divided field.
