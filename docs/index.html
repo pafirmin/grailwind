@@ -1009,9 +1009,9 @@
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Azure, a cross potent Or">
-              <div class="escutcheon azure">
-                <div class="charges charge-size-70">
+            <figure data-blazon="Per pale Vert and Argent, a cross potent counterchanged">
+              <div class="escutcheon per-pale-vert-argent">
+                <div class="charges counterchanged charge-size-70">
                   <i class="cross-potent or"></i>
                 </div>
               </div>
@@ -1704,8 +1704,9 @@ export default [
         pre.append(source.slice(last));
       }
 
-      // Caption each example with its blazon and its own markup, read from the
-      // live element so the two can't drift apart.
+      // Caption each example with its blazon and its own markup.
+      const wide = matchMedia("(width >= 40rem)");
+      const markups = [];
       for (const fig of document.querySelectorAll("figure[data-blazon]")) {
         const shield = fig.querySelector(".escutcheon");
         const html = shield.outerHTML;
@@ -1729,12 +1730,37 @@ export default [
         const pre = document.createElement("pre");
         pre.dataset.lang = "html";
         pre.textContent = html.replaceAll("\n" + indent, "\n");
-        caption.append(pre);
+
+        const details = document.createElement("details");
+        details.className = "group";
+        const summary = document.createElement("summary");
+        summary.className =
+          "sm:hidden text-sm text-center cursor-pointer group-open:mb-2";
+        summary.textContent = "View markup";
+        details.append(summary, pre);
+        caption.append(details);
+        markups.push(details);
 
         shield.classList.add(fig.dataset.size ?? "w-36");
         shield.setAttribute("aria-hidden", "true");
         fig.append(caption);
       }
+
+      function openDetails() {
+        for (const details of markups) {
+          details.open = true;
+        }
+      }
+
+      if (wide.matches) {
+        openDetails();
+      }
+
+      wide.addEventListener("change", (e) => {
+        if (e.matches) {
+          openDetails();
+        }
+      });
 
       for (const pre of document.querySelectorAll("pre[data-lang]")) {
         highlight(pre, pre.dataset.lang);
