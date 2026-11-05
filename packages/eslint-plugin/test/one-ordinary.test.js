@@ -41,6 +41,10 @@ run("one-ordinary", rule, {
       code: `<div class="charges in-chief in-pale"></div>`,
       errors: [{ message: "`in-pale` and `in-chief` both place these charges" }],
     },
+    {
+      code: `<div class="charges semy in-fess"></div>`,
+      errors: [{ message: "`in-fess` and `semy` both place these charges" }],
+    },
 
     {
       code: `<div class="escutcheon or fess-engrailed-azure chevron-gules"></div>`,

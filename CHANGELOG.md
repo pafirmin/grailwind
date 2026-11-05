@@ -11,6 +11,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Crosses and the shakefork as charges: `cross-couped`, `cross-potent`,
   `cross-pattee`, `maltese-cross`, `cross-crosslet`, `cross-moline`,
   `cross-fleury` and `shakefork`.
+- `semy`: a semé, one built-in charge strewn across the field, e.g. bezanty or
+  crusilly.
 
 ## [0.5.0] - 2026-11-04
 

@@ -218,7 +218,7 @@ try {
       }
     }
     for (const cls of DATA_CLASSES) {
-      if (!new RegExp(`\\.${cls}[ :{]`).test(css)) {
+      if (!new RegExp(`\\.${cls}[ :{.]`).test(css)) {
         failures++;
         console.error(`✗ ${entry}: data.js names .${cls}, which isn't generated`);
       }

@@ -66,8 +66,9 @@ tinctures replace Tailwind's colours entirely.
   on a divided field.
 - **Charges:** `mullet`, `fleur-de-lis`, `bezant`, crosses and more, arranged by
   number, `in-pale`, `in-fess`, `in-bend`, `in-bend-sinister`, `on` or `between`
-  the ordinary, or placed at a named point such as `in-dexter-chief`, sized
-  with `charge-size-*`, and `counterchanged` on a divided field.
+  the ordinary, or placed at a named point such as `in-dexter-chief`, strewn
+  `semy` across the field, sized with `charge-size-*`, and `counterchanged` on
+  a divided field.
 - **Your own charges:** any SVG, via `charge-[url(…)]`.
 
 ## Linting

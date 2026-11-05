@@ -251,6 +251,23 @@ const PROBES = [
   ]),
   { shield: "azure fess-gules", charges: "between", items: Array(3).fill("cross-crosslet or"), at: [[30, 15], [70, 15], [50, 78]].flatMap((p) => ring(p, 20)), expect: "or", why: "three crosses crosslet between a fess" },
 
+  // Semé: 25% tiles from −6.25%, so charges centre at 6.25 + 25i and, staggered, 18.75 + 25i. A
+  // mullet's centre sits a little low.
+  { shield: "azure", charges: "semy", items: ["mullet or"], at: [31.25, 32], expect: "or", why: "semé: a whole charge" },
+  { shield: "azure", charges: "semy", items: ["mullet or"], at: [18.75, 31.25], expect: "azure", why: "semé: the field between charges" },
+  { shield: "azure", charges: "semy", items: ["mullet or"], at: [6.25, 6.6], expect: "or", why: "semé: whole charges along the top and side" },
+  { shield: "azure chief-gules", charges: "semy", items: ["mullet or"], at: [31.25, 7], expect: "gules", why: "semé: the chief covers it" },
+  { shield: "azure chief-gules", charges: "semy", items: ["mullet or"], at: [31.25, 57], expect: "or", why: "semé: below a chief, it stays on the shield's tiling" },
+  { shield: "azure pale-argent", charges: "semy", items: ["mullet or"], at: [43.75, 44.5], expect: "argent", why: "semé: an ordinary covers it" },
+  { shield: "azure", charges: "semy", items: ["mullet or"], more: { charges: "", items: ["roundel argent"] }, at: [50, 45], expect: "argent", why: "semé: a second charges container paints over it" },
+  { shield: "azure", charges: "semy", items: ["charge-[url(data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201%201'%3E%3Crect%20width='1'%20height='1'/%3E%3C/svg%3E)] or"], at: [31.25, 32], expect: "azure", why: "semé: a custom charge draws nothing" },
+  { shield: "per-pale-or-azure", charges: "semy", items: ["mullet counterchanged"], at: [31.25, 32], expect: "azure", why: "semé: counterchanged on the or half" },
+  { shield: "per-pale-or-azure", charges: "semy", items: ["mullet counterchanged"], at: [81.25, 32], expect: "or", why: "semé: counterchanged on the azure half" },
+  // A bezant is 12.5% wide: a ring at 0.8 of its radius is covered, and the gap between two is not.
+  { shield: "gules", charges: "semy", items: ["bezant"], at: [...ring([56.25, 56.25], 12.5), ...ring([43.75, 68.75], 12.5)], expect: "or", why: "semé: bezanty" },
+  { shield: "gules", charges: "semy", items: ["bezant"], at: [[43.75, 56.25], [50, 50], [50, 62.5]], expect: "gules", why: "semé: bezanty, the field between bezants" },
+  { shield: "gules", charges: "semy", items: ["crescent or"], at: [56.25, 54.2], expect: "gules", why: "semé: a crescent's own mask still cuts it" },
+
   ...charged("azure pale-gules", "between", 18, [[18, 42], [82, 42]], "between a pale"),
   ...charged("azure fess-gules", "between", 20, [[30, 15], [70, 15], [50, 78]], "between a fess"),
   ...charged("azure bend-gules", "between", 24, [[70, 26], [30, 68]], "between a bend"),

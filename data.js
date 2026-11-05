@@ -98,6 +98,7 @@ export const ARRANGEMENTS = [
   "in-bend-sinister",
   "in-chief",
   "in-base",
+  "semy",
 ];
 
 // Where charges go for "between", as [left%, top%], plus their size as % of width.

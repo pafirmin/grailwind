@@ -49,6 +49,10 @@ run("charges-in-container", rule, {
       code: `<div class="escutcheon azure"><div class="charges"><i class="mullet or in-pale"></i></div></div>`,
       errors: [arranged("`in-pale` arranges a `charges` container, not a charge")],
     },
+    {
+      code: `<div class="escutcheon azure"><div class="charges"><i class="mullet or semy"></i></div></div>`,
+      errors: [arranged("`semy` arranges a `charges` container, not a charge")],
+    },
   ],
   jsxOnly: {
     valid: [

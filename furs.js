@@ -11,7 +11,7 @@ const SPOT = [
 
 // A 5:6 tile, the shield's own shape, so whole tiles fill it: a spot at its centre, and quarters of one at each
 // corner that join up with the neighbouring tiles.
-const AT = [
+export const AT = [
   [25, 30],
   [0, 0],
   [50, 0],

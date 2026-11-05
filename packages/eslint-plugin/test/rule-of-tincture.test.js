@@ -115,6 +115,10 @@ run("rule-of-tincture", rule, {
       errors: [error("`gules` puts a mullet Gules on Azure: colour on colour")],
     },
     {
+      code: `<div class="escutcheon azure"><div class="charges semy"><i class="mullet gules"></i></div></div>`,
+      errors: [error("`gules` puts a mullet Gules on Azure: colour on colour")],
+    },
+    {
       code: `<div class="escutcheon or"><div class="charges"><i class="bezant"></i></div></div>`,
       errors: [error("`bezant` puts a bezant Or on Or: metal on metal")],
     },

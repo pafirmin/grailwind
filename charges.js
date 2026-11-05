@@ -3,6 +3,7 @@
  */
 import plugin from "tailwindcss/plugin";
 import { POINTS, ROUNDELS } from "./data.js";
+import { AT } from "./furs.js";
 
 const star = (cx, cy, r, points = 5) => {
   const coords = [];
@@ -116,6 +117,19 @@ const svgUrl = (shape) =>
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${shape}</svg>`,
   )}")`;
 
+// Semé: whole charges across the field, staggered on the furs' tile (see furs.js), cut at the
+// edges. The shape is defined once and reused, so a shape with its own ids stays valid.
+const SEMY_ACROSS = 4;
+const SEMY_SCALE = 0.25;
+const SEMY_SHIFT = `${-100 / (4 * (SEMY_ACROSS - 1))}%`;
+const semyTile = (shape) => {
+  const at = (x, y) => `translate(${x - 50 * SEMY_SCALE} ${y - 50 * SEMY_SCALE})`;
+  const uses = AT.map(([x, y]) => `<use href="#s" transform="${at(x, y)} scale(${SEMY_SCALE})"/>`);
+  return `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 60"><defs><g id="s">${shape}</g></defs>${uses.join("")}</svg>`,
+  )}")`;
+};
+
 const maskRules = (image) => ({
   "mask-image": image,
   "mask-size": "contain",
@@ -171,12 +185,13 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   const utilities = {};
 
   for (const [name, shape] of Object.entries(SHAPES)) {
-    utilities[`.${name}`] = maskRules(svgUrl(shape));
+    utilities[`.${name}`] = { ...maskRules(svgUrl(shape)), "--semy-image": semyTile(shape) };
   }
 
   for (const [name, tincture] of Object.entries(ROUNDELS)) {
     utilities[`.${name}`] = {
       ...maskRules(svgUrl(SHAPES.roundel)),
+      "--semy-image": semyTile(SHAPES.roundel),
       "background-color": `var(--color-${tincture})`,
     };
   }
@@ -269,6 +284,22 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   for (const name of Object.keys(POINTS)) {
     utilities[`.in-${name}`] = { ".charges > &": atPoint(name) };
   }
+
+  // The whole field, under the ordinaries and the chief. A custom charge has no tile, so it
+  // draws nothing: `none` would mean no mask, and flood the field.
+  utilities[".semy"] = {
+    "&.charges": { inset: "0", "z-index": "0" },
+    "&.charges > *": {
+      inset: "0",
+      width: "auto",
+      margin: "0",
+      "aspect-ratio": "auto",
+      "mask-image": "var(--semy-image, linear-gradient(transparent, transparent))",
+      "mask-size": `calc(100% / ${SEMY_ACROSS}) auto`,
+      "mask-repeat": "repeat",
+      "mask-position": `${SEMY_SHIFT} ${SEMY_SHIFT}`,
+    },
+  };
 
   // On a charge, or on `charges` for all of them.
   utilities[".counterchanged"] = {
