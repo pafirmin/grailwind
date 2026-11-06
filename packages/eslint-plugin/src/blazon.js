@@ -58,6 +58,12 @@ for (const ordinary of VOIDABLE) {
       voided: true,
     });
   }
+  ORDINARY_CLASSES.set(`${ordinary}-voided-counterchanged`, {
+    ordinary,
+    tincture: null,
+    counterchanged: true,
+    voided: true,
+  });
 }
 for (const tincture of [...TINCTURES, OF_THE_FIRST]) {
   ORDINARY_CLASSES.set(`bordure-${tincture}`, { ordinary: "bordure", tincture });

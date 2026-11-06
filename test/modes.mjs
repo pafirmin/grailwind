@@ -193,6 +193,7 @@ const DATA_CLASSES = [
   ...VOIDABLE.map((o) => `${o}-voided-or`),
   "saltire-voided-ermine",
   `cross-voided-${OF_THE_FIRST}`,
+  ...VOIDABLE.map((o) => `${o}-voided-counterchanged`),
 ];
 
 writeFileSync(

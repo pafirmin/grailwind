@@ -63,6 +63,7 @@ const outer = ([x, y]) => {
 // A y in % of the field, as % of the whole shield when a chief takes the top of it.
 const belowChief = (y) =>
   y === 100 ? "100%" : `calc(${num(y)}% + var(--field-top, 0%) * ${num(1 - y / 100)})`;
+const pointBelowChief = ([x, y]) => `${pct(x)} ${belowChief(y)}`;
 
 // Fimbriation: the ordinary's clip is widened and filled with the fimbriation
 // tincture, and the ordinary's own tincture is painted over it as gradient
@@ -113,7 +114,7 @@ const widen = (vertices, distance = FIMBRIATION) => {
 const rotate = (list, start) => [...list.slice(start), ...list.slice(0, start)];
 
 // The ordinary with a hole the shape of it shrunk by `distance`, cut with evenodd.
-const voidedPolygon = (vertices, distance) => {
+const voidedPolygon = (vertices, distance, format = point) => {
   const offsets = widen(vertices, -distance);
   const inner = vertices.map(([x, y], i) => [x + offsets[i][0], y + offsets[i][1]]);
   // Start and end at the shield's edge so we don't draw through it.
@@ -121,8 +122,8 @@ const voidedPolygon = (vertices, distance) => {
   if (edge === -1) {
     throw new Error("a voided ordinary needs a side on the shield's edge");
   }
-  const outerStr = [...rotate(vertices, edge), vertices[edge]].map(point).join(", ");
-  const innerStr = [...rotate(inner, edge), inner[edge]].map(point).join(", ");
+  const outerStr = [...rotate(vertices, edge), vertices[edge]].map(format).join(", ");
+  const innerStr = [...rotate(inner, edge), inner[edge]].map(format).join(", ");
 
   return `polygon(evenodd, ${outerStr}, ${innerStr})`;
 };
@@ -486,7 +487,7 @@ export default plugin(({ addBase, addUtilities, theme }) => {
 
     // Covers the whole shield, so the swapped field lines up with the real one,
     // and the clip moves the ordinary below any chief instead.
-    utilities[`.${ordinary}-counterchanged`] = ordinaryRules(ordinary, {
+    const counterchanged = {
       ...(chief ? OVER_BORDURE : { inset: "0" }),
       // Registered not to inherit, so a shield inside another can't pick up its swap.
       ...Object.fromEntries(
@@ -502,9 +503,10 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       "background-repeat": "var(--counterchange-repeat, repeat)",
       // The swapped field's tiles would wrap into the bordure's strips, so the bordure shows there.
       ...(chief && { "background-clip": "content-box" }),
-      "clip-path": chief
-        ? plain
-        : `polygon(${vertices.map(([x, y]) => `${pct(x)} ${belowChief(y)}`).join(", ")})`,
+    };
+    utilities[`.${ordinary}-counterchanged`] = ordinaryRules(ordinary, {
+      ...counterchanged,
+      "clip-path": chief ? plain : `polygon(${vertices.map(pointBelowChief).join(", ")})`,
     });
 
     for (const [tincture, colour] of PAINTS) {
@@ -565,6 +567,10 @@ export default plugin(({ addBase, addUtilities, theme }) => {
           "clip-path": clip,
         });
       }
+      utilities[`.${ordinary}-voided-counterchanged`] = ordinaryRules(ordinary, {
+        ...counterchanged,
+        "clip-path": voidedPolygon(vertices, VOIDS[ordinary], pointBelowChief),
+      });
     }
   }
 

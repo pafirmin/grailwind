@@ -10,6 +10,7 @@ run("modifier-needs-target", rule, {
     `<div class="escutcheon per-pale-argent-gules chevron-counterchanged"></div>`,
     `<div class="escutcheon quarterly-or-gules chief-counterchanged"></div>`,
     `<div class="escutcheon barry-argent-gules fess-counterchanged"></div>`,
+    `<div class="escutcheon per-pale-or-gules cross-voided-counterchanged"></div>`,
     `<div class="escutcheon paly-of-eight-or-azure"><div class="charges counterchanged"><i class="roundel"></i></div></div>`,
     `<div class="escutcheon gules cross-azure fimbriated-argent"></div>`,
     `<div class="escutcheon or chevron-sable chief-azure fimbriated-argent"></div>`,
@@ -88,6 +89,14 @@ run("modifier-needs-target", rule, {
       // A fur field isn't divided.
       code: `<div class="escutcheon ermine chevron-counterchanged"></div>`,
       errors: [noDivision("chevron-counterchanged")],
+    },
+    {
+      code: `<div class="escutcheon gules saltire-voided-counterchanged"></div>`,
+      errors: [noDivision("saltire-voided-counterchanged")],
+    },
+    {
+      code: `<div class="escutcheon per-pale-or-gules cross-voided-counterchanged fimbriated-argent"></div>`,
+      errors: [noOrdinary("fimbriated-argent")],
     },
     {
       code: `<div class="escutcheon per-pale-or-gules"><div class="charges"><i class="mullet counterchanged rotate-45"></i></div></div>`,
