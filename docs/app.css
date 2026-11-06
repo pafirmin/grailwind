@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "../strict.css";
 
-/* Junicode 2 by Peter S. Baker, subset to Latin. See fonts/OFL.txt. */
+/* Junicode 2 by Peter S. Baker, subset to Latin. See fonts/OFL-Junicode.txt. */
 @font-face {
   font-family: "Junicode";
   src: url("fonts/JunicodeVF-Roman.woff2") format("woff2");
@@ -18,8 +18,35 @@
   font-display: swap;
 }
 
+/* Alegreya Sans by Juan Pablo del Peral, subset to Latin. See fonts/OFL-AlegreyaSans.txt. */
+@font-face {
+  font-family: "Alegreya Sans";
+  src: url("fonts/AlegreyaSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Alegreya Sans";
+  src: url("fonts/AlegreyaSans-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Alegreya Sans";
+  src: url("fonts/AlegreyaSans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Junicode for display, Alegreya Sans for reading. */
 @theme {
   --font-serif: "Junicode", ui-serif, Georgia, serif;
+  --font-sans: "Alegreya Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* The text's measure as a fixed length, so code in a smaller font can match it. */
@@ -81,7 +108,7 @@
   }
 
   main :is(h1, h2, h3) {
-    @apply font-semibold;
+    @apply font-serif font-semibold;
   }
 
   main h2 {
@@ -113,12 +140,16 @@
     @apply text-center;
   }
 
+  figure[data-blazon] > figcaption > p:first-child {
+    @apply font-serif;
+  }
+
   code {
     @apply font-mono text-[0.85em];
   }
 
   pre {
-    @apply font-mono text-xs border border-sable/30 p-3 overflow-x-auto;
+    @apply font-mono text-xs border border-sable/30 rounded-sm p-3 overflow-x-auto;
   }
 }
 
@@ -127,4 +158,10 @@
   gap: 4rem 2rem;
   grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
   margin-block: 2rem;
+
+  @variant max-sm {
+    &[data-collapsed] > .extra {
+      display: none;
+    }
+  }
 }
