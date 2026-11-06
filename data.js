@@ -23,6 +23,10 @@ export const DIVISIONS = [
   "paly-of-eight",
 ];
 
+// Ordinaries that can be reversed, e.g. `pile-reversed-or`: the same shape upside down.
+export const REVERSIBLE = ["chevron", "pall", "pile"];
+const reversed = (ordinary) => `${ordinary}-reversed`;
+
 export const ORDINARIES = [
   "pale",
   "fess",
@@ -37,6 +41,7 @@ export const ORDINARIES = [
   "pall",
   "chief",
   "pile",
+  ...REVERSIBLE.map(reversed),
 ];
 
 export const CHARGES = [
@@ -81,6 +86,7 @@ export const VOIDABLE = [
   "saltire",
   "pall",
   "pile",
+  ...REVERSIBLE.map(reversed),
 ];
 
 // Each fur's [ground, spot] tinctures.
@@ -150,4 +156,29 @@ export const ON = {
   saltire: { size: 14, counts: { 1: [[50, 50]], 5: [[22, 22], [78, 22], [50, 50], [22, 78], [78, 78]] } },
   pall: { size: 14, counts: { 1: [[50, 50]], 3: [[22, 22], [78, 22], [50, 75]] } },
   pile: { size: 14, counts: { 1: [[50, 25]], 3: [[50, 14], [50, 34], [50, 54]] } },
+};
+
+const mirror = (points) => points.map(([x, y]) => [x, 100 - y]);
+const mapValues = (object, fn) =>
+  Object.fromEntries(Object.entries(object).map(([key, value]) => [key, fn(value)]));
+
+for (const ordinary of REVERSIBLE) {
+  const { size, points, counts = {} } = BETWEEN[ordinary];
+  BETWEEN[reversed(ordinary)] = {
+    size,
+    points: mirror(points),
+    counts: mapValues(counts, (count) => ({ ...count, points: mirror(count.points) })),
+  };
+  ON[reversed(ordinary)] = {
+    size: ON[ordinary].size,
+    counts: mapValues(ON[ordinary].counts, mirror),
+  };
+}
+
+// Mirrored, the lower charges would clip on the heater's curved flanks.
+// prettier-ignore
+BETWEEN["chevron-reversed"] = {
+  ...BETWEEN["chevron-reversed"],
+  points: [[28, 74], [72, 74], [50, 30]],
+  counts: { 6: { size: 12, points: [[26, 78], [50, 89], [74, 78], [38, 34], [62, 34], [50, 16]] } },
 };

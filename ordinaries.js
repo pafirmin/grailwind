@@ -2,7 +2,7 @@
  * Grailwind CSS: ordinaries, e.g. `fess-or`.
  */
 import plugin from "tailwindcss/plugin";
-import { BETWEEN, FURS, OF_THE_FIRST, ON, TINCTURES, VOIDABLE } from "./data.js";
+import { BETWEEN, FURS, OF_THE_FIRST, ON, REVERSIBLE, TINCTURES, VOIDABLE } from "./data.js";
 import { furBackground } from "./furs.js";
 
 // prettier-ignore
@@ -34,6 +34,10 @@ const ORDINARIES = {
   chief: [[0, 0], [100, 0], [100, 30], [0, 30]],
   pile: [[20, 0], [80, 0], [50, 85]],
 };
+// signedArea() follows the flip's winding, so the order stays.
+for (const ordinary of REVERSIBLE) {
+  ORDINARIES[`${ordinary}-reversed`] = ORDINARIES[ordinary].map(([x, y]) => [x, 100 - y]);
+}
 
 const num = (v) => +v.toFixed(3);
 const pct = (v) => (num(v) === 0 ? "0" : `${num(v)}%`);
@@ -179,6 +183,28 @@ const BANDS = {
   pile: [half("u-v", "end", [20, 0, 50, 85]), half("u+v", "start", [50, 0, 80, 85]), seam(83)],
 };
 
+// The bands upside down. A diagonal swaps kind, as x − y becomes x + (100 − y) − 100. A half's
+// stops stay: its 50% line is the flipped tile's other diagonal, which is the flipped side.
+const reverseBand = ({ kind, from, to, tile, ...rest }) => {
+  const layer = { ...rest, tile: tile && [tile[0], 100 - tile[3], tile[2], 100 - tile[1]] };
+  if (from === undefined) {
+    return { ...layer, kind: { "u-v": "u+v", "u+v": "u-v" }[kind] ?? kind };
+  }
+  switch (kind) {
+    case "x":
+      return { ...layer, kind, from, to };
+    case "y":
+      return { ...layer, kind, from: 100 - to, to: 100 - from };
+    case "u-v":
+      return { ...layer, kind: "u+v", from: from + 100, to: to + 100 };
+    case "u+v":
+      return { ...layer, kind: "u-v", from: from - 100, to: to - 100 };
+  }
+};
+for (const ordinary of REVERSIBLE) {
+  BANDS[`${ordinary}-reversed`] = BANDS[ordinary].map(reverseBand);
+}
+
 const DIRECTION = {
   x: "to right",
   y: "to bottom",
@@ -247,6 +273,12 @@ const VOIDS = {
   pale: 7.5, fess: 9, bar: 4.2, bend: 7.7, "bend-sinister": 7.7,
   chevron: 3.8, cross: 5, saltire: 5.8, pall: 5, pile: 8,
 };
+for (const ordinary of REVERSIBLE) {
+  if (SCALLOPS[ordinary]) {
+    SCALLOPS[`${ordinary}-reversed`] = SCALLOPS[ordinary];
+  }
+  VOIDS[`${ordinary}-reversed`] = VOIDS[ordinary];
+}
 const DEPTH = 0.35;
 
 const at = ([x, y]) => point([(x * 100) / W, (y * 100) / H]);

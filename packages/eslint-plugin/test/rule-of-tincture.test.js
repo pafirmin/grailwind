@@ -103,6 +103,10 @@ run("rule-of-tincture", rule, {
       errors: [error("`cross-voided-argent` puts a cross voided Argent on Or: metal on metal")],
     },
     {
+      code: `<div class="escutcheon or pile-reversed-argent"></div>`,
+      errors: [error("`pile-reversed-argent` puts a pile reversed Argent on Or: metal on metal")],
+    },
+    {
       code: `<div class="escutcheon gules bordure-azure"></div>`,
       errors: [error("`bordure-azure` puts a bordure Azure on Gules: colour on colour")],
     },

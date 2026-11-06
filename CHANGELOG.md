@@ -14,6 +14,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `semy`: a semé, one built-in charge strewn across the field, e.g. bezanty or
   crusilly.
 - Voided ordinaries, e.g. `cross-voided-argent`: the field shows through.
+- Reversed ordinaries: `pile-reversed-*`, `chevron-reversed-*` and
+  `pall-reversed-*`, upside down.
 
 ### Fixed
 

@@ -24,6 +24,9 @@ const ORDINARIES = [
   "pall",
   "chief",
   "pile",
+  "chevron-reversed",
+  "pall-reversed",
+  "pile-reversed",
 ];
 const WIDTH = 300;
 // A point in px on the 300 × 360 shield, as %.
@@ -119,6 +122,10 @@ const VOIDED = [
   ["saltire", [25, 25], [25, 13.75], [50, 15]],
   ["pall", [50, 80], [42.5, 80], [20, 80]],
   ["pile", [50, 40], [38.3, 40], [20, 40]],
+  // Mirrored, with a point on each arm so a wrong closing vertex in the bridge shows.
+  ["chevron-reversed", [25, 40], [[25, 47.5], [75, 47.5]], [25, 60]],
+  ["pall-reversed", [50, 20], [[42.5, 20], [20, 68], [80, 68]], [20, 20]],
+  ["pile-reversed", [50, 60], [[38.3, 60], [61.7, 60]], [20, 60]],
 ];
 
 // `at` is [x%, y%] of the shield. Bite and bulge points are at the middle scallop of an inner
@@ -228,6 +235,38 @@ const PROBES = [
   { shield: "azure pile-ermine", at: [furSpot(2, 0), furSpot(3, 1)], expect: "sable", why: "spots on a fur pile" },
   { shield: "azure pile-ermine", at: [[15, 20], [85, 20]], expect: "azure", why: "the field beside a fur pile" },
 
+  // Reversed: the probes above, mirrored as y → 100 − y; below a chief, 30 + 0.7 × (100 − y).
+  { shield: "azure pile-reversed-or", at: [[50, 80], [50, 50], [50, 22], [35.62, 60], [64.38, 60]], expect: "or", why: "the pile reversed is drawn, up to near its tip" },
+  { shield: "azure pile-reversed-or", at: [[20, 80], [80, 80], [32.62, 60], [67.38, 60], [50, 12]], expect: "azure", why: "the field either side and above the reversed tip" },
+  { shield: "azure chevron-reversed-or", at: [[25, 40], [75, 40]], expect: "or", why: "the chevron reversed is drawn" },
+  { shield: "azure chevron-reversed-or", at: [50, 40], expect: "azure", why: "the field above the chevron reversed" },
+  { shield: "azure pall-reversed-or", at: [[50, 30], [20, 80], [80, 80]], expect: "or", why: "the pall reversed's stem and arms are drawn" },
+  { shield: "azure pall-reversed-or", at: [50, 80], expect: "azure", why: "the field between the pall reversed's arms" },
+  { shield: "azure chevron-reversed-engrailed-or", at: [20.6, 27.8], expect: "azure", why: "a bite in the chevron reversed" },
+  { shield: "gules chevron-reversed-engrailed-or", at: [50, 73], expect: "gules", why: "no sliver below the chevron reversed's point" },
+  { shield: "azure pall-reversed-engrailed-or", at: [73.7, 85.6], expect: "azure", why: "a bite in the pall reversed" },
+  { shield: "azure pile-reversed-engrailed-or", at: [[35.36, 63.36], [64.64, 63.36]], expect: "azure", why: "a bite in each side of the pile reversed" },
+  { shield: "azure pile-reversed-engrailed-or", at: [[50, 80], [37.88, 58.21], [62.12, 58.21]], expect: "or", why: "the engrailed pile reversed, by a cusp on each side" },
+  { shield: "azure pile-reversed-engrailed-or", at: [50, 16], expect: "azure", why: "no sliver above the engrailed pile reversed's tip" },
+  { shield: "gules pile-reversed-azure fimbriated-argent", at: [[32.62, 60], [67.38, 60], [50, 12]], expect: "argent", why: "the pile reversed's fimbriation, on each side and above the tip" },
+  { shield: "gules pile-reversed-azure fimbriated-argent", at: [[35.62, 60], [64.38, 60], [50, 99], [50, 70], [50, 40], [50, 20]], expect: "azure", why: "the pile reversed itself, just inside each side and up its centre line" },
+  { shield: "gules pile-reversed-azure fimbriated-argent", at: [[29.12, 60], [70.88, 60], [20, 20]], expect: "gules", why: "the field beyond the pile reversed's fimbriation" },
+  { shield: "gules pile-reversed-azure fimbriated-argent w-[305px]!", at: [[49.8, 80], [50.2, 80], [49.8, 50], [50.2, 50], [49.8, 25], [50.2, 25]], expect: "azure", why: "no seam up a fimbriated pile reversed where its tiles meet" },
+  { shield: "gules pile-reversed-azure fimbriated-argent chief-or", at: [[32.62, 72], [67.38, 72]], expect: "argent", why: "the fimbriation of a pile reversed below a chief" },
+  { shield: "gules pile-reversed-azure fimbriated-argent chief-or", at: [[35.62, 72], [64.38, 72], [50, 90]], expect: "azure", why: "a fimbriated pile reversed below a chief" },
+  { shield: "gules pile-reversed-azure fimbriated-argent chief-or", at: [[29.12, 72], [70.88, 72]], expect: "gules", why: "the field beside a fimbriated pile reversed below a chief" },
+  // Fimbriated, a diagonal arm's edge moves 3.9% down or up at a fixed x.
+  { shield: "gules chevron-reversed-azure fimbriated-argent", at: [[25, 40], [75, 40]], expect: "azure", why: "the fimbriated chevron reversed itself" },
+  { shield: "gules chevron-reversed-azure fimbriated-argent", at: [[25, 52], [75, 52], [25, 28], [75, 28]], expect: "argent", why: "the chevron reversed's fimbriation, below and above each arm" },
+  { shield: "gules chevron-reversed-azure fimbriated-argent", at: [[25, 57], [75, 57], [25, 23], [75, 23]], expect: "gules", why: "the field beyond the chevron reversed's fimbriation" },
+  { shield: "gules pall-reversed-azure fimbriated-argent", at: [[50, 20], [20, 80], [80, 80]], expect: "azure", why: "the fimbriated pall reversed itself" },
+  { shield: "gules pall-reversed-azure fimbriated-argent", at: [[38.5, 20], [61.5, 20], [20, 63], [80, 63]], expect: "argent", why: "the pall reversed's fimbriation, on the stem and each arm" },
+  { shield: "gules pall-reversed-azure fimbriated-argent", at: [[35, 20], [65, 20], [20, 58], [80, 58]], expect: "gules", why: "the field beyond the pall reversed's fimbriation" },
+  { shield: "per-pale-or-gules pile-reversed-counterchanged", at: [45, 70], expect: "gules", why: "the counterchanged pile reversed's dexter half" },
+  { shield: "per-pale-or-gules pile-reversed-counterchanged", at: [[55, 70], [20, 70]], expect: "or", why: "the counterchanged pile reversed's sinister half, and the field beside it" },
+  { shield: "azure pile-reversed-ermine", at: [furSpot(2, 4), furSpot(3, 3)], expect: "sable", why: "spots on a fur pile reversed" },
+  { shield: "azure pile-reversed-ermine", at: [[15, 80], [85, 80]], expect: "azure", why: "the field beside a fur pile reversed" },
+
   ...charged("azure", "", 50, [[50, 45]], "one charge"),
   ...charged("azure", "", 30, [[50, 24], [50, 66]], "two charges"),
   ...charged("azure", "", 28, [[28, 25], [72, 25], [50, 64]], "three charges, 2 and 1"),
@@ -323,6 +362,23 @@ const PROBES = [
   { shield: "azure pile-gules", charges: "on", items: bezants(3), at: [[42.5, 54], [57.5, 54]], expect: "gules", why: "the lowest of three on a pile fits inside it" },
   ...charged("azure pile-gules chief-or", "on", 14, [[50, 39.8], [50, 53.8], [50, 67.8]], "three on a pile below a chief"),
   { shield: "azure pile-gules chief-or", charges: "on", items: bezants(3), at: [[42.5, 67.8], [57.5, 67.8]], expect: "gules", why: "the lowest of three on a pile fits inside it, below a chief" },
+
+  ...charged("azure chevron-reversed-gules", "between", 22, [[28, 74], [72, 74], [50, 30]], "between a chevron reversed"),
+  ...charged("azure chevron-reversed-gules chief-or", "between", 22, [[28, 81.8], [72, 81.8], [50, 51]], "between a chevron reversed below a chief"),
+  ...charged("azure chevron-reversed-gules", "between", 12, [[26, 78], [50, 89], [74, 78], [38, 34], [62, 34], [50, 16]], "six between a chevron reversed"),
+  ...charged("azure chevron-reversed-gules chief-or", "between", 12, [[26, 84.6], [50, 92.3], [74, 84.6], [38, 53.8], [62, 53.8], [50, 41.2]], "six between a chevron reversed below a chief"),
+  ...charged("azure pall-reversed-gules", "between", 18, [[50, 89], [18, 44], [82, 44]], "between a pall reversed"),
+  ...charged("azure pall-reversed-gules chief-or", "between", 18, [[50, 92.3], [18, 60.8], [82, 60.8]], "between a pall reversed below a chief"),
+  ...charged("azure pile-reversed-gules", "between", 20, [[18, 45], [82, 45]], "between a pile reversed"),
+  ...charged("azure pile-reversed-gules chief-or", "between", 20, [[18, 61.5], [82, 61.5]], "between a pile reversed below a chief"),
+  ...charged("azure chevron-reversed-gules", "on", 12, [[20, 35], [50, 64], [80, 35]], "on a chevron reversed"),
+  ...charged("azure chevron-reversed-gules chief-or", "on", 12, [[20, 54.5], [50, 74.8], [80, 54.5]], "on a chevron reversed below a chief"),
+  ...charged("azure pall-reversed-gules", "on", 14, [[22, 78], [78, 78], [50, 25]], "on a pall reversed"),
+  ...charged("azure pall-reversed-gules chief-or", "on", 14, [[22, 84.6], [78, 84.6], [50, 47.5]], "on a pall reversed below a chief"),
+  ...charged("azure pile-reversed-gules", "on", 14, [[50, 75]], "one on a pile reversed"),
+  ...charged("azure pile-reversed-gules", "on", 14, [[50, 86], [50, 66], [50, 46]], "three on a pile reversed"),
+  ...charged("azure pile-reversed-gules chief-or", "on", 14, [[50, 90.2], [50, 76.2], [50, 62.2]], "three on a pile reversed below a chief"),
+  { shield: "azure pile-reversed-gules", charges: "on", items: bezants(3), at: [[42.5, 46], [57.5, 46]], expect: "gules", why: "the highest of three on a pile reversed fits inside it" },
 
   { shield: "azure", charges: "", items: ["bezant"], at: [68, 45], expect: "or", why: "one charge is half the shield wide" },
   { shield: "azure", charges: "charge-size-20", items: ["bezant"], at: [68, 45], expect: "azure", why: "charge-size-20 shrinks it" },
