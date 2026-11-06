@@ -144,8 +144,9 @@
     @apply font-serif;
   }
 
+  /* Strict mode has no greys, so a faint sable stands in for one. */
   code {
-    @apply font-mono text-[0.85em];
+    @apply font-mono text-[0.85em] bg-sable/5 px-1 py-0.5 rounded-sm box-decoration-clone;
   }
 
   pre {
