@@ -26,6 +26,10 @@ run("one-ordinary", rule, {
       errors: [{ messageId: "ordinaries" }],
     },
     {
+      code: `<div class="escutcheon azure cross-voided-or fess-gules"></div>`,
+      errors: [{ messageId: "ordinaries" }],
+    },
+    {
       code: `<div class="escutcheon or chief-or chief-azure"></div>`,
       errors: [{ message: "`chief-or` and `chief-azure` both draw a chief; only one will show" }],
     },

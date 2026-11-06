@@ -105,6 +105,22 @@ const atPoint = (name, at) => [
   },
 ];
 
+// Each voided ordinary: a point in its hole, in its outline and outside it, from VOIDS in
+// ordinaries.js.
+// prettier-ignore
+const VOIDED = [
+  ["pale", [50, 50], [38.75, 50], [20, 50]],
+  ["fess", [50, 45], [50, 33.75], [50, 15]],
+  ["bar", [50, 45], [50, 39.75], [50, 30]],
+  ["bend", [50, 50], [50, 35], [50, 15]],
+  ["bend-sinister", [50, 50], [50, 35], [50, 15]],
+  ["chevron", [25, 60], [[25, 52.5], [75, 52.5]], [25, 40]],
+  ["cross", [50, 45], [42.5, 20], [20, 20]],
+  ["saltire", [25, 25], [25, 13.75], [50, 15]],
+  ["pall", [50, 80], [42.5, 80], [20, 80]],
+  ["pile", [50, 40], [38.3, 40], [20, 40]],
+];
+
 // `at` is [x%, y%] of the shield. Bite and bulge points are at the middle scallop of an inner
 // edge, half the scallop's depth from the straight edge. Charges are bezants, whose centres
 // sit at the points in charges.js and the ordinaries' `between`/`on` tables.
@@ -145,6 +161,20 @@ const PROBES = [
   { shield: "azure chief-invected-or", at: [50, 32.1], expect: "or", why: "a bulge on the chief" },
 
   { shield: "or chevron-gules chief-azure", at: [50, 38], expect: "or", why: "the chevron moves below a chief" },
+
+  ...VOIDED.flatMap(([o, hole, outline, outside]) => [
+    { shield: `gules ${o}-voided-argent`, at: hole, expect: "gules", why: `the hole in a ${o} voided` },
+    { shield: `gules ${o}-voided-argent`, at: outline, expect: "argent", why: `the outline of a ${o} voided` },
+    { shield: `gules ${o}-voided-argent`, at: outside, expect: "gules", why: `the field beside a ${o} voided` },
+  ]),
+  { shield: "gules cross-voided-argent", at: [[50, 2], [50, 98], [2, 45], [98, 45]], expect: "gules", why: "a cross voided is open at its ends" },
+  { shield: "gules chief-or cross-voided-argent", at: [50, 32], expect: "gules", why: "the hole in a cross voided, just below a chief" },
+  { shield: "gules chief-or cross-voided-argent", at: [42.5, 33], expect: "argent", why: "the outline of a cross voided, just below a chief" },
+  { shield: "gules saltire-voided-ermine", at: [8.33, 20.83], expect: "argent", why: "the outline of a saltire voided ermine shows its ground" },
+  { shield: "gules saltire-voided-ermine", at: [25, 25], expect: "gules", why: "the hole in a saltire voided ermine" },
+  { shield: "per-pale-or-azure cross-voided-argent", at: [47.5, 20], expect: "or", why: "the field shows through a cross voided, dexter" },
+  { shield: "per-pale-or-azure cross-voided-argent", at: [52.5, 20], expect: "azure", why: "the field shows through a cross voided, sinister" },
+  { shield: "azure cross-voided-argent", charges: "semy", items: ["mullet or"], at: [18.75, 44.5], expect: "or", why: "a semé shows through a cross voided" },
   { shield: "gules cross-azure fimbriated-argent", at: [38.5, 15], expect: "argent", why: "the cross's fimbriation" },
   { shield: "gules cross-azure fimbriated-argent", at: [50, 45], expect: "azure", why: "the fimbriated cross itself" },
   { shield: "per-pale-or-gules chevron-counterchanged", at: [25, 60], expect: "gules", why: "the counterchanged chevron's dexter half" },
@@ -480,9 +510,10 @@ const PROBES = [
 ];
 
 const LINES = ["", "-engrailed", "-invected"];
-const CONTACT = ORDINARIES.flatMap((o) =>
-  LINES.map((line) => ({ shield: `azure ${o}${line}-or` })),
-);
+const CONTACT = [
+  ...ORDINARIES.flatMap((o) => LINES.map((line) => ({ shield: `azure ${o}${line}-or` }))),
+  ...VOIDED.map(([o]) => ({ shield: `azure ${o}-voided-or` })),
+];
 // `more` is a second charges container, as { charges, items }.
 const key = ({ kind, shield, charges, items, inner, first, more, quarters }) =>
   `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ? JSON.stringify(quarters) : ""}`;

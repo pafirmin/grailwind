@@ -2,7 +2,7 @@
  * Grailwind CSS: ordinaries, e.g. `fess-or`.
  */
 import plugin from "tailwindcss/plugin";
-import { BETWEEN, FURS, OF_THE_FIRST, ON, TINCTURES } from "./data.js";
+import { BETWEEN, FURS, OF_THE_FIRST, ON, TINCTURES, VOIDABLE } from "./data.js";
 import { furBackground } from "./furs.js";
 
 // prettier-ignore
@@ -86,15 +86,15 @@ const offsetLine = (a, b, outward, distance) => {
   return { n, c: n[0] * ax + n[1] * ay + distance };
 };
 
-// How far each vertex moves, in %, when fimbriated. Sides on the shield's edge
-// don't move, so their vertices slide along it.
-const widen = (vertices) => {
+// How far each vertex moves, in %, when the sides move out by `distance` (in by a negative one).
+// Sides on the shield's edge don't move, so their vertices slide along it.
+const widen = (vertices, distance = FIMBRIATION) => {
   const outward = Math.sign(signedArea(vertices));
   const count = vertices.length;
   const line = (i) => {
     const a = vertices[i];
     const b = vertices[(i + 1) % count];
-    return offsetLine(a, b, outward, onShieldEdge(a, b) ? 0 : FIMBRIATION);
+    return offsetLine(a, b, outward, onShieldEdge(a, b) ? 0 : distance);
   };
   return vertices.map((v, i) => {
     const p = line((i - 1 + count) % count);
@@ -104,6 +104,23 @@ const widen = (vertices) => {
     const [rx, ry] = real(v);
     return [((x - rx) * 100) / W, ((y - ry) * 100) / H];
   });
+};
+
+const rotate = (list, start) => [...list.slice(start), ...list.slice(0, start)];
+
+// The ordinary with a hole the shape of it shrunk by `distance`, cut with evenodd.
+const voidedPolygon = (vertices, distance) => {
+  const offsets = widen(vertices, -distance);
+  const inner = vertices.map(([x, y], i) => [x + offsets[i][0], y + offsets[i][1]]);
+  // Start and end at the shield's edge so we don't draw through it.
+  const edge = vertices.findIndex((v, i) => onShieldEdge(v, vertices[(i + 1) % vertices.length]));
+  if (edge === -1) {
+    throw new Error("a voided ordinary needs a side on the shield's edge");
+  }
+  const outerStr = [...rotate(vertices, edge), vertices[edge]].map(point).join(", ");
+  const innerStr = [...rotate(inner, edge), inner[edge]].map(point).join(", ");
+
+  return `polygon(evenodd, ${outerStr}, ${innerStr})`;
 };
 
 const shift = (v, d) =>
@@ -223,6 +240,13 @@ const bands = (layers, colour) => ({
 // box is shorter, so they are slightly squashed.
 const SCALLOP = 14;
 const SCALLOPS = { chevron: 10 };
+
+// A quarter of the ordinary's width, in real units. The pile tapers, so its is set by eye.
+// prettier-ignore
+const VOIDS = {
+  pale: 7.5, fess: 9, bar: 4.2, bend: 7.7, "bend-sinister": 7.7,
+  chevron: 3.8, cross: 5, saltire: 5.8, pall: 5, pile: 8,
+};
 const DEPTH = 0.35;
 
 const at = ([x, y]) => point([(x * 100) / W, (y * 100) / H]);
@@ -488,6 +512,25 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         utilities[`.${ordinary}-${name}-${fur}`] = ordinaryRules(ordinary, {
           ...pseudo,
           "clip-path": lined(line),
+        });
+      }
+    }
+
+    // Not fimbriated.
+    if (VOIDABLE.includes(ordinary)) {
+      const clip = voidedPolygon(vertices, VOIDS[ordinary]);
+      for (const [tincture, colour] of PAINTS) {
+        utilities[`.${ordinary}-voided-${tincture}`] = ordinaryRules(ordinary, {
+          ...placed,
+          "background-color": colour,
+          "clip-path": clip,
+        });
+      }
+      for (const fur of Object.keys(FURS)) {
+        utilities[`.${ordinary}-voided-${fur}`] = ordinaryRules(ordinary, {
+          ...placed,
+          ...furBackground(fur, theme),
+          "clip-path": clip,
         });
       }
     }

@@ -14,6 +14,7 @@ import {
   POINTS,
   ROUNDELS,
   TINCTURES,
+  VOIDABLE,
 } from "../data.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -189,6 +190,9 @@ const DATA_CLASSES = [
   ...LINES.flatMap((l) => ORDINARIES.map((o) => `${o}-${l}-${OF_THE_FIRST}`)),
   `fimbriated-${OF_THE_FIRST}`,
   `bordure-${OF_THE_FIRST}`,
+  ...VOIDABLE.map((o) => `${o}-voided-or`),
+  "saltire-voided-ermine",
+  `cross-voided-${OF_THE_FIRST}`,
 ];
 
 writeFileSync(

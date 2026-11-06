@@ -69,6 +69,20 @@ export const ROUNDELS = {
 // Lines of partition for an ordinary's edge, e.g. `fess-engrailed-or`.
 export const LINES = ["engrailed", "invected"];
 
+// Ordinaries that can be voided, e.g. `cross-voided-argent`.
+export const VOIDABLE = [
+  "pale",
+  "fess",
+  "bar",
+  "bend",
+  "bend-sinister",
+  "chevron",
+  "cross",
+  "saltire",
+  "pall",
+  "pile",
+];
+
 // Each fur's [ground, spot] tinctures.
 export const FURS = {
   ermine: ["argent", "sable"],

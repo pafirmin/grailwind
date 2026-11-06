@@ -62,6 +62,7 @@ tinctures replace Tailwind's colours entirely.
 - **Ordinaries:** `fess-or`, `chevron-gules`, `cross-argent`, `chief-azure`,
   `two-bars-or` and more, with `fimbriated-*` for a narrow border,
   `fess-engrailed-or` and the like for an engrailed or invected edge,
+  `cross-voided-argent` and the like to show the field through it,
   `chief-ermine` and the like in a fur, or `chevron-counterchanged` and the like
   on a divided field.
 - **Charges:** `mullet`, `fleur-de-lis`, `bezant`, crosses and more, arranged by

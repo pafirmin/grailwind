@@ -23,7 +23,8 @@ const article = (thing) => (/^[aeiou]/.test(thing) ? `an ${thing}` : `a ${thing}
 const KINDS = ["metal", "colour", "exempt"];
 
 // e.g. "fess engrailed", as blazoned.
-const name = ({ ordinary, line }) => describe(line ? `${ordinary} ${line}` : ordinary);
+const name = ({ ordinary, line, voided }) =>
+  describe([ordinary, line, voided && "voided"].filter(Boolean).join(" "));
 
 // e.g. " (ermine counts as a metal)", or " (ermine and erminois count as metals)".
 const furNote = (tinctures, kind) => {

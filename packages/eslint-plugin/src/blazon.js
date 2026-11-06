@@ -15,6 +15,7 @@ import {
   POINTS,
   ROUNDELS,
   TINCTURES,
+  VOIDABLE,
 } from "grailwind/data";
 
 const METAL = new Set(METALS);
@@ -47,6 +48,17 @@ for (const ordinary of ORDINARIES) {
     counterchanged: true,
   });
 }
+for (const ordinary of VOIDABLE) {
+  for (const tincture of PAINT) {
+    const fur = FUR.has(tincture);
+    ORDINARY_CLASSES.set(`${ordinary}-voided-${tincture}`, {
+      ordinary,
+      tincture,
+      fur,
+      voided: true,
+    });
+  }
+}
 for (const tincture of [...TINCTURES, OF_THE_FIRST]) {
   ORDINARY_CLASSES.set(`bordure-${tincture}`, { ordinary: "bordure", tincture });
 }
@@ -64,7 +76,7 @@ for (const division of DIVISIONS) {
 }
 
 // Only a plain, tinctured ordinary is fimbriated (see ordinaries.js).
-export const isFimbriable = (o) => !o.counterchanged && !o.line && !o.fur;
+export const isFimbriable = (o) => !o.counterchanged && !o.line && !o.fur && !o.voided;
 
 export const isFur = (tincture) => FUR.has(tincture);
 

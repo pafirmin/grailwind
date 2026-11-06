@@ -81,6 +81,10 @@ run("modifier-needs-target", rule, {
       errors: [noOrdinary("fimbriated-argent")],
     },
     {
+      code: `<div class="escutcheon gules cross-voided-or fimbriated-argent"></div>`,
+      errors: [noOrdinary("fimbriated-argent")],
+    },
+    {
       // A fur field isn't divided.
       code: `<div class="escutcheon ermine chevron-counterchanged"></div>`,
       errors: [noDivision("chevron-counterchanged")],
