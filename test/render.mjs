@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, firefox } from "playwright";
+import { DIVISIONS } from "../data.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const cli = join(root, "node_modules/.bin/tailwindcss");
@@ -574,12 +575,19 @@ const CONTACT = [
   ...ORDINARIES.flatMap((o) => LINES.map((line) => ({ shield: `azure ${o}${line}-or` }))),
   ...VOIDED.map(([o]) => ({ shield: `azure ${o}-voided-or` })),
 ];
+const DIVIDED = DIVISIONS.flatMap((d) => [
+  { shield: `${d}-or-azure` },
+  { shield: `${d}-ermine-gules` },
+]);
+// Tile edges at % positions fall mid-pixel at this width, where seams show.
+const ODD_WIDTH = 155;
 // `more` is a second charges container, as { charges, items }.
 const key = ({ kind, shield, charges, items, inner, first, more, quarters }) =>
   `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ? JSON.stringify(quarters) : ""}`;
 const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
 const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
 const NESTED = SHIELDS.filter((s) => s.inner);
+const PLAIN = SHIELDS.filter((s) => !s.items && !s.inner);
 const TINCTURE_MATCH_THRESHOLD = 12;
 
 const isWithinThreshold = (threshold, gotRgb, wantRgb) => {
@@ -626,7 +634,7 @@ const caption = (spec) =>
     : describeShield(spec);
 
 const build = (dir) => {
-  const specs = [...SHIELDS, ...CONTACT];
+  const specs = [...SHIELDS, ...CONTACT, ...DIVIDED];
   const classes = [...specs.map((s) => markup(s)), ...TINCTURES.map((t) => `<i class="${t}"></i>`)];
   writeFileSync(join(dir, "index.html"), classes.join("\n"));
   const input = join(dir, "input.css");
@@ -706,11 +714,11 @@ const probe = async (page, css) => {
   });
 };
 
-const contactSheet = async (page, css, specs, columns, file) => {
+const contactSheet = async (page, css, specs, columns, file, width = 150) => {
   const cells = specs
     .map((s) => `<figure>${markup(s)}<figcaption>${caption(s)}</figcaption></figure>`)
     .join("\n");
-  await page.setContent(grid(css, 150, cells).replace("repeat(6,", `repeat(${columns},`));
+  await page.setContent(grid(css, width, cells).replace("repeat(6,", `repeat(${columns},`));
   mkdirSync(out, { recursive: true });
   await page.screenshot({ path: join(out, file), fullPage: true });
 };
@@ -743,6 +751,9 @@ try {
         await contactSheet(page, css, CONTACT, 9, `contact-${name}.png`);
         await contactSheet(page, css, CHARGED, 8, `charges-${name}.png`);
         await contactSheet(page, css, NESTED, 6, `inescutcheons-${name}.png`);
+        await contactSheet(page, css, PLAIN, 8, `probes-${name}.png`);
+        await contactSheet(page, css, DIVIDED, 8, `divisions-${name}.png`);
+        await contactSheet(page, css, DIVIDED, 8, `divisions-odd-${name}.png`, ODD_WIDTH);
       } catch (error) {
         console.error(`  (no contact sheet for ${name}: ${error.message})`);
       }
