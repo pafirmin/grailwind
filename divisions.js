@@ -36,6 +36,25 @@ const DIVISIONS = {
   // Line from sinister chief to dexter base: first in the upper half.
   "per-bend-sinister": (a, b) => layer(`linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`),
 
+  "per-chevron": (a, b) =>
+    a === "transparent"
+      ? {
+          "background-image": [
+            `linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`,
+            `linear-gradient(to bottom left, ${a} 50%, ${b} 50%)`,
+            `linear-gradient(${b}, ${b})`,
+          ].join(", "),
+          "background-size": "50% 50%, 50% 50%, 100% 15%",
+          "background-position": "left 70%, right 70%, bottom",
+          "background-repeat": "no-repeat",
+        }
+      : {
+          "background-image": [
+            `linear-gradient(to bottom right, ${a} 42.5%, transparent 42.5%)`,
+            `linear-gradient(to bottom left, ${a} 42.5%, ${b} 42.5%)`,
+          ].join(", "),
+        },
+
   // Both diagonals, crossing at the centre like the saltire: first in chief and base.
   // Gyronny's four tiles, with the top-right and bottom-left swapped.
   "per-saltire": (a, b) => ({

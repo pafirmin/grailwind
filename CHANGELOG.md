@@ -6,6 +6,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `per-chevron-*`: a field divided along a chevron's centre line, the first
+  tincture in chief.
+
 ## [0.6.0] - 2026-11-06
 
 ### Added

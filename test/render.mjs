@@ -437,6 +437,24 @@ const PROBES = [
   { shield: "per-saltire-ermine-azure", at: furSpot(2, 4), expect: "sable", why: "a spot in base" },
   { shield: "per-saltire-ermine-azure", at: [[15, 50], [85, 50]], expect: "azure", why: "the flanks are azure" },
   { shield: "per-saltire-gules-ermine", at: [[50, 10], [50, 80]], expect: "gules", why: "gules in chief and base" },
+
+  // Per chevron's sides run from the apex at (50, 35) to the flanks at 85%, so at 25% across they're at 60%.
+  { shield: "per-chevron-or-gules", at: [[50, 10], [50, 30], [5, 70], [95, 70]], expect: "or", why: "or in chief, above the apex and down the flanks" },
+  { shield: "per-chevron-or-gules", at: [[50, 40], [50, 80]], expect: "gules", why: "gules below the apex and in base" },
+  { shield: "per-chevron-or-gules", at: [[25, 55], [75, 55]], expect: "or", why: "or above each side" },
+  { shield: "per-chevron-or-gules", at: [[25, 65], [75, 65]], expect: "gules", why: "gules below each side" },
+  { shield: "per-chevron-or-gules w-[305px]!", at: [[49.8, 20], [50.2, 20], [49.8, 30], [50.2, 30]], expect: "or", why: "no seam down the centre above the apex" },
+  { shield: "per-chevron-or-gules w-[305px]!", at: [[49.8, 50], [50.2, 50], [49.8, 75], [50.2, 75]], expect: "gules", why: "no seam down the centre below the apex" },
+  // Fur row 2 is at 37.5% down, below the apex but above both sides out at the flanks.
+  { shield: "per-chevron-ermine-gules", at: [furGround(0, 2), furGround(5, 2)], expect: "argent", why: "the fur's ground in both flanks, below the apex" },
+  { shield: "per-chevron-ermine-gules", at: furSpot(0, 2), expect: "sable", why: "a spot in the dexter flank, below the apex" },
+  { shield: "per-chevron-ermine-gules", at: [[50, 50], [50, 80], [25, 65], [75, 65]], expect: "gules", why: "gules in base and below each side" },
+  { shield: "per-chevron-gules-ermine", at: [[50, 10], [10, 40], [90, 40], [25, 55], [75, 55]], expect: "gules", why: "gules in chief and above each side" },
+  { shield: "per-chevron-gules-ermine", at: furSpot(2, 4), expect: "sable", why: "a spot in base" },
+  { shield: "per-chevron-ermine-gules pale-counterchanged", at: [50, 20], expect: "gules", why: "a counterchanged pale is gules in chief" },
+  { shield: "per-chevron-ermine-gules pale-counterchanged", at: furGround(2, 4), expect: "argent", why: "a counterchanged pale is ermine in base" },
+  { shield: "per-chevron-gules-ermine pale-counterchanged", at: furGround(2, 0), expect: "argent", why: "a counterchanged pale is ermine in chief" },
+  { shield: "per-chevron-gules-ermine pale-counterchanged", at: [50, 80], expect: "gules", why: "a counterchanged pale is gules in base" },
   { shield: "per-saltire-gules-ermine", at: [furSpot(0, 2), furSpot(5, 2)], expect: "sable", why: "spots in both flanks" },
   { shield: "per-saltire-gules-ermine", at: furGround(0, 2), expect: "argent", why: "the ground in the dexter flank" },
 

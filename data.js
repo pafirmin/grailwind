@@ -13,6 +13,7 @@ export const DIVISIONS = [
   "per-fess",
   "per-bend",
   "per-bend-sinister",
+  "per-chevron",
   "per-saltire",
   "quarterly",
   "gyronny",
