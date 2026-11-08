@@ -107,17 +107,19 @@ const DIVISIONS = {
         },
 
   // Both diagonals, crossing at the centre like the saltire: first in chief and base.
-  // Gyronny's four tiles, with the top-right and bottom-left swapped.
+  // Gyronny's four tiles, with the top-right and bottom-left swapped. Two strips under them fill
+  // the sub-pixel seam where the tiles meet: the first tincture down, the second across.
   "per-saltire": (a, b) => ({
-    "background-color": b,
     "background-image": [
       `linear-gradient(to bottom left, ${a} 50%, ${b} 50%)`,
       `linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`,
       `linear-gradient(to bottom left, ${b} 50%, ${a} 50%)`,
       `linear-gradient(to bottom right, ${b} 50%, ${a} 50%)`,
+      `linear-gradient(${a}, ${a})`,
+      `linear-gradient(${b}, ${b})`,
     ].join(", "),
-    "background-size": "50% 50%",
-    "background-position": "left top, right top, right bottom, left bottom",
+    "background-size": "50% 50%, 50% 50%, 50% 50%, 50% 50%, 2px 100%, 100% 2px",
+    "background-position": "left top, right top, right bottom, left bottom, center, center",
     "background-repeat": "no-repeat",
   }),
 

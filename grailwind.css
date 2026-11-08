@@ -135,10 +135,18 @@
   grid-auto-flow: row;
   grid-auto-rows: 1fr;
 
-  /* See per-pale. */
-  &:is(.escutcheon, .escutcheon *) > * {
-    position: relative;
-    contain: layout;
+  /* On a shield, two parts split at the fess point, FESS_POINT in divisions.js.
+   * More parts stay equal. */
+  &:is(.escutcheon, .escutcheon *) {
+    &:has(> :last-child:nth-child(2)) {
+      grid-template-rows: 45fr 55fr;
+    }
+
+    /* See per-pale. */
+    & > * {
+      position: relative;
+      contain: layout;
+    }
   }
 }
 
@@ -155,10 +163,15 @@
     --outer-inset: 0px;
   }
 
-  /* See per-pale. */
-  &:is(.escutcheon, .escutcheon *) > * {
-    position: relative;
-    contain: layout;
+  /* On a shield, split at the fess point, as per-fess. */
+  &:is(.escutcheon, .escutcheon *) {
+    grid-template-rows: 45fr 55fr;
+
+    /* See per-pale. */
+    & > * {
+      position: relative;
+      contain: layout;
+    }
   }
 }
 

@@ -13,6 +13,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `bendy-*`, `bendy-sinister-*`, `chevronny-*` (each with `-of-eight-*`) and
   `chequy-*`: six or eight pieces, or five squares by six.
 
+### Fixed
+
+- On a shield, `quarterly` and two-part `per-fess` split at the fess point, as
+  the divisions do, not halfway down.
+- No seam down the centre of `per-saltire-*` at odd widths.
+
 ## [0.6.0] - 2026-11-06
 
 ### Added

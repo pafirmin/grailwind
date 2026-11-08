@@ -82,6 +82,14 @@ const PATTERNS = {
     /\.per-pale-or-gules \{[^}]*--counterchange-image: linear-gradient\(to right, var\(--color-gules\) 50%, var\(--color-or\) 50%\);/,
   "quarterly splits at the fess point":
     /\.quarterly-or-gules \{[^}]*background-size: 100% 45%, 100% 100%;/,
+  "per saltire's strips fill the seam, not a background colour":
+    /\.per-saltire-or-gules \{(?![^}]*background-color)[^}]*background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 2px 100%, 100% 2px;/,
+  "grid quarterly stays equal off a shield":
+    /\.quarterly \{\s*display: grid;[^}]*grid-template-rows: 1fr 1fr;/,
+  "grid quarterly splits at the fess point on a shield":
+    /\.quarterly \{[^]*?&:is\(\.escutcheon, \.escutcheon \*\) \{\s*grid-template-rows: 45fr 55fr;/,
+  "grid per-fess splits at the fess point on a shield, in two parts only":
+    /\.per-fess \{[^]*?&:is\(\.escutcheon, \.escutcheon \*\) \{\s*&:has\(> :last-child:nth-child\(2\)\) \{\s*grid-template-rows: 45fr 55fr;/,
   "counterchange vars don't inherit":
     /@property --counterchange-image \{\s*syntax: "\*";\s*inherits: false;/,
   "a counterchanged ordinary pulls them from its shield":
@@ -198,7 +206,7 @@ const DATA_CLASSES = [
 
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly per-pale"></div>`,
+  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly per-pale per-fess"></div>`,
 );
 
 const build = (entry, { css = "", source = "index.html" } = {}) => {

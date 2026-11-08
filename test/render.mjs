@@ -667,15 +667,20 @@ const PROBES = [
   { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: [px(6, 60), px(60, 6)], expect: "argent", why: "a canton in a quarter doesn't move over the bordure" },
   { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: px(20, 20), expect: "or", why: "a canton in a quarter" },
   { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: px(80, 40), expect: "gules", why: "a canton in a quarter is a third of the quarter" },
-  // Each part of a divided shield is a coat of its own: a quarter is 5:6, so its charges place as on a shield.
-  { shield: "quarterly", quarters: [{ shield: "or", charges: "", items: ["roundel gules"] }, "azure", "azure", "or"], at: ring([25, 22.5], 25), expect: "gules", why: "a charge in a plain quarter" },
-  { shield: "quarterly", quarters: [{ shield: "or", charges: "", items: ["roundel gules"] }, "azure", "azure", "or"], at: [55, 45], expect: "azure", why: "a charge in a plain quarter stays in it" },
+  // Each part of a divided shield is a coat of its own: a quarter's charges place within it,
+  // so quarter 1's fess point is 45% of 45% down.
+  { shield: "quarterly", quarters: [{ shield: "or", charges: "", items: ["roundel gules"] }, "azure", "azure", "or"], at: ring([25, 20.25], 25), expect: "gules", why: "a charge in a plain quarter" },
+  { shield: "quarterly", quarters: [{ shield: "or", charges: "", items: ["roundel gules"] }, "azure", "azure", "or"], at: [55, 40], expect: "azure", why: "a charge in a plain quarter stays in it" },
   { shield: "quarterly cross-argent", quarters: ["or", "azure", "azure", { shield: "or", charges: "", items: ["roundel gules"] }], at: [50, 45], expect: "argent", why: "the shield's ordinary over a charge in a plain quarter" },
   { shield: "quarterly cross-argent", quarters: ["or", "azure", "azure", { shield: "or", charges: "", items: ["roundel gules"] }], at: [75, 72.5], expect: "gules", why: "a charge in a plain quarter, under the shield's ordinary" },
   { shield: "quarterly", quarters: [{ shield: "per-pale-or-azure", charges: "counterchanged", items: ["roundel"] }, "gules", "gules", "gules"], at: [19, 22.5], expect: "azure", why: "a counterchanged charge in a quarter, on its or half" },
   { shield: "quarterly", quarters: [{ shield: "per-pale-or-azure", charges: "counterchanged", items: ["roundel"] }, "gules", "gules", "gules"], at: [31, 22.5], expect: "or", why: "a counterchanged charge in a quarter, on its azure half" },
   // A fess is 30–60% of its quarter; the shield's chief doesn't push it down.
   { shield: "quarterly chief-or", quarters: ["gules", "gules", "azure fess-argent", "gules"], at: [25, 72], expect: "argent", why: "a quarter doesn't take the shield's chief's layout" },
+  // On a shield, the grid quarterly and two-part per-fess split at the fess point, 45%.
+  { shield: "quarterly", quarters: ["or", "azure", "azure", "or"], at: [25, 43], expect: "or", why: "a quartered shield's chief quarters end at 45%" },
+  { shield: "quarterly", quarters: ["or", "azure", "azure", "or"], at: [25, 47], expect: "azure", why: "a quartered shield is split per-fess at 45%" },
+  { shield: "per-fess", quarters: ["or", "azure"], at: [25, 47], expect: "azure", why: "a per-fess shield is split 45% of the way down the shield" },
   { shield: "azure bordure-or chief-gules", at: [px(4, 4), px(150, 4), px(296, 40), px(150, 110)], expect: "gules", why: "a chief over the bordure" },
   { shield: "azure bordure-or chief-gules", at: px(150, 116), expect: "azure", why: "a chief's lower edge stays at 30% of the field" },
   { shield: "azure bordure-or chief-gules", at: [px(4, 116), px(4, 200)], expect: "or", why: "the bordure below a chief" },
