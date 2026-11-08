@@ -22,6 +22,13 @@ export const DIVISIONS = [
   "barry-of-ten",
   "paly",
   "paly-of-eight",
+  "bendy",
+  "bendy-of-eight",
+  "bendy-sinister",
+  "bendy-sinister-of-eight",
+  "chevronny",
+  "chevronny-of-eight",
+  "chequy",
 ];
 
 // Ordinaries that can be reversed, e.g. `pile-reversed-or`: the same shape upside down.

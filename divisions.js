@@ -22,6 +22,57 @@ const stripes = (to, pieces) => (a, b) => {
   };
 };
 
+// How much of the corner-to-corner extent the shield covers: the base corner is cut away by the
+// border-radius of 0 0 50% 50% / 0 0 45% 45% and the 5:6 aspect ratio in grailwind.css. It runs
+// from the chief corner the bands start in to the tangent on the base curve.
+const BENDY_VISIBLE = (() => {
+  const [width, height] = [5, 6];
+  const [radiusX, radiusY] = [width / 2, 0.45 * height];
+  const [centreX, centreY] = [width / 2, height - radiusY];
+  const tangent = Math.sqrt((height * radiusX) ** 2 + (width * radiusY) ** 2);
+  return (width * height - height * centreX + width * centreY + tangent) / (2 * width * height);
+})();
+
+// Diagonal bands parallel to per bend, `pieces` equal ones across the visible part of the shield,
+// the last running to the edge. Explicit stops, not a repeating gradient, so a canton's square
+// corners don't show the first tincture again.
+const bendy = (to, pieces) => (a, b) => {
+  const stops = [];
+  for (let i = 0; i < pieces; i++) {
+    const start = i === 0 ? 0 : ((i * BENDY_VISIBLE * 100) / pieces).toFixed(2);
+    const end = i === pieces - 1 ? 100 : (((i + 1) * BENDY_VISIBLE * 100) / pieces).toFixed(2);
+    stops.push(`${i % 2 === 0 ? a : b} ${start}% ${end}%`);
+  }
+  return layer(`linear-gradient(to ${to}, ${stops.join(", ")})`);
+};
+
+// The direction of `to bottom right` on the shield (aspect-ratio 5 / 6 in grailwind.css), so
+// chevronny's lines run parallel to per chevron's, the field's diagonals.
+const CHEVRON_ANGLE = 180 - (Math.atan(6 / 5) * 180) / Math.PI;
+
+// A half box is 75% as long as the whole along this angle (45/sqrt(61) over 60/sqrt(61)).
+// Plain, the sinister half sits over a full-width dexter layer, which hides the centre seam.
+// With a fur the layers can't overlap, as the transparent stripes would show the layer below.
+const chevronny = (pieces) => (a, b, fur) => {
+  const stripe = (angle, length) =>
+    `repeating-linear-gradient(${angle}deg, ${a} 0 calc(${length}% / ${pieces}), ${b} 0 calc(${2 * length}% / ${pieces}))`;
+  const sinister = stripe(-CHEVRON_ANGLE, 100);
+
+  return fur
+    ? {
+        "background-image": [stripe(CHEVRON_ANGLE, 100), sinister].join(", "),
+        "background-size": "50% 100%",
+        "background-position": "left, right",
+        "background-repeat": "no-repeat",
+      }
+    : {
+        "background-image": [sinister, stripe(CHEVRON_ANGLE, 75)].join(", "),
+        "background-size": "50% 100%, 100% 100%",
+        "background-position": "right, left",
+        "background-repeat": "no-repeat",
+      };
+};
+
 const DIVISIONS = {
   // Vertical split: first on the dexter (viewer's left).
   "per-pale": (a, b) => layer(`linear-gradient(to right, ${a} 50%, ${b} 50%)`),
@@ -102,22 +153,42 @@ const DIVISIONS = {
   "barry-of-ten": stripes("bottom", 10),
   paly: stripes("right", 6),
   "paly-of-eight": stripes("right", 8),
+
+  // Bendy has the first tincture in the sinister chief corner, bendy sinister in the dexter.
+  bendy: bendy("bottom left", 6),
+  "bendy-of-eight": bendy("bottom left", 8),
+  "bendy-sinister": bendy("bottom right", 6),
+  "bendy-sinister-of-eight": bendy("bottom right", 8),
+
+  // The first tincture in the chief corners.
+  chevronny: chevronny(6),
+  "chevronny-of-eight": chevronny(8),
+
+  // 5 across and 6 down, the first tincture in the dexter chief square. Conic starts at the top.
+  // The repeat must be explicit, as with stripes.
+  chequy: (a, b) => ({
+    "background-image": `conic-gradient(${b} 0 25%, ${a} 0 50%, ${b} 0 75%, ${a} 0)`,
+    "background-size": "40% calc(100% / 3)",
+    "background-repeat": "repeat",
+  }),
 };
 
 // A division's background rules as one { image, size, position, repeat } per layer.
 const toLayers = (rules) => {
-  return rules["background-image"].split(/, (?=linear-gradient)/).map((gradient, i) => {
-    const size = (rules["background-size"] ?? "100% 100%").split(", ");
-    const position = (rules["background-position"] ?? "0 0").split(", ");
-    const repeat = (rules["background-repeat"] ?? "no-repeat").split(", ");
+  return rules["background-image"]
+    .split(/, (?=(?:repeating-)?(?:linear|conic)-gradient)/)
+    .map((gradient, i) => {
+      const size = (rules["background-size"] ?? "100% 100%").split(", ");
+      const position = (rules["background-position"] ?? "0 0").split(", ");
+      const repeat = (rules["background-repeat"] ?? "no-repeat").split(", ");
 
-    return {
-      image: gradient,
-      size: size[i % size.length],
-      position: position[i % position.length],
-      repeat: repeat[i % repeat.length],
-    };
-  });
+      return {
+        image: gradient,
+        size: size[i % size.length],
+        position: position[i % position.length],
+        repeat: repeat[i % repeat.length],
+      };
+    });
 };
 
 // A division with one fur: the fur's part is left transparent, over the fur's own layers.

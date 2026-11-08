@@ -57,8 +57,8 @@ tinctures replace Tailwind's colours entirely.
 - **The shield:** `escutcheon`, plus `bordure-*`, `inescutcheon` (a small shield at the centre)
   and `canton` (a ninth of the shield in dexter chief), each with its own field and charges.
 - **Divided fields:** `per-pale-or-gules`, `quarterly-azure-argent`,
-  `gyronny-or-sable`, `barry-argent-azure` and more, or `per-pale`, `per-fess` and `quarterly` for
-  layout.
+  `gyronny-or-sable`, `barry-argent-azure`, `bendy-argent-gules`, `chequy-or-azure` and more, or
+  `per-pale`, `per-fess` and `quarterly` for layout.
 - **Ordinaries:** `fess-or`, `chevron-gules`, `cross-argent`, `chief-azure`,
   `two-bars-or` and more, with `fimbriated-*` for a narrow border,
   `fess-engrailed-or` and the like for an engrailed or invected edge,

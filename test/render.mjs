@@ -79,6 +79,76 @@ const charged = (shield, charges, size, points, why) =>
 const FUR_TILE = 100 / 6;
 const furSpot = (k, j) => [FUR_TILE * (k + 0.25), FUR_TILE * (j + 0.25) + FUR_TILE / 10];
 const furGround = (k, j) => [FUR_TILE * (k + 0.75), FUR_TILE * (j + 0.25)];
+// A point is kept off the shield's rounded base, which is tighter near the flanks.
+const onShield = (x, y) => y >= 4 && y <= (x < 20 || x > 80 ? 75 : 96);
+// Bendy's n equal pieces cover the visible part of the shield, the last running to the edge.
+const BENDY_VISIBLE = (30 - 15 + 16.5 + Math.sqrt(15 ** 2 + 13.5 ** 2)) / 60;
+// How far across the corner-to-corner extent a point `lean` of the way through a piece is.
+const bendyFraction = (pieces, piece, lean) => {
+  const last = piece === pieces - 1;
+  const start = (piece * BENDY_VISIBLE) / pieces;
+  const end = last ? 1 : ((piece + 1) * BENDY_VISIBLE) / pieces;
+  return last ? start + lean * (BENDY_VISIBLE - start) : start + lean * (end - start);
+};
+// A point in a piece at x, as a distance from the start corner. The fraction is the mean of the
+// distances across and down. Kept off the rounded base, which is tighter near the flanks.
+const bendyPoint = (pieces, piece, lean, x, sinister) => {
+  const y = 100 * (2 * bendyFraction(pieces, piece, lean) - (100 - x) / 100);
+  if (!onShield(x, y)) {
+    return null;
+  }
+  return [sinister ? 100 - x : x, y];
+};
+const bendyPiece = (pieces, piece, sinister) => {
+  for (const x of [92, 8, 75, 25, 97]) {
+    const point = bendyPoint(pieces, piece, 0.5, x, sinister);
+    if (point) {
+      return point;
+    }
+  }
+  throw new Error(`no point for bendy piece ${piece}`);
+};
+// Chevronny's dexter lines run at the angle of the field's diagonal, measured from the top left
+// corner (5.76 box units to the centre line's foot); the sinister side mirrors it. Points near
+// the flanks where they fit, so the angle matters.
+const chevronnyPiece = (pieces, piece, side) => {
+  const sine = 6 / Math.sqrt(61);
+  const cosine = 5 / Math.sqrt(61);
+  const along = ((piece + 0.5) / pieces) * 5.76;
+  for (const x of [8, 15, 3, 45, 35, 25]) {
+    const y = ((along - (x / 100) * 5 * sine) / cosine / 6) * 100;
+    if (onShield(x, y)) {
+      return [side === "sinister" ? 100 - x : x, y];
+    }
+  }
+  throw new Error(`no point for chevronny piece ${piece}`);
+};
+// A point in a piece at the flank, `lean` of the way through it. Leaning towards a piece's edge
+// puts a line at the wrong angle (45 degrees, say) in the neighbouring piece.
+const bendyFlank = (pieces, piece, lean, x, sinister) => {
+  const point = bendyPoint(pieces, piece, lean, x, sinister);
+  if (!point) {
+    throw new Error(`bendy flank point ${piece} at ${x} is off the shield`);
+  }
+  return point;
+};
+const chevronnyFlank = (pieces, piece, lean, side) => {
+  const x = 10;
+  const sine = 6 / Math.sqrt(61);
+  const cosine = 5 / Math.sqrt(61);
+  const along = ((piece + lean) / pieces) * 5.76;
+  const y = ((along - (x / 100) * 5 * sine) / cosine / 6) * 100;
+  if (!onShield(x, y)) {
+    throw new Error(`chevronny flank point ${x}, ${y} is off the shield`);
+  }
+  return [side === "sinister" ? 100 - x : x, y];
+};
+const bothSides = (pieces, chosen) =>
+  chosen.flatMap((piece) =>
+    ["dexter", "sinister"].map((side) => chevronnyPiece(pieces, piece, side)),
+  );
+// Chequy is 5 across and 6 down; the dexter chief square is the first tincture.
+const chequySquare = (col, row) => [20 * col + 10, (100 / 6) * row + 100 / 12];
 const gap = (shield, charges, n) => ({ shield, charges, items: bezants(n), expect: "azure" });
 // An inescutcheon is a third of the shield with its top left at (33.5%, 28.5%), from grailwind.css.
 const INNER = 0.33;
@@ -473,6 +543,48 @@ const PROBES = [
   { shield: "barry-gules-ermine", at: [furSpot(1, 1), furSpot(1, 3)], expect: "sable", why: "barry with a fur: spots in stripes 2 and 4" },
   { shield: "barry-gules-ermine", at: [furGround(1, 1), furGround(1, 3)], expect: "argent", why: "barry with a fur: the ground in stripes 2 and 4" },
   { shield: "paly-ermine-azure", at: [[25, 40], [91.67, 40]], expect: "azure", why: "paly with a fur: azure in pallets 2 and 6" },
+  // Bendy: pieces across the visible shield, the first in the sinister chief corner.
+  { shield: "bendy-or-gules", at: [0, 2, 4].map((piece) => bendyPiece(6, piece, false)), expect: "or", why: "bendy: or in pieces 1, 3 and 5, the first in the sinister chief corner" },
+  { shield: "bendy-or-gules", at: [1, 3].map((piece) => bendyPiece(6, piece, false)), expect: "gules", why: "bendy: gules in pieces 2 and 4" },
+  { shield: "bendy-of-eight-or-gules", at: [0, 4, 6].map((piece) => bendyPiece(8, piece, false)), expect: "or", why: "bendy of eight: or in pieces 1, 5 and 7" },
+  { shield: "bendy-of-eight-or-gules", at: [1, 5].map((piece) => bendyPiece(8, piece, false)), expect: "gules", why: "bendy of eight: gules in pieces 2 and 6" },
+  { shield: "bendy-sinister-or-gules", at: [0, 2, 4].map((piece) => bendyPiece(6, piece, true)), expect: "or", why: "bendy sinister: or in pieces 1, 3 and 5, the first in the dexter chief corner" },
+  { shield: "bendy-sinister-or-gules", at: [1, 3].map((piece) => bendyPiece(6, piece, true)), expect: "gules", why: "bendy sinister: gules in pieces 2 and 4" },
+  { shield: "bendy-sinister-of-eight-or-gules", at: [0, 4, 6].map((piece) => bendyPiece(8, piece, true)), expect: "or", why: "bendy sinister of eight: or in pieces 1, 5 and 7" },
+  { shield: "bendy-sinister-of-eight-or-gules", at: [1, 5].map((piece) => bendyPiece(8, piece, true)), expect: "gules", why: "bendy sinister of eight: gules in pieces 2 and 6" },
+  { shield: "bendy-or-gules", at: bendyPiece(6, 5, false), expect: "gules", why: "bendy of six: gules in the last piece, on the curved base" },
+  { shield: "bendy-of-eight-or-gules", at: bendyPiece(8, 7, false), expect: "gules", why: "bendy of eight: gules in the last piece, on the curved base" },
+  { shield: "bendy-sinister-or-gules", at: bendyPiece(6, 5, true), expect: "gules", why: "bendy sinister of six: gules in the last piece, on the curved base" },
+  { shield: "bendy-sinister-of-eight-or-gules", at: bendyPiece(8, 7, true), expect: "gules", why: "bendy sinister of eight: gules in the last piece, on the curved base" },
+  { shield: "bendy-gules-ermine", at: furSpot(4, 1), expect: "sable", why: "bendy with a fur: a spot in piece 2" },
+  { shield: "bendy-gules-ermine", at: [bendyPiece(6, 0, false), bendyPiece(6, 2, false)], expect: "gules", why: "bendy with a fur: gules in pieces 1 and 3" },
+
+  // Near the flanks, leaning to a piece's edge, so a line at 45 degrees lands in the next piece.
+  { shield: "bendy-of-eight-or-gules", at: [bendyFlank(8, 2, 0.88, 92), bendyFlank(8, 6, 0.12, 8)], expect: "or", why: "bendy of eight: or in pieces 3 and 7 near the flanks, parallel to per bend" },
+  { shield: "bendy-of-eight-or-gules", at: [bendyFlank(8, 3, 0.88, 90), bendyFlank(8, 5, 0.12, 8)], expect: "gules", why: "bendy of eight: gules in pieces 4 and 6 near the flanks, parallel to per bend" },
+  { shield: "bendy-sinister-of-eight-or-gules", at: [bendyFlank(8, 2, 0.88, 92, true), bendyFlank(8, 6, 0.12, 8, true)], expect: "or", why: "bendy sinister of eight: or in pieces 3 and 7 near the flanks, parallel to per bend sinister" },
+  { shield: "bendy-sinister-of-eight-or-gules", at: [bendyFlank(8, 3, 0.88, 90, true), bendyFlank(8, 5, 0.12, 8, true)], expect: "gules", why: "bendy sinister of eight: gules in pieces 4 and 6 near the flanks, parallel to per bend sinister" },
+  { shield: "chevronny-of-eight-or-gules", at: ["dexter", "sinister"].map((side) => chevronnyFlank(8, 2, 0.88, side)), expect: "or", why: "chevronny of eight: or in piece 3 near the flanks, parallel to per chevron" },
+  { shield: "chevronny-of-eight-or-gules", at: ["dexter", "sinister"].map((side) => chevronnyFlank(8, 3, 0.88, side)), expect: "gules", why: "chevronny of eight: gules in piece 4 near the flanks, parallel to per chevron" },
+  { shield: "chevronny-or-gules", at: ["dexter", "sinister"].map((side) => chevronnyFlank(6, 1, 0.5, side)), expect: "gules", why: "chevronny: gules in piece 2 at the flanks, the sinister layer over the dexter" },
+
+  // Chevronny: lines parallel to per chevron's, the first tincture in the chief corners.
+  { shield: "chevronny-or-gules", at: bothSides(6, [0, 2, 4]), expect: "or", why: "chevronny: or in pieces 1, 3 and 5, on both sides" },
+  { shield: "chevronny-or-gules", at: bothSides(6, [1, 3, 5]), expect: "gules", why: "chevronny: gules in pieces 2, 4 and 6, on both sides" },
+  { shield: "chevronny-of-eight-or-gules", at: bothSides(8, [0, 4, 6]), expect: "or", why: "chevronny of eight: or in pieces 1, 5 and 7" },
+  { shield: "chevronny-of-eight-or-gules", at: bothSides(8, [1, 5, 7]), expect: "gules", why: "chevronny of eight: gules in pieces 2, 6 and 8" },
+  { shield: "chevronny-or-gules w-[305px]!", at: [[49.8, 30], [50.2, 30], [49.8, 45], [50.2, 45], [49.8, 80], [50.2, 80]], expect: "gules", why: "chevronny: no seam down the centre in the gules piece" },
+  { shield: "chevronny-or-gules w-[305px]!", at: [[49.8, 10], [50.2, 10], [49.8, 20], [50.2, 20], [49.8, 60], [50.2, 60]], expect: "or", why: "chevronny: no seam down the centre in the or piece" },
+  { shield: "chevronny-gules-ermine", at: [furSpot(1, 1), furSpot(5, 1)], expect: "sable", why: "chevronny with a fur: spots in piece 2 on both sides" },
+  { shield: "chevronny-gules-ermine", at: bothSides(6, [0, 2]), expect: "gules", why: "chevronny with a fur: gules in pieces 1 and 3" },
+
+  // Chequy: 5 across and 6 down, the first tincture in the dexter chief square.
+  { shield: "chequy-or-azure", at: [chequySquare(0, 0), chequySquare(2, 0), chequySquare(4, 0), chequySquare(1, 1), chequySquare(3, 3), chequySquare(2, 4)], expect: "or", why: "chequy: or in the dexter chief square and alternately" },
+  { shield: "chequy-or-azure", at: [chequySquare(1, 0), chequySquare(3, 0), chequySquare(0, 1), chequySquare(4, 1), chequySquare(2, 3), chequySquare(3, 4)], expect: "azure", why: "chequy: azure between the or squares" },
+  { shield: "chequy-or-azure", at: chequySquare(2, 5), expect: "azure", why: "chequy: six rows down" },
+  { shield: "chequy-gules-ermine", at: [furSpot(2, 0), furSpot(2, 2)], expect: "sable", why: "chequy with a fur: spots in ermine squares" },
+  { shield: "chequy-gules-ermine", at: [chequySquare(0, 0), chequySquare(2, 2), chequySquare(4, 0)], expect: "gules", why: "chequy with a fur: gules squares, repeated down the field" },
+
   { shield: "barry-or-gules fess-counterchanged", at: [50, 41.67], expect: "gules", why: "a counterchanged fess on an or bar" },
   { shield: "barry-or-gules fess-counterchanged", at: [50, 55], expect: "or", why: "a counterchanged fess on a gules bar" },
   { shield: "barry-or-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: [30, 45], expect: "gules", why: "a counterchanged charge on an or bar" },
