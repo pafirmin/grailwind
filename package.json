@@ -1,6 +1,6 @@
 {
   "name": "grailwind",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "scripts": {
     "build": "tailwindcss -i docs/app.css -o docs/site.css",
     "dev": "tailwindcss -i docs/app.css -o docs/site.css --watch",
@@ -27,7 +27,7 @@
   "license": "MIT",
   "description": "Heraldic blazon for Tailwind CSS: tinctures, divisions, ordinaries and charges",
   "devDependencies": {
-    "@grailwind/eslint-plugin": "^0.1.0-beta.2",
+    "@grailwind/eslint-plugin": "^0.1.0-beta.3",
     "@html-eslint/parser": "^0.67.0",
     "@tailwindcss/cli": "^4.3.3",
     "eslint": "^10.14.0",
