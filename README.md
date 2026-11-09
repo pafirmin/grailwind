@@ -28,6 +28,8 @@ gold chevron, and three silver stars around it.
 > Grailwind is a light-hearted project at version 0.x, so class names may
 > still change.
 
+![grailwind — draw heraldic coats of arms with Tailwind CSS classes](https://raw.githubusercontent.com/yasirwhite/opendemo-media/main/pafirmin-grailwind/grailwind-demo.gif)
+
 ## Install
 
 Grailwind is a plugin for Tailwind CSS v4.
