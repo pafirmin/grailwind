@@ -159,7 +159,7 @@
           <li>
             <a href="#ordinaries">Ordinaries</a>
             <ul>
-              <li><a href="#engrailed">Engrailed and invected</a></li>
+              <li><a href="#lines">Lines</a></li>
               <li><a href="#combining">Combining</a></li>
               <li><a href="#fimbriation">Fimbriation</a></li>
               <li><a href="#counterchanged">Counterchanged</a></li>
@@ -743,7 +743,11 @@
             </figure>
           </div>
 
-          <h3 id="engrailed">Engrailed and invected</h3>
+          <h3 id="lines">Lines</h3>
+          <p>
+            Any ordinary can be <code>engrailed</code>, <code>invected</code> or
+            <code>wavy</code>
+          </p>
           <div class="examples">
             <figure data-blazon="Azure, a fess engrailed Or">
               <div class="escutcheon azure fess-engrailed-or"></div>
@@ -751,17 +755,26 @@
             <figure data-blazon="Gules, a chevron invected Or">
               <div class="escutcheon gules chevron-invected-or"></div>
             </figure>
+            <figure data-blazon="Erminois, a pile reversed wavy Gules">
+              <div class="escutcheon erminois pile-reversed-wavy-gules"></div>
+            </figure>
+            <figure data-blazon="Azure, three bars wavy Argent">
+              <div class="escutcheon azure three-bars-wavy-argent"></div>
+            </figure>
             <figure data-blazon="Sable, a cross engrailed Argent">
               <div class="escutcheon sable cross-engrailed-argent"></div>
-            </figure>
-            <figure data-blazon="Argent, a saltire invected Gules">
-              <div class="escutcheon argent saltire-invected-gules"></div>
             </figure>
             <figure data-blazon="Or, a chief engrailed Azure">
               <div class="escutcheon or chief-engrailed-azure"></div>
             </figure>
-            <figure data-blazon="Vert, a bend engrailed Argent">
-              <div class="escutcheon vert bend-engrailed-argent"></div>
+            <figure data-blazon="Argent, a saltire invected Gules">
+              <div class="escutcheon argent saltire-invected-gules"></div>
+            </figure>
+            <figure data-blazon="Argent, a bend wavy Sable">
+              <div class="escutcheon argent bend-wavy-sable"></div>
+            </figure>
+            <figure data-blazon="Or, a cross wavy Azure">
+              <div class="escutcheon or cross-wavy-azure"></div>
             </figure>
           </div>
 
@@ -1689,7 +1702,7 @@
      aria-label="Azure, a fess Or"&gt;&lt;/div&gt;</pre>
           <p class="mt-4">
             Grailwind uses <code>:has()</code>, CSS masks and CSS nesting, so it
-            needs a current browser. Engrailed and invected edges use
+            needs a current browser. Engrailed, invected and wavy edges use
             <code>clip-path: shape()</code>. Where that isn't supported, the
             ordinary is drawn with straight edges instead.
           </p>

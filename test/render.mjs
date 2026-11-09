@@ -238,6 +238,12 @@ const PROBES = [
   { shield: "azure bend-sinister-invected-or", at: [38.1, 38.7], expect: "or", why: "a bulge on the bend sinister" },
   { shield: "azure chief-invected-or", at: [50, 32.1], expect: "or", why: "a bulge on the chief" },
 
+  // Half-waves are 14 wide from the dexter edge, so x 49 and 63 are a trough and a crest.
+  { shield: "azure fess-wavy-or", at: [49, 31.2], expect: "azure", why: "the fess's top edge dips" },
+  { shield: "azure fess-wavy-or", at: [49, 61.2], expect: "or", why: "the fess's bottom edge dips with it" },
+  { shield: "azure fess-wavy-or", at: [63, 28.8], expect: "or", why: "the fess's top edge rises" },
+  { shield: "azure fess-wavy-or", at: [63, 58.8], expect: "azure", why: "the fess's bottom edge rises with it" },
+
   { shield: "or chevron-gules chief-azure", at: [50, 38], expect: "or", why: "the chevron moves below a chief" },
 
   ...VOIDED.flatMap(([o, hole, outline, outside]) => [
@@ -705,7 +711,7 @@ const PROBES = [
   { shield: "quarterly", quarters: ["or", "per-pale-gules-argent pale-of-the-first", "azure", "vert"], at: [92, 25], expect: "argent", why: "beside a pale of the first in a quarter" },
 ];
 
-const LINES = ["", "-engrailed", "-invected"];
+const LINES = ["", "-engrailed", "-invected", "-wavy"];
 const CONTACT = [
   ...ORDINARIES.flatMap((o) => LINES.map((line) => ({ shield: `azure ${o}${line}-or` }))),
   ...VOIDED.map(([o]) => ({ shield: `azure ${o}-voided-or` })),

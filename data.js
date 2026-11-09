@@ -80,7 +80,7 @@ export const ROUNDELS = {
 };
 
 // Lines of partition for an ordinary's edge, e.g. `fess-engrailed-or`.
-export const LINES = ["engrailed", "invected"];
+export const LINES = ["engrailed", "invected", "wavy"];
 
 // Ordinaries that can be voided, e.g. `cross-voided-argent`.
 export const VOIDABLE = [

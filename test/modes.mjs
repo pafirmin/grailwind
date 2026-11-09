@@ -53,6 +53,7 @@ const CLASSES = [
   "fess-ermine",
   "chief-pean",
   "cross-engrailed-erminois",
+  "fess-wavy-or",
 ];
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -147,6 +148,8 @@ const PATTERNS = {
   "the chief isn't fimbriated": /\.chief-or \{[^]*?&::after \{(?:(?!fimbriat)[^}])*\}/,
   "fess-engrailed-or falls back to a polygon":
     /\.fess-engrailed-or \{[^}]*&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(from 0 30%, arc to [^;]* ccw/,
+  "fess-wavy-or falls back to a polygon":
+    /\.fess-wavy-or \{[^}]*&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(/,
   "chief-invected-azure bulges out":
     /\.chief-invected-azure \{[^}]*&::after \{[^}]*clip-path: polygon\([^;]*\) content-box;\s*clip-path: shape\([^;]*line to 100% 30%, arc to [^;]* cw,[^;]*\) content-box;/,
   "chevron-engrailed-or peaks where its arcs cross":

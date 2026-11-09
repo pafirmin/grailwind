@@ -267,6 +267,13 @@ const bands = (layers, colour) => ({
 // box is shorter, so they are slightly squashed.
 const SCALLOP = 14;
 const SCALLOPS = { chevron: 10 };
+// Wavy half-waves, longer where the default reads as beads: the bend, cross and cornered ordinaries.
+// prettier-ignore
+const WAVES = {
+  bend: 21, "bend-sinister": 21, cross: 20,
+  chevron: 28, saltire: 28, pall: 28,
+};
+const LENGTHS = { wavy: WAVES };
 
 // A quarter of the ordinary's width, in real units. The pile tapers, so its is set by eye.
 // prettier-ignore
@@ -277,6 +284,9 @@ const VOIDS = {
 for (const ordinary of REVERSIBLE) {
   if (SCALLOPS[ordinary]) {
     SCALLOPS[`${ordinary}-reversed`] = SCALLOPS[ordinary];
+  }
+  if (WAVES[ordinary]) {
+    WAVES[`${ordinary}-reversed`] = WAVES[ordinary];
   }
   VOIDS[`${ordinary}-reversed`] = VOIDS[ordinary];
 }
@@ -297,10 +307,54 @@ const arcs = (a, b, scallop, sweep) => {
   });
 };
 
+const WAVE_DEPTH = 0.2;
+
+// Which way half-wave `k` bulges, for an edge walked along the shared axis (`forward`) or
+// against it. Along the axis, `cw` bulges to its left: up for a horizontal edge.
+const waveSweep = (k, forward) => {
+  return forward === (k % 2 === 0) ? "cw" : "ccw";
+};
+
+// One arc per half-wave, phased by position along a shared axis rather than from the edge's
+// start, so the two edges of a band crest together.
+const wavy = (a, b, halfWave) => {
+  const [dx, dy] = [b[0] - a[0], b[1] - a[1]];
+  const length = Math.hypot(dx, dy);
+  // Right, or down for a vertical edge, whichever way the polygon walks it.
+  const forward = Math.abs(dx) > 1e-9 ? dx > 0 : dy > 0;
+  const axis = (forward ? [dx, dy] : [-dx, -dy]).map((d) => d / length);
+  const station = (p) => p[0] * axis[0] + p[1] * axis[1];
+  const [from, to] = [station(a), station(b)];
+
+  const ts = [0, 1];
+  const [low, high] = [Math.min(from, to), Math.max(from, to)];
+  for (let cut = Math.ceil(low / halfWave); cut * halfWave < high; cut++) {
+    const t = (cut * halfWave - from) / (to - from);
+    if (t > 1e-6 && t < 1 - 1e-6) {
+      ts.push(t);
+    }
+  }
+  ts.sort((x, y) => x - y);
+
+  return ts.slice(1).map((t, i) => {
+    const middle = (ts[i] + t) / 2;
+    const k = Math.floor((from + (to - from) * middle) / halfWave);
+    const chord = length * (t - ts[i]);
+    // As high as a default wave whatever the length, so a longer wave is gentler, not deeper.
+    const depth = chord * WAVE_DEPTH * (SCALLOP / halfWave);
+    return {
+      to: [a[0] + dx * t, a[1] + dy * t],
+      r: (chord * chord) / (8 * depth) + depth / 2,
+      sweep: waveSweep(k, forward),
+    };
+  });
+};
+
 // Each line maps an edge to arcs; `inward` is the sweep that bulges into the ordinary.
 const LINES = {
   engrailed: (a, b, scallop, inward) => arcs(a, b, scallop, inward),
   invected: (a, b, scallop, inward) => arcs(a, b, scallop, inward === "cw" ? "ccw" : "cw"),
+  wavy: (a, b, scallop) => wavy(a, b, scallop),
 };
 
 const side = (a, b, p) => (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
@@ -478,11 +532,11 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       ? `polygon(${vertices.map(outer).join(", ")}) content-box`
       : polygon(vertices);
     // Browsers without shape() keep the straight polygon.
-    const lined = (line) => [
+    const lined = (name, line) => [
       plain,
       chief
         ? `${shape(vertices, line, SCALLOP, outer)} content-box`
-        : shape(vertices, line, SCALLOPS[ordinary] ?? SCALLOP),
+        : shape(vertices, line, (LENGTHS[name] ?? SCALLOPS)[ordinary] ?? SCALLOP),
     ];
 
     // Covers the whole shield, so the swapped field lines up with the real one,
@@ -530,7 +584,7 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         utilities[`.${ordinary}-${name}-${tincture}`] = ordinaryRules(ordinary, {
           ...placed,
           "background-color": colour,
-          "clip-path": lined(line),
+          "clip-path": lined(name, line),
         });
       }
     }
@@ -545,7 +599,7 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       for (const [name, line] of Object.entries(LINES)) {
         utilities[`.${ordinary}-${name}-${fur}`] = ordinaryRules(ordinary, {
           ...pseudo,
-          "clip-path": lined(line),
+          "clip-path": lined(name, line),
         });
       }
     }

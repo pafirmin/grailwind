@@ -15,7 +15,7 @@ export default {
     messages: {
       noDivision: "`{{cls}}` needs a divided field to swap, e.g. `per-pale-argent-gules`",
       noOrdinary:
-        "`{{cls}}` needs a plain tinctured ordinary to edge: a chief, and an engrailed, invected, fur or counterchanged ordinary, aren't fimbriated",
+        "`{{cls}}` needs a plain tinctured ordinary to edge: a chief, and an engrailed, invected, wavy, fur or counterchanged ordinary, aren't fimbriated",
       transformed:
         "`{{cls}}` breaks `counterchanged`: a transformed charge shows its own small copy of the field",
     },

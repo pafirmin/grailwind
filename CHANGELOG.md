@@ -14,6 +14,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   tincture in chief.
 - `bendy-*`, `bendy-sinister-*`, `chevronny-*` (each with `-of-eight-*`) and
   `chequy-*`: six or eight pieces, or five squares by six.
+- Wavy ordinaries, e.g. `fess-wavy-or` and `three-bars-wavy-argent`.
 
 ### Changed
 
