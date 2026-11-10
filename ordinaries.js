@@ -27,21 +27,22 @@ const ORDINARIES = {
   ],
   bend: [[0, 0], [20, 0], [100, 80], [100, 100], [80, 100], [0, 20]],
   "bend-sinister": [[100, 0], [80, 0], [0, 80], [0, 100], [20, 100], [100, 20]],
-  chevron: [[50, 25], [100, 75], [100, 95], [50, 45], [0, 95], [0, 75]],
+  chevron: [[50, 22], [100, 72], [100, 98], [50, 48], [0, 98], [0, 72]],
   cross: [
-    [40, 0], [60, 0], [60, 35], [100, 35], [100, 55], [60, 55],
-    [60, 100], [40, 100], [40, 55], [0, 55], [0, 35], [40, 35],
+    [38, 0], [62, 0], [62, 35], [100, 35], [100, 55], [62, 55],
+    [62, 100], [38, 100], [38, 55], [0, 55], [0, 35], [38, 35],
   ],
+  // Its centre lines run from the top corners through the fess point, reaching the flanks at 90%.
   saltire: [
-    [0, 0], [15, 0], [50, 35], [85, 0], [100, 0], [100, 15], [65, 50], [100, 85],
-    [100, 100], [85, 100], [50, 65], [15, 100], [0, 100], [0, 85], [35, 50], [0, 15],
+    [0, 0], [16.35, 0], [50, 30.28], [83.65, 0], [100, 0], [100, 14.72], [66.35, 45], [100, 75.28],
+    [100, 100], [94.76, 100], [50, 59.72], [5.24, 100], [0, 100], [0, 75.28], [33.65, 45], [0, 14.72],
   ],
   pall: [
     [0, 0], [15, 0], [50, 35], [85, 0], [100, 0], [100, 15],
     [60, 55], [60, 100], [40, 100], [40, 55], [0, 15],
   ],
   chief: [[0, 0], [100, 0], [100, 30], [0, 30]],
-  pile: [[20, 0], [80, 0], [50, 85]],
+  pile: [[17, 0], [83, 0], [50, 85]],
 };
 // signedArea() follows the flip's winding, so the order stays.
 for (const ordinary of REVERSIBLE) {
@@ -152,14 +153,29 @@ const widenedPolygon = (vertices) => {
 // The ordinary's tincture, top layer first. `x`/`y` bands run between two x or y
 // values in %; `u-v`/`u+v` are diagonal, between values of x − y or x + y.
 // A `tile` [x0, y0, x1, y1] confines a layer to part of the box (square, if
-// diagonal). Stripes repaint the fimbriation where one arm's band runs on into
-// another's.
+// diagonal, unless `half` or `diagonal` gives its stops). Stripes repaint the
+// fimbriation where one arm's band runs on into another's.
 const S = 12;
 const band = (kind, from, to, tile) => ({ kind, from, to, tile });
 const stripe = (kind, from, to, tile) => ({ kind, from, to, tile, stripe: true });
-// Half a tile, split on its diagonal, as gradient stops: 0–50% or 50–100%. The one diagonal band
-// a tile that isn't square can take, as its diagonal isn't a line of constant x ± y.
+// Half a tile, split on its diagonal, as gradient stops: 0–50% or 50–100%. For a tile that isn't
+// square, whose diagonal isn't a line of constant x ± y.
 const half = (kind, end, tile) => ({ kind, tile, stops: end === "start" ? [0, 50] : [50, 100] });
+// A band `halfWidth` real units either side of a tile's diagonal, for an arm that isn't a line of
+// constant x ± y: `u-v` runs from the tile's top left, `u+v` from its top right.
+const diagonal = (kind, halfWidth, tile) => {
+  const [w, h] = real([tile[2] - tile[0], tile[3] - tile[1]]);
+  const length = (2 * w * h) / Math.hypot(w, h);
+  const offset = (halfWidth / length) * 100;
+
+  return {
+    kind,
+    tile,
+    stops: [50 - offset, 50 + offset],
+  };
+};
+// The saltire's arms are the diagonals of a tile as tall as the shield, sloping through (50, 45).
+const SALTIRE_TILE = (100 * 50) / 45;
 // A 2px strip down the centre, from the top to `bottom`, where two tiles meet mid-pixel and
 // would let the fimbriation show between them. Unsoftened, as it lies on its own tincture.
 const seam = (bottom) => ({ kind: "x", tile: [0, 0, 100, bottom], seam: true });
@@ -173,13 +189,16 @@ const BANDS = {
   bend: [band("u-v", -20, 20)],
   "bend-sinister": [band("u+v", 80, 120)],
   chevron: [
-    stripe("u+v", 75 - S, 75),
-    stripe("u-v", 25, 25 + S),
-    band("u+v", 75, 95),
-    band("u-v", 5, 25),
+    stripe("u+v", 72 - S, 72),
+    stripe("u-v", 28, 28 + S),
+    band("u+v", 72, 98),
+    band("u-v", 2, 28),
   ],
-  cross: [band("x", 40, 60), band("y", 35, 55)],
-  saltire: [band("u-v", -15, 15), band("u+v", 85, 115)],
+  cross: [band("x", 38, 62), band("y", 35, 55)],
+  saltire: [
+    diagonal("u-v", 12, [0, 0, SALTIRE_TILE, 100]),
+    diagonal("u+v", 12, [100 - SALTIRE_TILE, 0, 100, 100]),
+  ],
   pall: [
     stripe("x", 60, 60 + S, [0, 55, 100, 100]),
     stripe("x", 40 - S, 40, [0, 55, 100, 100]),
@@ -190,7 +209,7 @@ const BANDS = {
     band("x", 40, 60, [0, 55, 100, 100]),
   ],
   // Each slanted side is its tile's diagonal.
-  pile: [half("u-v", "end", [20, 0, 50, 85]), half("u+v", "start", [50, 0, 80, 85]), seam(83)],
+  pile: [half("u-v", "end", [17, 0, 50, 85]), half("u+v", "start", [50, 0, 83, 85]), seam(83)],
 };
 
 // The bands upside down. A diagonal swaps kind, as x − y becomes x + (100 − y) − 100. A half's
@@ -288,7 +307,7 @@ const LENGTHS = { wavy: WAVES };
 // prettier-ignore
 const VOIDS = {
   pale: 7.5, fess: 9, bar: 4.2, bend: 7.7, "bend-sinister": 7.7,
-  chevron: 3.8, cross: 5, saltire: 5.8, pall: 5, pile: 8,
+  chevron: 5, cross: 6, saltire: 6, pall: 5, pile: 8.8,
 };
 for (const ordinary of REVERSIBLE) {
   if (SCALLOPS[ordinary]) {

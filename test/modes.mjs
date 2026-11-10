@@ -80,13 +80,15 @@ const PATTERNS = {
   "an ordinary opts in to fimbriation":
     /\.cross-azure \{[^]*?&::before \{[^}]*--fimbriated: inherit;\s*--fimbriation: inherit;\s*background-color: var\(--fimbriation, var\(--color-azure\)\);/,
   "a fimbriated ordinary is widened":
-    /\.cross-azure \{[^]*?&::before \{[^}]*clip-path: polygon\(calc\(40% - 3% \* var\(--fimbriated, 0\)\) 0,/,
+    /\.cross-azure \{[^]*?&::before \{[^}]*clip-path: polygon\(calc\(38% - 3% \* var\(--fimbriated, 0\)\) 0,/,
   "a division publishes its swap":
     /\.per-pale-or-gules \{[^}]*--counterchange-image: linear-gradient\(to right, var\(--color-gules\) 50%, var\(--color-or\) 50%\);/,
   "quarterly splits at the fess point":
     /\.quarterly-or-gules \{[^}]*background-size: 100% 45%, 100% 100%;/,
   "per saltire's strips fill the seam, not a background colour":
-    /\.per-saltire-or-gules \{(?![^}]*background-color)[^}]*background-size: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 2px 100%, 100% 2px;/,
+    /\.per-saltire-or-gules \{(?![^}]*background-color)[^}]*background-size: 50% 45%, 50% 45%, 50% 45%, 50% 45%, 100% calc\(10% \+ 2px\), 2px 100%, 100% 2px;/,
+  "per saltire's seam strips cross at the fess point":
+    /\.per-saltire-or-gules \{[^}]*background-position: [^;]*, [^,;]+ 45%;/,
   "grid quarterly stays equal off a shield":
     /\.quarterly \{\s*display: grid;[^}]*grid-template-rows: 1fr 1fr;/,
   "grid quarterly splits at the fess point on a shield":
@@ -100,7 +102,7 @@ const PATTERNS = {
   "a counterchanged ordinary paints it":
     /\.chevron-counterchanged \{[^]*?&::before \{[^}]*background-image: var\(--counterchange-image, none\);/,
   "a counterchanged ordinary sits below a chief":
-    /\.chevron-counterchanged \{[^]*?clip-path: polygon\(50% calc\(25% \+ var\(--field-top, 0%\) \* 0\.75\),/,
+    /\.chevron-counterchanged \{[^]*?clip-path: polygon\(50% calc\(22% \+ var\(--field-top, 0%\) \* 0\.78\),/,
   "a counterchanged ordinary isn't fimbriated":
     /\.chevron-counterchanged \{[^]*?&::before \{(?:(?!fimbriat)[^}])*\}/,
   "an ordinary is isolated": /\.bend-sable \{[^}]*isolation: isolate;/,
@@ -157,7 +159,7 @@ const PATTERNS = {
   "chief-invected-azure bulges out":
     /\.chief-invected-azure \{[^}]*&::after \{[^}]*clip-path: polygon\([^;]*\) content-box;\s*clip-path: shape\([^;]*line to 100% 30%, arc to [^;]* cw,[^;]*\) content-box;/,
   "chevron-engrailed-or peaks where its arcs cross":
-    /\.chevron-engrailed-or \{[^}]*&::before \{[^}]*clip-path: shape\(from 50% (?!25%)[\d.]+%,/,
+    /\.chevron-engrailed-or \{[^}]*&::before \{[^}]*clip-path: shape\(from 50% (?!22%)[\d.]+%,/,
   "ermine has an argent ground and sable spots":
     /\.ermine \{[^}]*background-color: var\(--color-argent\);[^}]*background-image: url\("data:image\/svg\+xml,[^"]*%23141414/,
   "pean has or spots":

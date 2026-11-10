@@ -5,8 +5,12 @@ import plugin from "tailwindcss/plugin";
 import { FURS, TINCTURES } from "./data.js";
 import { furLayers } from "./furs.js";
 
-// Horizontal lines of partition pass through the fess point, as the cross and fess do.
-const FESS_POINT = "45%";
+// The fess point, in % down the shield: horizontal lines of partition pass through it, as the
+// cross and fess do.
+const FESS_POINT = 45;
+
+// The background-position that puts a tile FESS_POINT% high just below the fess point.
+const BASE_TILES = ((100 * FESS_POINT) / (100 - FESS_POINT)).toFixed(2);
 
 // Each division maps (first, second) tincture colours to background rules.
 const layer = (image) => ({ "background-image": image });
@@ -78,7 +82,8 @@ const DIVISIONS = {
   "per-pale": (a, b) => layer(`linear-gradient(to right, ${a} 50%, ${b} 50%)`),
 
   // Horizontal split through the fess point: first in chief.
-  "per-fess": (a, b) => layer(`linear-gradient(to bottom, ${a} ${FESS_POINT}, ${b} ${FESS_POINT})`),
+  "per-fess": (a, b) =>
+    layer(`linear-gradient(to bottom, ${a} ${FESS_POINT}%, ${b} ${FESS_POINT}%)`),
 
   // Line from dexter chief to sinister base: first in the upper half.
   // With a corner-to-corner gradient, the 50% line joins the other two corners.
@@ -106,9 +111,11 @@ const DIVISIONS = {
           ].join(", "),
         },
 
-  // Both diagonals, crossing at the centre like the saltire: first in chief and base.
-  // Gyronny's four tiles, with the top-right and bottom-left swapped. Two strips under them fill
-  // the sub-pixel seam where the tiles meet: the first tincture down, the second across.
+  // Both lines of the saltire, from the top corners through the fess point to the flanks at 90%:
+  // first in chief and base. Four tiles, each half the width and 45% high, with each half-line
+  // as a tile's diagonal, and the base below them in the first tincture, 2px taller so Chromium
+  // leaves no seam where it meets them. Two strips under the tiles fill the sub-pixel seam where
+  // they meet: the first tincture down, the second across.
   "per-saltire": (a, b) => ({
     "background-image": [
       `linear-gradient(to bottom left, ${a} 50%, ${b} 50%)`,
@@ -116,10 +123,24 @@ const DIVISIONS = {
       `linear-gradient(to bottom left, ${b} 50%, ${a} 50%)`,
       `linear-gradient(to bottom right, ${b} 50%, ${a} 50%)`,
       `linear-gradient(${a}, ${a})`,
+      `linear-gradient(${a}, ${a})`,
       `linear-gradient(${b}, ${b})`,
     ].join(", "),
-    "background-size": "50% 50%, 50% 50%, 50% 50%, 50% 50%, 2px 100%, 100% 2px",
-    "background-position": "left top, right top, right bottom, left bottom, center, center",
+    "background-size": [
+      ...Array(4).fill(`50% ${FESS_POINT}%`),
+      `100% calc(${100 - 2 * FESS_POINT}% + 2px)`,
+      "2px 100%",
+      "100% 2px",
+    ].join(", "),
+    "background-position": [
+      "left top",
+      "right top",
+      `right ${BASE_TILES}%`,
+      `left ${BASE_TILES}%`,
+      "bottom",
+      "center",
+      `center ${FESS_POINT}%`,
+    ].join(", "),
     "background-repeat": "no-repeat",
   }),
 
@@ -128,7 +149,7 @@ const DIVISIONS = {
   // With a fur, the bands can't overlap, or the fur's transparent half shows the band below.
   quarterly: (a, b, fur) => ({
     "background-image": `linear-gradient(to right, ${a} 50%, ${b} 50%), linear-gradient(to right, ${b} 50%, ${a} 50%)`,
-    "background-size": `100% ${FESS_POINT}, 100% ${fur ? `calc(100% - ${FESS_POINT})` : "100%"}`,
+    "background-size": `100% ${FESS_POINT}%, 100% ${fur ? `calc(100% - ${FESS_POINT}%)` : "100%"}`,
     "background-position": fur ? "top, bottom" : "top, top",
     "background-repeat": "no-repeat",
   }),
