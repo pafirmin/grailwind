@@ -80,7 +80,24 @@ export const ROUNDELS = {
 };
 
 // Lines of partition for an ordinary's edge, e.g. `fess-engrailed-or`.
-export const LINES = ["engrailed", "invected", "wavy"];
+export const LINES = ["engrailed", "invected", "wavy", "indented", "embattled"];
+
+// Indented and embattled are drawn only on the ordinaries without corners between lined edges,
+// until the cornered ones are drawn by hand (064).
+const STRAIGHT = [
+  "pale",
+  "fess",
+  "bar",
+  "two-bars",
+  "three-bars",
+  "bend",
+  "bend-sinister",
+  "chief",
+];
+const PARTIAL_LINES = { indented: STRAIGHT, embattled: STRAIGHT };
+
+// The ordinaries that take `line`.
+export const lineOrdinaries = (line) => PARTIAL_LINES[line] ?? ORDINARIES;
 
 // Ordinaries that can be voided, e.g. `cross-voided-argent`.
 export const VOIDABLE = [

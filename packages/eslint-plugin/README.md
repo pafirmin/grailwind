@@ -57,7 +57,7 @@ export default [
 No metal (`or`, `argent`) on metal, and no colour on colour.
 
 - An ordinary, chief or bordure is checked against the field on the same element:
-  `escutcheon or fess-argent` is metal on metal. So are engrailed, invected, wavy and voided ones
+  `escutcheon or fess-argent` is metal on metal. So are engrailed, invected, wavy, indented, embattled and voided ones
   (`fess-engrailed-argent`, `cross-voided-argent`).
 - A fimbriated ordinary is checked against its fimbriation, and the fimbriation against the
   field: `or chevron-sable fimbriated-argent` is metal on metal (Argent on Or).
@@ -104,7 +104,8 @@ one, other than a chief, they have nowhere to go.
 An element draws one ordinary plus, optionally, a chief. With two, such as
 `fess-azure chevron-gules`, only one shows. Two chiefs are flagged too. A `charges` container
 takes one arrangement: `between`, `on`, `in-pale`, `in-fess`, `in-bend` or `in-bend-sinister`.
-Counterchanged, engrailed, invected, wavy, voided and fur ordinaries count as ordinaries.
+Counterchanged, engrailed, invected, wavy, indented, embattled, voided and fur ordinaries count as
+ordinaries.
 
 A charge at a named point (`in-dexter-chief` and so on) is a separate group in the blazon, so it
 goes in its own `charges` container. Among other charges, it still counts towards their number
@@ -120,7 +121,7 @@ Modifiers that would otherwise do nothing:
 - `counterchanged` on `charges`, or on a charge, needs a divided field on the shield that holds
   the container.
 - `fimbriated-*` needs a plain tinctured ordinary. A chief, and an engrailed, invected, wavy,
-  voided, fur or counterchanged ordinary, aren't fimbriated.
+  indented, embattled, voided, fur or counterchanged ordinary, aren't fimbriated.
 - `counterchanged` doesn't work on a charge with a transform (`rotate-*`, `scale-*`, `skew-*`,
   `translate-*`): the charge shows its own small copy of the field instead.
 

@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, firefox } from "playwright";
-import { DIVISIONS } from "../data.js";
+import { DIVISIONS, lineOrdinaries } from "../data.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const cli = join(root, "node_modules/.bin/tailwindcss");
@@ -243,6 +243,19 @@ const PROBES = [
   { shield: "azure fess-wavy-or", at: [49, 61.2], expect: "or", why: "the fess's bottom edge dips with it" },
   { shield: "azure fess-wavy-or", at: [63, 28.8], expect: "or", why: "the fess's top edge rises" },
   { shield: "azure fess-wavy-or", at: [63, 58.8], expect: "azure", why: "the fess's bottom edge rises with it" },
+
+  // Merlons and crenels are 100/15 wide from the dexter edge, ±3 about the edge: x 45.5 is a merlon, 52.5 a crenel.
+  { shield: "azure fess-embattled-or", at: [45.5, 29], expect: "or", why: "a merlon on the fess" },
+  { shield: "azure fess-embattled-or", at: [52.5, 31], expect: "azure", why: "a crenel in the fess" },
+  { shield: "azure fess-embattled-or", at: [[45.5, 61], [52.5, 61]], expect: "azure", why: "a fess embattled is plain below" },
+  { shield: "azure fess-embattled-or", at: [[45.5, 59], [52.5, 59]], expect: "or", why: "a fess embattled is plain below, inside" },
+  // Down the pale, y 47% (56.4 units) is a merlon and 41.5% (49.8) a crenel, on both edges.
+  { shield: "azure pale-embattled-or", at: [[33.5, 47], [66.5, 47]], expect: "or", why: "merlon opposite merlon" },
+  { shield: "azure pale-embattled-or", at: [[36.5, 41.5], [63.5, 41.5]], expect: "azure", why: "crenel opposite crenel" },
+  // Down the pale indented, turns are 100/14 apart and both edges shift together: left at y 47.6%
+  // (turn 8), right at 41.7% (turn 7). So each point stands opposite a notch.
+  { shield: "azure pale-indented-or", at: [[33, 47.6], [67, 41.7]], expect: "or", why: "a point on each edge" },
+  { shield: "azure pale-indented-or", at: [[63, 47.6], [37, 41.7]], expect: "azure", why: "a notch opposite each point" },
 
   { shield: "or chevron-gules chief-azure", at: [50, 38], expect: "or", why: "the chevron moves below a chief" },
 
@@ -711,9 +724,13 @@ const PROBES = [
   { shield: "quarterly", quarters: ["or", "per-pale-gules-argent pale-of-the-first", "azure", "vert"], at: [92, 25], expect: "argent", why: "beside a pale of the first in a quarter" },
 ];
 
-const LINES = ["", "-engrailed", "-invected", "-wavy"];
+const LINES = ["", "-engrailed", "-invected", "-wavy", "-indented", "-embattled"];
 const CONTACT = [
-  ...ORDINARIES.flatMap((o) => LINES.map((line) => ({ shield: `azure ${o}${line}-or` }))),
+  ...ORDINARIES.flatMap((o) =>
+    LINES.filter((line) => !line || lineOrdinaries(line.slice(1)).includes(o)).map((line) => ({
+      shield: `azure ${o}${line}-or`,
+    })),
+  ),
   ...VOIDED.map(([o]) => ({ shield: `azure ${o}-voided-or` })),
 ];
 const DIVIDED = DIVISIONS.flatMap((d) => [

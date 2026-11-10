@@ -57,7 +57,7 @@ run("modifier-needs-target", rule, {
       errors: [
         {
           message:
-            "`fimbriated-argent` needs a plain tinctured ordinary to edge: a chief, and an engrailed, invected, wavy, fur or counterchanged ordinary, aren't fimbriated",
+            "`fimbriated-argent` needs a plain tinctured ordinary to edge: a chief, and an engrailed, invected, wavy, indented, embattled, fur or counterchanged ordinary, aren't fimbriated",
         },
       ],
     },
@@ -76,6 +76,10 @@ run("modifier-needs-target", rule, {
     },
     {
       code: `<div class="escutcheon gules fess-wavy-or fimbriated-argent"></div>`,
+      errors: [noOrdinary("fimbriated-argent")],
+    },
+    {
+      code: `<div class="escutcheon gules fess-embattled-or fimbriated-argent"></div>`,
       errors: [noOrdinary("fimbriated-argent")],
     },
     {

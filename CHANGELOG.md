@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Indented and embattled ordinaries on the pale, fess, bars, bend and chief,
+  e.g. `chief-indented-azure` and `fess-embattled-sable`. A fess, bar or bend
+  embattled has battlements on its upper edge only.
+
 ## [0.7.0] - 2026-11-09
 
 ### Added

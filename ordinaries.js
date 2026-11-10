@@ -2,7 +2,16 @@
  * Grailwind CSS: ordinaries, e.g. `fess-or`.
  */
 import plugin from "tailwindcss/plugin";
-import { BETWEEN, FURS, OF_THE_FIRST, ON, REVERSIBLE, TINCTURES, VOIDABLE } from "./data.js";
+import {
+  BETWEEN,
+  FURS,
+  lineOrdinaries,
+  OF_THE_FIRST,
+  ON,
+  REVERSIBLE,
+  TINCTURES,
+  VOIDABLE,
+} from "./data.js";
 import { furBackground } from "./furs.js";
 
 // prettier-ignore
@@ -309,15 +318,16 @@ const arcs = (a, b, scallop, sweep) => {
 
 const WAVE_DEPTH = 0.2;
 
-// Which way half-wave `k` bulges, for an edge walked along the shared axis (`forward`) or
+// Which way half-wave `index` bulges, for an edge walked along the shared axis (`forward`) or
 // against it. Along the axis, `cw` bulges to its left: up for a horizontal edge.
-const waveSweep = (k, forward) => {
-  return forward === (k % 2 === 0) ? "cw" : "ccw";
+const waveSweep = (index, forward) => {
+  return forward === (index % 2 === 0) ? "cw" : "ccw";
 };
 
-// One arc per half-wave, phased by position along a shared axis rather than from the edge's
-// start, so the two edges of a band crest together.
-const wavy = (a, b, halfWave) => {
+// The edge a→b cut at every multiple of `period` along a shared axis, so the parallel edges of a
+// band are cut at the same places whichever way the polygon walks them. Each piece runs from
+// `start` to `end` (fractions of the edge) and lies in period `index`.
+const stations = (a, b, period) => {
   const [dx, dy] = [b[0] - a[0], b[1] - a[1]];
   const length = Math.hypot(dx, dy);
   // Right, or down for a vertical edge, whichever way the polygon walks it.
@@ -328,33 +338,111 @@ const wavy = (a, b, halfWave) => {
 
   const ts = [0, 1];
   const [low, high] = [Math.min(from, to), Math.max(from, to)];
-  for (let cut = Math.ceil(low / halfWave); cut * halfWave < high; cut++) {
-    const t = (cut * halfWave - from) / (to - from);
+  for (let cut = Math.ceil(low / period); cut * period < high; cut++) {
+    const t = (cut * period - from) / (to - from);
     if (t > 1e-6 && t < 1 - 1e-6) {
       ts.push(t);
     }
   }
   ts.sort((x, y) => x - y);
 
-  return ts.slice(1).map((t, i) => {
-    const middle = (ts[i] + t) / 2;
-    const k = Math.floor((from + (to - from) * middle) / halfWave);
-    const chord = length * (t - ts[i]);
+  const pieces = ts.slice(1).map((end, i) => {
+    const middle = (ts[i] + end) / 2;
+    return { start: ts[i], end, index: Math.floor((from + (to - from) * middle) / period) };
+  });
+  return { forward, axis, length, pieces };
+};
+
+// One arc per half-wave, phased by position along a shared axis rather than from the edge's
+// start, so the two edges of a band crest together.
+const wavy = (a, b, halfWave) => {
+  const [dx, dy] = [b[0] - a[0], b[1] - a[1]];
+  const { forward, length, pieces } = stations(a, b, halfWave);
+  return pieces.map(({ start, end, index }) => {
+    const chord = length * (end - start);
     // As high as a default wave whatever the length, so a longer wave is gentler, not deeper.
     const depth = chord * WAVE_DEPTH * (SCALLOP / halfWave);
     return {
-      to: [a[0] + dx * t, a[1] + dy * t],
+      to: [a[0] + dx * end, a[1] + dy * end],
       r: (chord * chord) / (8 * depth) + depth / 2,
-      sweep: waveSweep(k, forward),
+      sweep: waveSweep(index, forward),
     };
   });
 };
 
-// Each line maps an edge to arcs; `inward` is the sweep that bulges into the ordinary.
+// The unit normal of a→b pointing into the ordinary. An arc swept `inward` bulges that way.
+const intoOrdinary = (a, b, inward) => {
+  const [dx, dy] = [b[0] - a[0], b[1] - a[1]];
+  const length = Math.hypot(dx, dy);
+  return inward === "cw" ? [dy / length, -dx / length] : [-dy / length, dx / length];
+};
+
+const INDENT_DEPTH = 0.5;
+// Seven whole teeth across the shield, so both ends land on the same kind of turn.
+const TOOTH = W / 7;
+
+// A zigzag centred on the edge, its turns at the shared stations, so a band's two edges run in
+// phase, point opposite notch (FD Figs. 91, 106). At 0.5 deep the teeth are right-angled.
+const indented = (a, b, scallop) => {
+  const half = scallop / 2;
+  const { axis, pieces } = stations(a, b, half);
+  const normal = [-axis[1], axis[0]];
+  const height = (scallop * INDENT_DEPTH) / 2;
+  // Even turns sit on one side and odd ones on the other; between them the zigzag is straight.
+  const turnSide = (turn) => (turn % 2 === 0 ? height : -height);
+  const onZigzag = (t) => {
+    const p = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    const position = (p[0] * axis[0] + p[1] * axis[1]) / half;
+    const before = Math.floor(position);
+    const blend = position - before;
+    const side = turnSide(before) * (1 - blend) + turnSide(before + 1) * blend;
+    return { to: [p[0] + normal[0] * side, p[1] + normal[1] * side] };
+  };
+  // Start and end on the zigzag itself, not on the plain line, so it meets the shield's edge at
+  // its true angle.
+  return [onZigzag(0), ...pieces.map(({ end }) => onZigzag(end)), { to: b }];
+};
+
+// A merlon or crenel's width, and the battlements' height, in real units. An odd number across
+// the shield's width, so a fess or chief has a merlon at both ends.
+const BATTLEMENT = W / 15;
+const BATTLEMENT_HEIGHT = 6;
+// Embattled on the upper edge only (FD p. 93); the rest on every edge. The chevron joins these
+// when it's drawn (064).
+const UPPER_ONLY = ["fess", "bar", "two-bars", "three-bars", "bend", "bend-sinister"];
+
+// Battlements centred on the edge, in phase across a band like `wavy`, but merlon opposite
+// merlon: a piece's side is taken from the ordinary, not from the shield.
+const embattled = (a, b, merlon, inward, ordinary) => {
+  const into = intoOrdinary(a, b, inward);
+  // Upper-only ordinaries keep the edges whose outside doesn't face up plain.
+  if (UPPER_ONLY.includes(ordinary) && into[1] < 1e-8) {
+    return [{ to: b }];
+  }
+  const { pieces } = stations(a, b, merlon);
+  const along = (t, [ox, oy]) => [a[0] + (b[0] - a[0]) * t + ox, a[1] + (b[1] - a[1]) * t + oy];
+  // Even pieces are merlons, out of the ordinary; odd ones crenels, into it.
+  const offset = (index) => {
+    const shift = (index % 2 === 0 ? -1 : 1) * (BATTLEMENT_HEIGHT / 2);
+    return [into[0] * shift, into[1] * shift];
+  };
+  return [
+    ...pieces.flatMap(({ start, end, index }) => {
+      const off = offset(index);
+      return [{ to: along(start, off) }, { to: along(end, off) }];
+    }),
+    { to: b },
+  ];
+};
+
+// Each line maps an edge to segments, arcs or straight; `inward` is the sweep that bulges into
+// the ordinary.
 const LINES = {
   engrailed: (a, b, scallop, inward) => arcs(a, b, scallop, inward),
   invected: (a, b, scallop, inward) => arcs(a, b, scallop, inward === "cw" ? "ccw" : "cw"),
   wavy: (a, b, scallop) => wavy(a, b, scallop),
+  indented: (a, b) => indented(a, b, TOOTH),
+  embattled: (a, b, scallop, inward, ordinary) => embattled(a, b, BATTLEMENT, inward, ordinary),
 };
 
 const side = (a, b, p) => (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
@@ -532,12 +620,15 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       ? `polygon(${vertices.map(outer).join(", ")}) content-box`
       : polygon(vertices);
     // Browsers without shape() keep the straight polygon.
-    const lined = (name, line) => [
-      plain,
-      chief
-        ? `${shape(vertices, line, SCALLOP, outer)} content-box`
-        : shape(vertices, line, (LENGTHS[name] ?? SCALLOPS)[ordinary] ?? SCALLOP),
-    ];
+    const lined = (name, line) => {
+      const edge = (a, b, scallop, inward) => line(a, b, scallop, inward, ordinary);
+      return [
+        plain,
+        chief
+          ? `${shape(vertices, edge, SCALLOP, outer)} content-box`
+          : shape(vertices, edge, (LENGTHS[name] ?? SCALLOPS)[ordinary] ?? SCALLOP),
+      ];
+    };
 
     // Covers the whole shield, so the swapped field lines up with the real one,
     // and the clip moves the ordinary below any chief instead.
@@ -581,6 +672,9 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       });
       // Not fimbriated.
       for (const [name, line] of Object.entries(LINES)) {
+        if (!lineOrdinaries(name).includes(ordinary)) {
+          continue;
+        }
         utilities[`.${ordinary}-${name}-${tincture}`] = ordinaryRules(ordinary, {
           ...placed,
           "background-color": colour,
@@ -597,6 +691,9 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         "clip-path": plain,
       });
       for (const [name, line] of Object.entries(LINES)) {
+        if (!lineOrdinaries(name).includes(ordinary)) {
+          continue;
+        }
         utilities[`.${ordinary}-${name}-${fur}`] = ordinaryRules(ordinary, {
           ...pseudo,
           "clip-path": lined(name, line),

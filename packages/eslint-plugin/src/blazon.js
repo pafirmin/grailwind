@@ -9,6 +9,7 @@ import {
   DIVISIONS,
   FURS,
   LINES,
+  lineOrdinaries,
   METALS,
   OF_THE_FIRST,
   ORDINARIES,
@@ -38,7 +39,7 @@ for (const ordinary of ORDINARIES) {
   for (const tincture of PAINT) {
     const fur = FUR.has(tincture);
     ORDINARY_CLASSES.set(`${ordinary}-${tincture}`, { ordinary, tincture, fur });
-    for (const line of LINES) {
+    for (const line of LINES.filter((l) => lineOrdinaries(l).includes(ordinary))) {
       ORDINARY_CLASSES.set(`${ordinary}-${line}-${tincture}`, { ordinary, tincture, fur, line });
     }
   }

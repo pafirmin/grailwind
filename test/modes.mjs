@@ -9,6 +9,7 @@ import {
   DIVISIONS,
   FURS,
   LINES,
+  lineOrdinaries,
   OF_THE_FIRST,
   ORDINARIES,
   POINTS,
@@ -54,6 +55,7 @@ const CLASSES = [
   "chief-pean",
   "cross-engrailed-erminois",
   "fess-wavy-or",
+  "chevron-indented-or",
 ];
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -148,6 +150,8 @@ const PATTERNS = {
   "the chief isn't fimbriated": /\.chief-or \{[^]*?&::after \{(?:(?!fimbriat)[^}])*\}/,
   "fess-engrailed-or falls back to a polygon":
     /\.fess-engrailed-or \{[^}]*&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(from 0 30%, arc to [^;]* ccw/,
+  "fess-embattled-or falls back to a polygon":
+    /\.fess-embattled-or \{[^}]*&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(/,
   "fess-wavy-or falls back to a polygon":
     /\.fess-wavy-or \{[^}]*&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(/,
   "chief-invected-azure bulges out":
@@ -175,8 +179,17 @@ const PATTERNS = {
 };
 
 const EXPECTED = {
-  "grailwind.css": { "bg-blue-500": true, "per-pale-ermine-ermines": false },
-  "strict.css": { "bg-blue-500": false, "per-pale-ermine-ermines": false },
+  // Indented waits for the cornered ordinaries' artwork (064).
+  "grailwind.css": {
+    "bg-blue-500": true,
+    "per-pale-ermine-ermines": false,
+    "chevron-indented-or": false,
+  },
+  "strict.css": {
+    "bg-blue-500": false,
+    "per-pale-ermine-ermines": false,
+    "chevron-indented-or": false,
+  },
 };
 
 // Every class named in data.js must be generated, so tooling can't drift from the CSS.
@@ -194,11 +207,11 @@ const DATA_CLASSES = [
   ...Object.keys(FURS),
   ...Object.keys(FURS).map((f) => `fess-${f}`),
   ...Object.keys(FURS).map((f) => `per-pale-${f}-gules`),
-  ...LINES.flatMap((l) => ORDINARIES.map((o) => `${o}-${l}-or`)),
+  ...LINES.flatMap((l) => lineOrdinaries(l).map((o) => `${o}-${l}-or`)),
   ...Object.keys(POINTS).map((p) => `in-${p}`),
   OF_THE_FIRST,
   ...ORDINARIES.map((o) => `${o}-${OF_THE_FIRST}`),
-  ...LINES.flatMap((l) => ORDINARIES.map((o) => `${o}-${l}-${OF_THE_FIRST}`)),
+  ...LINES.flatMap((l) => lineOrdinaries(l).map((o) => `${o}-${l}-${OF_THE_FIRST}`)),
   `fimbriated-${OF_THE_FIRST}`,
   `bordure-${OF_THE_FIRST}`,
   ...VOIDABLE.map((o) => `${o}-voided-or`),
