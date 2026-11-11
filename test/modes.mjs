@@ -1,8 +1,6 @@
 // Builds both entry points and checks which colours each one provides.
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   ARRANGEMENTS,
   CHARGES,
@@ -17,10 +15,8 @@ import {
   TINCTURES,
   VOIDABLE,
 } from "../data.js";
+import { build, root } from "./build.mjs";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const cli = join(root, "node_modules/.bin/tailwindcss");
-// Inside the project, so the build can resolve tailwindcss.
 const dir = mkdtempSync(join(root, "test", ".tmp-"));
 
 const CLASSES = [
@@ -227,23 +223,14 @@ writeFileSync(
   `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly per-pale per-fess"></div>`,
 );
 
-const build = (entry, { css = "", source = "index.html" } = {}) => {
-  const input = join(dir, "input.css");
-  const output = join(dir, "output.css");
-  writeFileSync(
-    input,
-    `@import "tailwindcss" source(none);\n@source "./${source}";\n@import "${join(root, entry)}";\n${css}`,
-  );
-  execFileSync(cli, ["-i", input, "-o", output], { stdio: "pipe" });
-  return readFileSync(output, "utf8");
-};
-
+let checks = 0;
 let failures = 0;
+let buildFailed = false;
 
 try {
   for (const [entry, overrides] of Object.entries(EXPECTED)) {
-    const css = build(entry);
-    const before = failures;
+    const css = await build({ dir, entry });
+    checks += CLASSES.length + DATA_CLASSES.length + Object.keys(PATTERNS).length;
     for (const cls of CLASSES) {
       const expected = overrides[cls] ?? true;
       const actual = css.includes(`.${cls} {`);
@@ -264,11 +251,10 @@ try {
         console.error(`✗ ${entry}: ${name}`);
       }
     }
-    console.log(`${failures > before ? "✗" : "✓"} ${entry}`);
   }
 
   // Fur spots are baked in at build time, so a re-themed tincture must reach them.
-  const themed = build("grailwind.css", { css: "@theme { --color-sable: #00ff00; }\n" });
+  const themed = await build({ dir, css: "@theme { --color-sable: #00ff00; }\n" });
   const furChecks = {
     "a re-themed sable reaches ermine's spots": /\.ermine \{[^}]*%2300ff00/.test(themed),
     "and a fur division's": /\.per-pale-ermine-gules \{[^}]*%2300ff00/.test(themed),
@@ -276,17 +262,31 @@ try {
   // Tailwind only emits the theme variables that generated CSS uses.
   writeFileSync(join(dir, "erminois.html"), `<div class="escutcheon erminois"></div>`);
   furChecks["a fur alone still defines its ground's colour"] = /--color-or: #f5c518;/.test(
-    build("grailwind.css", { source: "erminois.html" }),
+    await build({ dir, source: "erminois.html" }),
   );
+  checks += Object.keys(furChecks).length;
   for (const [name, ok] of Object.entries(furChecks)) {
     if (!ok) {
       failures++;
       console.error(`✗ furs: ${name}`);
     }
   }
-  console.log(`${Object.values(furChecks).every(Boolean) ? "✓" : "✗"} furs and the theme`);
+} catch (error) {
+  if (!error.buildFailed) {
+    throw error;
+  }
+  console.error(error.message);
+  buildFailed = true;
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }
 
-process.exit(failures ? 1 : 0);
+// npm prints nothing when a script fails, so the last line must say.
+if (!buildFailed) {
+  if (failures) {
+    console.error(`✗ ${failures} of ${checks} checks failed`);
+  } else {
+    console.log(`✓ all ${checks} checks passed`);
+  }
+}
+process.exit(failures || buildFailed ? 1 : 0);

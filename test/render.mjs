@@ -1,13 +1,10 @@
 // Renders shields in Chromium and Firefox and checks the tincture at chosen points.
-import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { chromium, firefox } from "playwright";
 import { DIVISIONS, lineOrdinaries } from "../data.js";
+import { build, root } from "./build.mjs";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const cli = join(root, "node_modules/.bin/tailwindcss");
 const out = join(root, "test", ".render");
 
 const TINCTURES = ["or", "argent", "gules", "azure", "vert", "purpure", "sable"];
@@ -812,18 +809,12 @@ const caption = (spec) =>
     ? `${describeShield(spec)} · ${spec.inner.kind ?? "inescutcheon"}${spec.first ? " (first)" : ""} ${describeShield(spec.inner)}`
     : describeShield(spec);
 
-const build = (dir) => {
+// The CSS for every shield the probes and contact sheets draw.
+const buildShields = (dir) => {
   const specs = [...SHIELDS, ...CONTACT, ...DIVIDED];
   const classes = [...specs.map((s) => markup(s)), ...TINCTURES.map((t) => `<i class="${t}"></i>`)];
   writeFileSync(join(dir, "index.html"), classes.join("\n"));
-  const input = join(dir, "input.css");
-  const output = join(dir, "output.css");
-  writeFileSync(
-    input,
-    `@import "tailwindcss" source(none);\n@source "./index.html";\n@import "${join(root, "grailwind.css")}";\n`,
-  );
-  execFileSync(cli, ["-i", input, "-o", output], { stdio: "pipe" });
-  return readFileSync(output, "utf8");
+  return build({ dir });
 };
 
 const grid = (css, width, cells) => `<!doctype html>
@@ -903,22 +894,22 @@ const contactSheet = async (page, css, specs, columns, file, width = 150) => {
 };
 
 const dir = mkdtempSync(join(root, "test", ".tmp-"));
-let failures = 0;
+const failed = {};
+let buildFailed = false;
 
 try {
-  const css = build(dir);
+  const css = await buildShields(dir);
   for (const engine of [chromium, firefox]) {
     const name = engine.name();
+    failed[name] = 0;
     const browser = await engine.launch();
     try {
       const page = await browser.newPage({ deviceScaleFactor: 1 });
       for (const result of await probe(page, css)) {
         const { at, expect, why, rgbs, swatches } = result;
         const miss = spots(at).findIndex((_, i) => nearest(rgbs[i], swatches) !== expect);
-        if (miss === -1) {
-          console.log(`✓ ${name}: ${caption(result)}: ${why}`);
-        } else {
-          failures++;
+        if (miss !== -1) {
+          failed[name]++;
           const [x, y] = spots(at)[miss].map((v) => +v.toFixed(1));
           const rgb = rgbs[miss];
           const seen = nearest(rgb, swatches) ?? `no tincture near (${rgb.join(", ")})`;
@@ -940,8 +931,26 @@ try {
       await browser.close();
     }
   }
+} catch (error) {
+  if (!error.buildFailed) {
+    throw error;
+  }
+  console.error(error.message);
+  buildFailed = true;
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }
 
-process.exit(failures ? 1 : 0);
+// npm prints nothing when a script fails, so the last line must say.
+const browsers = Object.keys(failed);
+const failures = Object.values(failed).reduce((sum, n) => sum + n, 0);
+const total = PROBES.length * browsers.length;
+if (!buildFailed) {
+  if (failures) {
+    const each = browsers.map((b) => `${b} ${failed[b]}`).join(", ");
+    console.error(`✗ ${failures} of ${total} probes failed (${each})`);
+  } else {
+    console.log(`✓ all ${total} probes passed (${browsers.join(", ")})`);
+  }
+}
+process.exit(failures || buildFailed ? 1 : 0);
