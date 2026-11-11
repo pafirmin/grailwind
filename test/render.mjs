@@ -321,7 +321,9 @@ const PROBES = [
   // Eight scallops a side, each 4.6 units deep; the bite is half that in from the middle of the fifth from the tip.
   { shield: "azure pile-engrailed-or", at: [[33.67, 36.59], [66.33, 36.59]], expect: "azure", why: "a bite in each side of the pile" },
   { shield: "azure pile-engrailed-or", at: [[50, 20], [36.35, 41.73], [63.65, 41.73]], expect: "or", why: "the engrailed pile, by a cusp on each side" },
-  { shield: "azure pile-engrailed-or", at: [50, 84], expect: "azure", why: "no sliver below the engrailed pile's tip" },
+  // Drawn (drawings/pile-engrailed.svg): its point reaches the plain pile's tip at 85%, 4 px wide at 81%.
+  { shield: "azure pile-engrailed-or", at: [50, 81], expect: "or", why: "the engrailed pile's point runs on to its tip" },
+  { shield: "azure pile-engrailed-or", at: [50, 86], expect: "azure", why: "no sliver below the engrailed pile's tip" },
   // Fimbriated, each side moves out 3.15% across, and the tip down to 93.1%.
   { shield: "gules pile-azure fimbriated-argent", at: [[31.03, 40], [68.97, 40], [50, 88]], expect: "argent", why: "the pile's fimbriation, on each side and below the tip" },
   { shield: "gules pile-azure fimbriated-argent", at: [[34.03, 40], [65.97, 40], [50, 1], [50, 30], [50, 60], [50, 80]], expect: "azure", why: "the pile itself, just inside each side and down its centre line" },
@@ -352,7 +354,25 @@ const PROBES = [
   { shield: "azure pall-reversed-engrailed-or", at: [12.5, 77.9], expect: "azure", why: "a bite in the pall reversed" },
   { shield: "azure pile-reversed-engrailed-or", at: [[33.67, 63.41], [66.33, 63.41]], expect: "azure", why: "a bite in each side of the pile reversed" },
   { shield: "azure pile-reversed-engrailed-or", at: [[50, 80], [36.35, 58.27], [63.65, 58.27]], expect: "or", why: "the engrailed pile reversed, by a cusp on each side" },
-  { shield: "azure pile-reversed-engrailed-or", at: [50, 16], expect: "azure", why: "no sliver above the engrailed pile reversed's tip" },
+  { shield: "azure pile-reversed-engrailed-or", at: [50, 19], expect: "or", why: "the engrailed pile reversed's point runs on to its tip" },
+  { shield: "azure pile-reversed-engrailed-or", at: [50, 14], expect: "azure", why: "no sliver above the engrailed pile reversed's tip" },
+  // Drawn (drawings/pile-embattled.svg): merlons stand 3 out from the plain sides, crenels on them.
+  // Probes sit 1.5 out, at a merlon and at a crenel; the plain point is 8 px wide at 81.5%.
+  { shield: "azure pile-embattled-or", at: [[28.6, 33.93], [71.4, 33.93]], expect: "or", why: "a merlon on each side of the pile, opposite" },
+  { shield: "azure pile-embattled-or", at: [[26.55, 28.64], [73.45, 28.64]], expect: "azure", why: "a crenel on each side of the pile, opposite" },
+  { shield: "azure pile-embattled-or", at: [50, 81.5], expect: "or", why: "the embattled pile ends in a plain point" },
+  { shield: "azure pile-embattled-or", at: [50, 86], expect: "azure", why: "no sliver below the embattled pile's tip" },
+  { shield: "azure pile-reversed-embattled-or", at: [[28.6, 66.07], [71.4, 66.07]], expect: "or", why: "a merlon on each side of the pile reversed, opposite" },
+  { shield: "azure pile-reversed-embattled-or", at: [[26.55, 71.36], [73.45, 71.36]], expect: "azure", why: "a crenel on each side of the pile reversed, opposite" },
+  { shield: "azure pile-reversed-embattled-or", at: [50, 18.5], expect: "or", why: "the embattled pile reversed ends in a plain point" },
+  { shield: "azure pile-reversed-embattled-or", at: [50, 14], expect: "azure", why: "no sliver above the embattled pile reversed's tip" },
+  // Drawn (drawings/cross-indented.svg), after FD Fig. 159: point opposite point across the limb and
+  // across each arm. Turns every 5.9, 3.4 either side of the plain edge.
+  { shield: "azure cross-indented-or", at: [[36.5, 19.67], [63.5, 19.67]], expect: "or", why: "a point on each side of the cross's limb, opposite" },
+  { shield: "azure cross-indented-or", at: [[39.5, 24.58], [60.5, 24.58]], expect: "azure", why: "a notch on each side of the cross's limb, opposite" },
+  { shield: "azure cross-indented-or", at: [[17.7, 33.75], [17.7, 56.25], [82.3, 33.75], [82.3, 56.25]], expect: "or", why: "a point on each edge of the cross's arms, opposite" },
+  { shield: "azure cross-indented-or", at: [[11.8, 36.25], [11.8, 53.75], [88.2, 36.25], [88.2, 53.75]], expect: "azure", why: "a notch on each edge of the cross's arms, opposite" },
+  { shield: "azure cross-indented-or", at: [[42, 38.33], [58, 38.33], [42, 51.67], [58, 51.67]], expect: "or", why: "the cross indented is solid inside its corners" },
   { shield: "gules pile-reversed-azure fimbriated-argent", at: [[31.03, 60], [68.97, 60], [50, 12]], expect: "argent", why: "the pile reversed's fimbriation, on each side and above the tip" },
   { shield: "gules pile-reversed-azure fimbriated-argent", at: [[34.03, 60], [65.97, 60], [50, 99], [50, 70], [50, 40], [50, 20]], expect: "azure", why: "the pile reversed itself, just inside each side and up its centre line" },
   { shield: "gules pile-reversed-azure fimbriated-argent", at: [[27.88, 60], [72.12, 60], [20, 20]], expect: "gules", why: "the field beyond the pile reversed's fimbriation" },

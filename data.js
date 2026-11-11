@@ -83,7 +83,7 @@ export const ROUNDELS = {
 export const LINES = ["engrailed", "invected", "wavy", "indented", "embattled"];
 
 // Indented and embattled are drawn only on the ordinaries without corners between lined edges,
-// until the cornered ones are drawn by hand (064).
+// and on each cornered one once it's drawn by hand (064).
 const STRAIGHT = [
   "pale",
   "fess",
@@ -94,7 +94,10 @@ const STRAIGHT = [
   "bend-sinister",
   "chief",
 ];
-const PARTIAL_LINES = { indented: STRAIGHT, embattled: STRAIGHT };
+const PARTIAL_LINES = {
+  indented: [...STRAIGHT, "cross"],
+  embattled: [...STRAIGHT, "pile", "pile-reversed"],
+};
 
 // The ordinaries that take `line`.
 export const lineOrdinaries = (line) => PARTIAL_LINES[line] ?? ORDINARIES;

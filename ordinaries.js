@@ -5,6 +5,7 @@ import plugin from "tailwindcss/plugin";
 import {
   BETWEEN,
   FURS,
+  LINES as LINE_NAMES,
   lineOrdinaries,
   OF_THE_FIRST,
   ON,
@@ -13,6 +14,7 @@ import {
   VOIDABLE,
 } from "./data.js";
 import { furBackground } from "./furs.js";
+import { PATHS } from "./paths.js";
 
 // prettier-ignore
 const ORDINARIES = {
@@ -426,9 +428,11 @@ const indented = (a, b, scallop) => {
 // the shield's width, so a fess or chief has a merlon at both ends.
 const BATTLEMENT = W / 15;
 const BATTLEMENT_HEIGHT = 6;
-// Embattled on the upper edge only (FD p. 93); the rest on every edge. The chevron joins these
-// when it's drawn (064).
-const UPPER_ONLY = ["fess", "bar", "two-bars", "three-bars", "bend", "bend-sinister"];
+// Embattled on the upper edge only (FD p. 93); the rest on every edge.
+// prettier-ignore
+const UPPER_ONLY = [
+  "fess", "bar", "two-bars", "three-bars", "bend", "bend-sinister", "chevron", "chevron-reversed",
+];
 
 // Battlements centred on the edge, in phase across a band like `wavy`, but merlon opposite
 // merlon: a piece's side is taken from the ordinary, not from the shield.
@@ -488,8 +492,8 @@ const crossing = (a, v, b, first, second) => {
     : null;
 };
 
-// `extend` moves the sides on the shield's edge out, as `outer` does; the lined sides stay put.
-const shape = (vertices, line, scallop, extend) => {
+// The lined edges of `vertices` as arcs and lines in real units, and where the shape starts.
+const outline = (vertices, line, scallop) => {
   const inward = signedArea(vertices) > 0 ? "ccw" : "cw";
   const pts = vertices.map(real);
   const straight = vertices.map((v, i) => onShieldEdge(v, vertices[(i + 1) % vertices.length]));
@@ -517,7 +521,12 @@ const shape = (vertices, line, scallop, extend) => {
       start = p;
     }
   });
+  return { pts, straight, edges, start };
+};
 
+// `extend` moves the sides on the shield's edge out, as `outer` does; the lined sides stay put.
+const shape = (vertices, line, scallop, extend) => {
+  const { pts, straight, edges, start } = outline(vertices, line, scallop);
   const commands = edges.flatMap((edge, i) => {
     const segments = edge.map(({ to, r, sweep }) =>
       r
@@ -537,6 +546,88 @@ const shape = (vertices, line, scallop, extend) => {
   const from = extend ? extend(vertices[0]) : at(start);
   return `shape(from ${from}, ${commands.join(", ")}, close)`;
 };
+
+// An outline as an SVG path, in real units. y points down in both, so cw is sweep-flag 1.
+const svgPath = ({ edges, start }) => {
+  const parts = [`M ${num(start[0])} ${num(start[1])}`];
+  for (const { to, r, sweep } of edges.flat()) {
+    const [x, y] = [num(to[0]), num(to[1])];
+    parts.push(r ? `A ${num(r)} ${num(r)} 0 0 ${sweep === "cw" ? 1 : 0} ${x} ${y}` : `L ${x} ${y}`);
+  }
+  return `${parts.join(" ")} Z`;
+};
+
+// The generator's lined ordinary, e.g. `generated("pile", "engrailed")`: the arguments for
+// `outline()` and `shape()`.
+const generated = (ordinary, name) => [
+  ORDINARIES[ordinary],
+  (a, b, scallop, inward) => LINES[name](a, b, scallop, inward, ordinary),
+  (LENGTHS[name] ?? SCALLOPS)[ordinary] ?? SCALLOP,
+];
+const draftOutline = (ordinary, name) => outline(...generated(ordinary, name));
+const generatedShape = (ordinary, name) => shape(...generated(ordinary, name));
+
+// Drawn shapes are segments in real units: ["M", x, y], ["L", x, y], ["C", x1, y1, x2, y2, x, y],
+// ["A", rx, ry, rotation, large, sweep, x, y] and ["Z"].
+const pathShape = (segments) => {
+  const [, startX, startY] = segments[0];
+  const commands = segments.slice(1).map(([command, ...n]) => {
+    switch (command) {
+      case "L":
+        return `line to ${at([n[0], n[1]])}`;
+      case "C":
+        return `curve to ${at([n[4], n[5]])} with ${at([n[0], n[1]])} / ${at([n[2], n[3]])}`;
+      case "A": {
+        const [rx, ry, rotation, large, sweep, x, y] = n;
+        return [
+          `arc to ${at([x, y])} of ${pct((rx * 100) / W)} ${pct((ry * 100) / H)}`,
+          sweep ? "cw" : "ccw",
+          large ? "large" : "",
+          rotation ? `rotate ${rotation}deg` : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+      }
+      case "Z":
+        return "close";
+      default:
+        throw new Error(`unknown path command ${command}`);
+    }
+  });
+  const last = commands.pop();
+  if (last !== "close") {
+    throw new Error("a drawn path must end with Z");
+  }
+  return `shape(from ${at([startX, startY])}, ${commands.join(", ")}, close)`;
+};
+
+// The same shape upside down, for an ordinary's reversed form.
+const flipPath = (segments) =>
+  segments.map(([command, ...n]) => {
+    switch (command) {
+      case "M":
+      case "L":
+        return [command, n[0], H - n[1]];
+      case "C":
+        return [command, n[0], H - n[1], n[2], H - n[3], n[4], H - n[5]];
+      case "A":
+        return [command, n[0], n[1], n[2] ? -n[2] : 0, n[3], n[4] ? 0 : 1, n[5], H - n[6]];
+      default:
+        return [command];
+    }
+  });
+
+// Drawn shapes by `ordinary-line`, each reversible one also upside down as `ordinary-reversed-line`
+// unless it was drawn too.
+const DRAWN = { ...PATHS };
+for (const key of Object.keys(PATHS)) {
+  const name = LINE_NAMES.find((line) => key.endsWith(`-${line}`));
+  const ordinary = key.slice(0, -name.length - 1);
+  const reversedKey = `${ordinary}-reversed-${name}`;
+  if (REVERSIBLE.includes(ordinary) && !(reversedKey in PATHS)) {
+    DRAWN[reversedKey] = flipPath(PATHS[key]);
+  }
+}
 
 const betweenVars = ({ size, points, counts = {} }) => {
   const vars = { "--between-size": `${size}%` };
@@ -593,6 +684,8 @@ const PAINTS = [
   [OF_THE_FIRST, "var(--the-first, transparent)"],
 ];
 
+export { draftOutline, DRAWN, flipPath, generatedShape, ORDINARIES, pathShape, svgPath };
+
 export default plugin(({ addBase, addUtilities, theme }) => {
   // Unset on an inescutcheon, a canton or a part of a divided shield, so it can't inherit its
   // shield's layout. In the base layer, so an ordinary on it still sets its own.
@@ -641,11 +734,14 @@ export default plugin(({ addBase, addUtilities, theme }) => {
     // Browsers without shape() keep the straight polygon.
     const lined = (name, line) => {
       const edge = (a, b, scallop, inward) => line(a, b, scallop, inward, ordinary);
+      const drawn = DRAWN[`${ordinary}-${name}`];
       return [
         plain,
         chief
           ? `${shape(vertices, edge, SCALLOP, outer)} content-box`
-          : shape(vertices, edge, (LENGTHS[name] ?? SCALLOPS)[ordinary] ?? SCALLOP),
+          : drawn
+            ? pathShape(drawn)
+            : shape(vertices, edge, (LENGTHS[name] ?? SCALLOPS)[ordinary] ?? SCALLOP),
       ];
     };
 
