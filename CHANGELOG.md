@@ -16,7 +16,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Ordinary proportions move towards Fox-Davies: the chevron is wider (a fifth
   of the shield), the cross's limbs are equal, the saltire is wider and crosses
-  at the fess point (as does `per-saltire-*`), and the pile is wider.
+  at the fess point (as does `per-saltire-*`), and the pile is wider. The
+  pall's arms and foot are equal, and its arms meet above the fess point.
 
 ## [0.7.0] - 2026-11-09
 

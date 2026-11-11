@@ -37,9 +37,10 @@ const ORDINARIES = {
     [0, 0], [16.35, 0], [50, 30.28], [83.65, 0], [100, 0], [100, 14.72], [66.35, 45], [100, 75.28],
     [100, 100], [94.76, 100], [50, 59.72], [5.24, 100], [0, 100], [0, 75.28], [33.65, 45], [0, 14.72],
   ],
+  // Its arms and foot are 24 across, the arms' centre lines running from the top corners to (50, 40).
   pall: [
-    [0, 0], [15, 0], [50, 35], [85, 0], [100, 0], [100, 15],
-    [60, 55], [60, 100], [40, 100], [40, 55], [0, 15],
+    [0, 0], [17.33, 0], [50, 26.14], [82.67, 0], [100, 0], [100, 13.86],
+    [62, 44.26], [62, 100], [38, 100], [38, 44.26], [0, 13.86],
   ],
   chief: [[0, 0], [100, 0], [100, 30], [0, 30]],
   pile: [[17, 0], [83, 0], [50, 85]],
@@ -176,6 +177,9 @@ const diagonal = (kind, halfWidth, tile) => {
 };
 // The saltire's arms are the diagonals of a tile as tall as the shield, sloping through (50, 45).
 const SALTIRE_TILE = (100 * 50) / 45;
+// The pall's arms are the diagonals of a tile reaching down to the foot's corners, through (50, 40).
+const PALL_TILE_H = 44.26;
+const PALL_TILE_W = (PALL_TILE_H * 50) / 40;
 // A 2px strip down the centre, from the top to `bottom`, where two tiles meet mid-pixel and
 // would let the fimbriation show between them. Unsoftened, as it lies on its own tincture.
 const seam = (bottom) => ({ kind: "x", tile: [0, 0, 100, bottom], seam: true });
@@ -200,13 +204,9 @@ const BANDS = {
     diagonal("u+v", 12, [100 - SALTIRE_TILE, 0, 100, 100]),
   ],
   pall: [
-    stripe("x", 60, 60 + S, [0, 55, 100, 100]),
-    stripe("x", 40 - S, 40, [0, 55, 100, 100]),
-    stripe("u+v", 115, 115 + S, [60, 30, 100, 70]),
-    stripe("u-v", -15 - S, -15, [0, 30, 40, 70]),
-    band("u-v", -15, 15),
-    band("u+v", 85, 115),
-    band("x", 40, 60, [0, 55, 100, 100]),
+    diagonal("u-v", 12, [0, 0, PALL_TILE_W, PALL_TILE_H]),
+    diagonal("u+v", 12, [100 - PALL_TILE_W, 0, 100, PALL_TILE_H]),
+    band("x", 38, 62, [0, 40, 100, 100]),
   ],
   // Each slanted side is its tile's diagonal.
   pile: [half("u-v", "end", [17, 0, 50, 85]), half("u+v", "start", [50, 0, 83, 85]), seam(83)],
@@ -307,7 +307,7 @@ const LENGTHS = { wavy: WAVES };
 // prettier-ignore
 const VOIDS = {
   pale: 7.5, fess: 9, bar: 4.2, bend: 7.7, "bend-sinister": 7.7,
-  chevron: 5, cross: 6, saltire: 6, pall: 5, pile: 8.8,
+  chevron: 5, cross: 6, saltire: 6, pall: 6, pile: 8.8,
 };
 for (const ordinary of REVERSIBLE) {
   if (SCALLOPS[ordinary]) {
