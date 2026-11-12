@@ -13,7 +13,7 @@ npm install --save-dev @grailwind/eslint-plugin@beta
 ```
 
 It reads the tinctures, ordinaries and charges from your installed `grailwind`, so it needs
-`grailwind` 0.7.x. For typos and other class errors, see
+`grailwind` 0.8.x. For typos and other class errors, see
 [Linting](https://github.com/pafirmin/grailwind#linting) in the Grailwind README.
 
 ## Setup

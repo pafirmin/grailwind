@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-12
+
 ### Added
 
 - Wavy ordinaries, e.g. `fess-wavy-or` and `three-bars-wavy-argent`.
@@ -21,6 +23,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   at the fess point (as does `per-saltire-*`), and the pile is wider. The
   pall's arms and foot are equal, and its arms meet above the fess point.
 - The engrailed cross and pile are hand-drawn, with clean corners and tips.
+- `@grailwind/eslint-plugin` 0.1.0-beta.4 needs `grailwind` 0.8.x.
 
 ### Fixed
 
@@ -180,7 +183,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release: tinctures, divisions, ordinaries, charges, strict mode and
 custom SVG charges.
 
-[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/pafirmin/grailwind/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/pafirmin/grailwind/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/pafirmin/grailwind/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/pafirmin/grailwind/compare/v0.4.0...v0.5.0
