@@ -656,6 +656,11 @@ const PROBES = [
   { shield: "gyronny-gules-ermine", at: [45, 5], expect: "gules", why: "the first gyron" },
   { shield: "gyronny-gules-ermine", at: furSpot(0, 2), expect: "sable", why: "a spot in the second gyron" },
   { shield: "gyronny-gules-ermine", at: furGround(0, 2), expect: "argent", why: "the ground in the second gyron" },
+  // Gyronny's lines cross at (50, 45) like per saltire's, so a counterchanged saltire lines up.
+  { shield: "gyronny-or-gules", at: [[25, 21], [75, 24], [25, 46], [75, 44], [25, 66], [75, 69], [55, 95]], expect: "or", why: "or gyrons, either side of each line" },
+  { shield: "gyronny-or-gules", at: [[25, 24], [75, 21], [25, 44], [75, 46], [25, 69], [75, 66], [45, 95]], expect: "gules", why: "gules gyrons, either side of each line" },
+  { shield: "gyronny-or-gules saltire-counterchanged", at: [[25, 21], [75, 24], [25, 66], [75, 69]], expect: "gules", why: "the saltire counterchanges along its centre lines" },
+  { shield: "gyronny-or-gules saltire-counterchanged", at: [[25, 24], [75, 21], [25, 69], [75, 66]], expect: "or", why: "the saltire counterchanges along its centre lines" },
 
   // Per saltire's lines run from the top corners through (50, 45) to the flanks at 90%, so at
   // x = 25 and 75 they're at 22.5% and 67.5%; each probe pair straddles one. Below 90% is base.

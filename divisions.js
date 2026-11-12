@@ -154,9 +154,10 @@ const DIVISIONS = {
     "background-repeat": "no-repeat",
   }),
 
-  // Gyronny of eight: each quarter split corner to corner. The first tincture
-  // is in the gyron just dexter of the top line. The background colour fills
-  // any sub-pixel seam between quarters.
+  // Gyronny of eight: quarterly and per saltire, all through the fess point. The first tincture
+  // is in the gyron just dexter of the top line. Per saltire's four tiles, then the base below
+  // them split per pale, 2px taller so no seam shows. The background colour fills any sub-pixel
+  // seam between tiles.
   gyronny: (a, b) => ({
     "background-color": b,
     "background-image": [
@@ -164,9 +165,19 @@ const DIVISIONS = {
       `linear-gradient(to bottom right, ${b} 50%, ${a} 50%)`,
       `linear-gradient(to bottom left, ${b} 50%, ${a} 50%)`,
       `linear-gradient(to bottom right, ${a} 50%, ${b} 50%)`,
+      `linear-gradient(to right, ${b} 50%, ${a} 50%)`,
     ].join(", "),
-    "background-size": "50% 50%",
-    "background-position": "left top, right top, right bottom, left bottom",
+    "background-size": [
+      ...Array(4).fill(`50% ${FESS_POINT}%`),
+      `100% calc(${100 - 2 * FESS_POINT}% + 2px)`,
+    ].join(", "),
+    "background-position": [
+      "left top",
+      "right top",
+      `right ${BASE_TILES}%`,
+      `left ${BASE_TILES}%`,
+      "bottom",
+    ].join(", "),
     "background-repeat": "no-repeat",
   }),
 

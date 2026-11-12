@@ -8,10 +8,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Wavy ordinaries, e.g. `fess-wavy-or` and `three-bars-wavy-argent`.
 - Indented and embattled ordinaries, e.g. `chief-indented-azure` and
   `cross-embattled-gules`. A fess, bar, bend or chevron embattled has
   battlements on its upper edge only. The chevron, cross, saltire, pall and
-  pile take them with hand-drawn corners.
+  pile take them with hand-drawn corners, as do the wavy chevron and pall.
 
 ### Changed
 
@@ -19,8 +20,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   of the shield), the cross's limbs are equal, the saltire is wider and crosses
   at the fess point (as does `per-saltire-*`), and the pile is wider. The
   pall's arms and foot are equal, and its arms meet above the fess point.
-- The wavy chevron and pall, and the engrailed cross and pile, are hand-drawn,
-  with clean corners and tips.
+- The engrailed cross and pile are hand-drawn, with clean corners and tips.
+
+### Fixed
+
+- `gyronny-*` crosses at the fess point, as `per-saltire-*` does, so a
+  counterchanged saltire lines up with it.
 
 ## [0.7.0] - 2026-11-09
 
@@ -30,7 +35,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   tincture in chief.
 - `bendy-*`, `bendy-sinister-*`, `chevronny-*` (each with `-of-eight-*`) and
   `chequy-*`: six or eight pieces, or five squares by six.
-- Wavy ordinaries, e.g. `fess-wavy-or` and `three-bars-wavy-argent`.
 
 ### Changed
 
