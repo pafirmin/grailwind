@@ -10,6 +10,15 @@
   font-display: swap;
 }
 
+/* Junicode's manicule (☞) alone, fetched only when the page uses it. */
+@font-face {
+  font-family: "Junicode";
+  src: url("fonts/Junicode-Manicule.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+261E;
+}
+
 @font-face {
   font-family: "Junicode";
   src: url("fonts/JunicodeVF-Italic.woff2") format("woff2");

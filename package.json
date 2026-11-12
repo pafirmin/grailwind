@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tailwindcss -i docs/app.css -o docs/site.css",
     "dev": "tailwindcss -i docs/app.css -o docs/site.css --watch",
-    "test": "node test/modes.mjs && node test/drawings.mjs && npm run drawings -- --check && npm test -w packages/eslint-plugin",
+    "test": "node test/modes.mjs && node test/drawings.mjs && node test/docs.mjs && npm run drawings -- --check && npm test -w packages/eslint-plugin",
     "drawings": "node drawings/build.mjs",
     "test:render": "node test/render.mjs",
     "dev:watch": "tailwindcss -i docs/app.css -o docs/site.css --watch=always & python3 -m http.server ${PORT:-8000} -d docs",

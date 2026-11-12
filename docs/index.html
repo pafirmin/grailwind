@@ -686,102 +686,540 @@
             tincture to name one: <code>fess-or</code>,
             <code>cross-gules</code>. Bars, narrow fesses, are named by count:
             <code>bar-or</code>, <code>two-bars-or</code> and
-            <code>three-bars-or</code>. Ordinaries can be <code>voided</code> to
-            render just the outline, and some have
-            <code>reversed</code> variants.
+            <code>three-bars-or</code>. Some have <code>reversed</code>
+            variants. Any ordinary can also take a line:
+            <code>engrailed</code>, <code>invected</code>, <code>wavy</code>,
+            <code>indented</code> or <code>embattled</code>, as in
+            <code>fess-wavy-or</code>, and most can be <code>voided</code> to
+            leave just the outline.
           </p>
-          <div class="examples">
-            <figure data-blazon="Azure, a fess Or">
-              <div class="escutcheon azure fess-or"></div>
-            </figure>
-            <figure data-blazon="Or, a bend Sable">
-              <div class="escutcheon or bend-sable"></div>
-            </figure>
-            <figure data-blazon="Gules, a chevron Argent">
-              <div class="escutcheon gules chevron-argent"></div>
-            </figure>
-            <figure data-blazon="Argent, a cross Gules">
-              <div class="escutcheon argent cross-gules"></div>
-            </figure>
-            <figure data-blazon="Gules, a pale Argent">
-              <div class="escutcheon gules pale-argent"></div>
-            </figure>
-            <figure data-blazon="Azure, a saltire Argent">
-              <div class="escutcheon azure saltire-argent"></div>
-            </figure>
-            <figure data-blazon="Argent, a chief Gules">
-              <div class="escutcheon argent chief-gules"></div>
-            </figure>
-            <figure data-blazon="Vert, a pall Or">
-              <div class="escutcheon vert pall-or"></div>
-            </figure>
-            <figure data-blazon="Or, a pile Gules">
-              <div class="escutcheon or pile-gules"></div>
-            </figure>
-            <figure data-blazon="Gules, two bars Or">
-              <div class="escutcheon gules two-bars-or"></div>
-            </figure>
-            <figure data-blazon="Argent, a bend sinister Vert">
-              <div class="escutcheon argent bend-sinister-vert"></div>
-            </figure>
-            <figure data-blazon="Or, a pile reversed Gules">
-              <div class="escutcheon or pile-reversed-gules"></div>
-            </figure>
-            <figure data-blazon="Argent, a chevron reversed Sable">
-              <div class="escutcheon argent chevron-reversed-sable"></div>
-            </figure>
-            <figure data-blazon="Azure, a pall reversed Or">
-              <div class="escutcheon azure pall-reversed-or"></div>
-            </figure>
-            <figure data-blazon="Gules, a cross voided Argent">
-              <div class="escutcheon gules cross-voided-argent"></div>
-            </figure>
-            <figure data-blazon="Per pale Or and Azure, a saltire voided Gules">
-              <div
-                class="escutcheon per-pale-or-azure saltire-voided-gules"
-              ></div>
-            </figure>
+          <div class="line-tabs">
+            <div
+              role="tablist"
+              aria-label="Style"
+              id="lines"
+              hidden
+              class="sticky top-(--header-height) lg:top-0 z-[5] argent shadow-sm lg:shadow-none flex overflow-x-auto motion-safe:scroll-smooth whitespace-nowrap -mx-6 px-6"
+            >
+              <button
+                type="button"
+                role="tab"
+                id="tab-plain"
+                aria-controls="panel-plain"
+                class="px-4 py-3 cursor-pointer border-b-2 border-transparent capitalize hover:text-gules aria-selected:border-gules aria-selected:font-semibold"
+              >
+                plain
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-engrailed"
+                aria-controls="panel-engrailed"
+                class="px-4 py-3 cursor-pointer border-b-2 border-transparent capitalize hover:text-gules aria-selected:border-gules aria-selected:font-semibold"
+              >
+                engrailed
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-invected"
+                aria-controls="panel-invected"
+                class="px-4 py-3 cursor-pointer border-b-2 border-transparent capitalize hover:text-gules aria-selected:border-gules aria-selected:font-semibold"
+              >
+                invected
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-wavy"
+                aria-controls="panel-wavy"
+                class="px-4 py-3 cursor-pointer border-b-2 border-transparent capitalize hover:text-gules aria-selected:border-gules aria-selected:font-semibold"
+              >
+                wavy
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-indented"
+                aria-controls="panel-indented"
+                class="px-4 py-3 cursor-pointer border-b-2 border-transparent capitalize hover:text-gules aria-selected:border-gules aria-selected:font-semibold"
+              >
+                indented
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-embattled"
+                aria-controls="panel-embattled"
+                class="px-4 py-3 cursor-pointer border-b-2 border-transparent capitalize hover:text-gules aria-selected:border-gules aria-selected:font-semibold"
+              >
+                embattled
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-voided"
+                aria-controls="panel-voided"
+                class="px-4 py-3 cursor-pointer border-b-2 border-transparent capitalize hover:text-gules aria-selected:border-gules aria-selected:font-semibold"
+              >
+                voided
+              </button>
+            </div>
+            <div
+              role="tabpanel"
+              id="panel-plain"
+              aria-labelledby="tab-plain"
+              tabindex="0"
+            >
+              <div class="examples">
+                <figure data-blazon="Azure, a fess Or">
+                  <div class="escutcheon azure fess-or"></div>
+                </figure>
+                <figure data-blazon="Or, a bend Sable">
+                  <div class="escutcheon or bend-sable"></div>
+                </figure>
+                <figure data-blazon="Gules, a chevron Argent">
+                  <div class="escutcheon gules chevron-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a cross Gules">
+                  <div class="escutcheon argent cross-gules"></div>
+                </figure>
+                <figure data-blazon="Vert, a pale Argent">
+                  <div class="escutcheon vert pale-argent"></div>
+                </figure>
+                <figure data-blazon="Azure, a saltire Argent">
+                  <div class="escutcheon azure saltire-argent"></div>
+                </figure>
+                <figure data-blazon="Or, a chief Azure">
+                  <div class="escutcheon or chief-azure"></div>
+                </figure>
+                <figure data-blazon="Vert, a pall Or">
+                  <div class="escutcheon vert pall-or"></div>
+                </figure>
+                <figure data-blazon="Or, a pile Gules">
+                  <div class="escutcheon or pile-gules"></div>
+                </figure>
+                <figure data-blazon="Sable, a bar Or">
+                  <div class="escutcheon sable bar-or"></div>
+                </figure>
+                <figure data-blazon="Gules, two bars Or">
+                  <div class="escutcheon gules two-bars-or"></div>
+                </figure>
+                <figure data-blazon="Purpure, three bars Argent">
+                  <div class="escutcheon purpure three-bars-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a bend sinister Vert">
+                  <div class="escutcheon argent bend-sinister-vert"></div>
+                </figure>
+                <figure data-blazon="Argent, a chevron reversed Sable">
+                  <div class="escutcheon argent chevron-reversed-sable"></div>
+                </figure>
+                <figure data-blazon="Sable, a pall reversed Argent">
+                  <div class="escutcheon sable pall-reversed-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a pile reversed Purpure">
+                  <div class="escutcheon argent pile-reversed-purpure"></div>
+                </figure>
+              </div>
+            </div>
+            <div
+              role="tabpanel"
+              id="panel-engrailed"
+              aria-labelledby="tab-engrailed"
+              tabindex="0"
+            >
+              <div class="examples">
+                <figure data-blazon="Azure, a fess engrailed Or">
+                  <div class="escutcheon azure fess-engrailed-or"></div>
+                </figure>
+                <figure data-blazon="Or, a bend engrailed Sable">
+                  <div class="escutcheon or bend-engrailed-sable"></div>
+                </figure>
+                <figure data-blazon="Gules, a chevron engrailed Argent">
+                  <div class="escutcheon gules chevron-engrailed-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a cross engrailed Gules">
+                  <div class="escutcheon argent cross-engrailed-gules"></div>
+                </figure>
+                <figure data-blazon="Vert, a pale engrailed Argent">
+                  <div class="escutcheon vert pale-engrailed-argent"></div>
+                </figure>
+                <figure data-blazon="Azure, a saltire engrailed Argent">
+                  <div class="escutcheon azure saltire-engrailed-argent"></div>
+                </figure>
+                <figure data-blazon="Or, a chief engrailed Azure">
+                  <div class="escutcheon or chief-engrailed-azure"></div>
+                </figure>
+                <figure data-blazon="Vert, a pall engrailed Or">
+                  <div class="escutcheon vert pall-engrailed-or"></div>
+                </figure>
+                <figure data-blazon="Or, a pile engrailed Gules">
+                  <div class="escutcheon or pile-engrailed-gules"></div>
+                </figure>
+                <figure data-blazon="Sable, a bar engrailed Or">
+                  <div class="escutcheon sable bar-engrailed-or"></div>
+                </figure>
+                <figure data-blazon="Gules, two bars engrailed Or">
+                  <div class="escutcheon gules two-bars-engrailed-or"></div>
+                </figure>
+                <figure data-blazon="Purpure, three bars engrailed Argent">
+                  <div
+                    class="escutcheon purpure three-bars-engrailed-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a bend sinister engrailed Vert">
+                  <div
+                    class="escutcheon argent bend-sinister-engrailed-vert"
+                  ></div>
+                </figure>
+                <figure
+                  data-blazon="Argent, a chevron reversed engrailed Sable"
+                >
+                  <div
+                    class="escutcheon argent chevron-reversed-engrailed-sable"
+                  ></div>
+                </figure>
+                <figure data-blazon="Sable, a pall reversed engrailed Argent">
+                  <div
+                    class="escutcheon sable pall-reversed-engrailed-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a pile reversed engrailed Purpure">
+                  <div
+                    class="escutcheon argent pile-reversed-engrailed-purpure"
+                  ></div>
+                </figure>
+              </div>
+            </div>
+            <div
+              role="tabpanel"
+              id="panel-invected"
+              aria-labelledby="tab-invected"
+              tabindex="0"
+            >
+              <div class="examples">
+                <figure data-blazon="Azure, a fess invected Or">
+                  <div class="escutcheon azure fess-invected-or"></div>
+                </figure>
+                <figure data-blazon="Or, a bend invected Sable">
+                  <div class="escutcheon or bend-invected-sable"></div>
+                </figure>
+                <figure data-blazon="Gules, a chevron invected Argent">
+                  <div class="escutcheon gules chevron-invected-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a cross invected Gules">
+                  <div class="escutcheon argent cross-invected-gules"></div>
+                </figure>
+                <figure data-blazon="Vert, a pale invected Argent">
+                  <div class="escutcheon vert pale-invected-argent"></div>
+                </figure>
+                <figure data-blazon="Azure, a saltire invected Argent">
+                  <div class="escutcheon azure saltire-invected-argent"></div>
+                </figure>
+                <figure data-blazon="Or, a chief invected Azure">
+                  <div class="escutcheon or chief-invected-azure"></div>
+                </figure>
+                <figure data-blazon="Vert, a pall invected Or">
+                  <div class="escutcheon vert pall-invected-or"></div>
+                </figure>
+                <figure data-blazon="Or, a pile invected Gules">
+                  <div class="escutcheon or pile-invected-gules"></div>
+                </figure>
+                <figure data-blazon="Sable, a bar invected Or">
+                  <div class="escutcheon sable bar-invected-or"></div>
+                </figure>
+                <figure data-blazon="Gules, two bars invected Or">
+                  <div class="escutcheon gules two-bars-invected-or"></div>
+                </figure>
+                <figure data-blazon="Purpure, three bars invected Argent">
+                  <div
+                    class="escutcheon purpure three-bars-invected-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a bend sinister invected Vert">
+                  <div
+                    class="escutcheon argent bend-sinister-invected-vert"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a chevron reversed invected Sable">
+                  <div
+                    class="escutcheon argent chevron-reversed-invected-sable"
+                  ></div>
+                </figure>
+                <figure data-blazon="Sable, a pall reversed invected Argent">
+                  <div
+                    class="escutcheon sable pall-reversed-invected-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a pile reversed invected Purpure">
+                  <div
+                    class="escutcheon argent pile-reversed-invected-purpure"
+                  ></div>
+                </figure>
+              </div>
+            </div>
+            <div
+              role="tabpanel"
+              id="panel-wavy"
+              aria-labelledby="tab-wavy"
+              tabindex="0"
+            >
+              <div class="examples">
+                <figure data-blazon="Azure, a fess wavy Or">
+                  <div class="escutcheon azure fess-wavy-or"></div>
+                </figure>
+                <figure data-blazon="Or, a bend wavy Sable">
+                  <div class="escutcheon or bend-wavy-sable"></div>
+                </figure>
+                <figure data-blazon="Gules, a chevron wavy Argent">
+                  <div class="escutcheon gules chevron-wavy-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a cross wavy Gules">
+                  <div class="escutcheon argent cross-wavy-gules"></div>
+                </figure>
+                <figure data-blazon="Vert, a pale wavy Argent">
+                  <div class="escutcheon vert pale-wavy-argent"></div>
+                </figure>
+                <figure data-blazon="Azure, a saltire wavy Argent">
+                  <div class="escutcheon azure saltire-wavy-argent"></div>
+                </figure>
+                <figure data-blazon="Or, a chief wavy Azure">
+                  <div class="escutcheon or chief-wavy-azure"></div>
+                </figure>
+                <figure data-blazon="Vert, a pall wavy Or">
+                  <div class="escutcheon vert pall-wavy-or"></div>
+                </figure>
+                <figure data-blazon="Or, a pile wavy Gules">
+                  <div class="escutcheon or pile-wavy-gules"></div>
+                </figure>
+                <figure data-blazon="Sable, a bar wavy Or">
+                  <div class="escutcheon sable bar-wavy-or"></div>
+                </figure>
+                <figure data-blazon="Gules, two bars wavy Or">
+                  <div class="escutcheon gules two-bars-wavy-or"></div>
+                </figure>
+                <figure data-blazon="Purpure, three bars wavy Argent">
+                  <div class="escutcheon purpure three-bars-wavy-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a bend sinister wavy Vert">
+                  <div class="escutcheon argent bend-sinister-wavy-vert"></div>
+                </figure>
+                <figure data-blazon="Argent, a chevron reversed wavy Sable">
+                  <div
+                    class="escutcheon argent chevron-reversed-wavy-sable"
+                  ></div>
+                </figure>
+                <figure data-blazon="Sable, a pall reversed wavy Argent">
+                  <div class="escutcheon sable pall-reversed-wavy-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a pile reversed wavy Purpure">
+                  <div
+                    class="escutcheon argent pile-reversed-wavy-purpure"
+                  ></div>
+                </figure>
+              </div>
+            </div>
+            <div
+              role="tabpanel"
+              id="panel-indented"
+              aria-labelledby="tab-indented"
+              tabindex="0"
+            >
+              <div class="examples">
+                <figure data-blazon="Azure, a fess indented Or">
+                  <div class="escutcheon azure fess-indented-or"></div>
+                </figure>
+                <figure data-blazon="Or, a bend indented Sable">
+                  <div class="escutcheon or bend-indented-sable"></div>
+                </figure>
+                <figure data-blazon="Gules, a chevron indented Argent">
+                  <div class="escutcheon gules chevron-indented-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a cross indented Gules">
+                  <div class="escutcheon argent cross-indented-gules"></div>
+                </figure>
+                <figure data-blazon="Vert, a pale indented Argent">
+                  <div class="escutcheon vert pale-indented-argent"></div>
+                </figure>
+                <figure data-blazon="Azure, a saltire indented Argent">
+                  <div class="escutcheon azure saltire-indented-argent"></div>
+                </figure>
+                <figure data-blazon="Or, a chief indented Azure">
+                  <div class="escutcheon or chief-indented-azure"></div>
+                </figure>
+                <figure data-blazon="Vert, a pall indented Or">
+                  <div class="escutcheon vert pall-indented-or"></div>
+                </figure>
+                <figure data-blazon="Or, a pile indented Gules">
+                  <div class="escutcheon or pile-indented-gules"></div>
+                </figure>
+                <figure data-blazon="Sable, a bar indented Or">
+                  <div class="escutcheon sable bar-indented-or"></div>
+                </figure>
+                <figure data-blazon="Gules, two bars indented Or">
+                  <div class="escutcheon gules two-bars-indented-or"></div>
+                </figure>
+                <figure data-blazon="Purpure, three bars indented Argent">
+                  <div
+                    class="escutcheon purpure three-bars-indented-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a bend sinister indented Vert">
+                  <div
+                    class="escutcheon argent bend-sinister-indented-vert"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a chevron reversed indented Sable">
+                  <div
+                    class="escutcheon argent chevron-reversed-indented-sable"
+                  ></div>
+                </figure>
+                <figure data-blazon="Sable, a pall reversed indented Argent">
+                  <div
+                    class="escutcheon sable pall-reversed-indented-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a pile reversed indented Purpure">
+                  <div
+                    class="escutcheon argent pile-reversed-indented-purpure"
+                  ></div>
+                </figure>
+              </div>
+            </div>
+            <div
+              role="tabpanel"
+              id="panel-embattled"
+              aria-labelledby="tab-embattled"
+              tabindex="0"
+            >
+              <div class="examples">
+                <figure data-blazon="Azure, a fess embattled Or">
+                  <div class="escutcheon azure fess-embattled-or"></div>
+                </figure>
+                <figure data-blazon="Or, a bend embattled Sable">
+                  <div class="escutcheon or bend-embattled-sable"></div>
+                </figure>
+                <figure data-blazon="Gules, a chevron embattled Argent">
+                  <div class="escutcheon gules chevron-embattled-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a cross embattled Gules">
+                  <div class="escutcheon argent cross-embattled-gules"></div>
+                </figure>
+                <figure data-blazon="Vert, a pale embattled Argent">
+                  <div class="escutcheon vert pale-embattled-argent"></div>
+                </figure>
+                <figure data-blazon="Azure, a saltire embattled Argent">
+                  <div class="escutcheon azure saltire-embattled-argent"></div>
+                </figure>
+                <figure data-blazon="Or, a chief embattled Azure">
+                  <div class="escutcheon or chief-embattled-azure"></div>
+                </figure>
+                <figure data-blazon="Vert, a pall embattled Or">
+                  <div class="escutcheon vert pall-embattled-or"></div>
+                </figure>
+                <figure data-blazon="Or, a pile embattled Gules">
+                  <div class="escutcheon or pile-embattled-gules"></div>
+                </figure>
+                <figure data-blazon="Sable, a bar embattled Or">
+                  <div class="escutcheon sable bar-embattled-or"></div>
+                </figure>
+                <figure data-blazon="Gules, two bars embattled Or">
+                  <div class="escutcheon gules two-bars-embattled-or"></div>
+                </figure>
+                <figure data-blazon="Purpure, three bars embattled Argent">
+                  <div
+                    class="escutcheon purpure three-bars-embattled-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a bend sinister embattled Vert">
+                  <div
+                    class="escutcheon argent bend-sinister-embattled-vert"
+                  ></div>
+                </figure>
+                <figure
+                  data-blazon="Argent, a chevron reversed embattled Sable"
+                >
+                  <div
+                    class="escutcheon argent chevron-reversed-embattled-sable"
+                  ></div>
+                </figure>
+                <figure data-blazon="Sable, a pall reversed embattled Argent">
+                  <div
+                    class="escutcheon sable pall-reversed-embattled-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a pile reversed embattled Purpure">
+                  <div
+                    class="escutcheon argent pile-reversed-embattled-purpure"
+                  ></div>
+                </figure>
+              </div>
+              <p>
+                Embattled puts battlements on the upper edge only of a fess,
+                bar, bend or chevron; every other ordinary has them on all its
+                edges.
+              </p>
+            </div>
+            <div
+              role="tabpanel"
+              id="panel-voided"
+              aria-labelledby="tab-voided"
+              tabindex="0"
+            >
+              <div class="examples">
+                <figure data-blazon="Azure, a fess voided Or">
+                  <div class="escutcheon azure fess-voided-or"></div>
+                </figure>
+                <figure data-blazon="Or, a bend voided Sable">
+                  <div class="escutcheon or bend-voided-sable"></div>
+                </figure>
+                <figure data-blazon="Gules, a chevron voided Argent">
+                  <div class="escutcheon gules chevron-voided-argent"></div>
+                </figure>
+                <figure data-blazon="Argent, a cross voided Gules">
+                  <div class="escutcheon argent cross-voided-gules"></div>
+                </figure>
+                <figure data-blazon="Vert, a pale voided Argent">
+                  <div class="escutcheon vert pale-voided-argent"></div>
+                </figure>
+                <figure data-blazon="Azure, a saltire voided Argent">
+                  <div class="escutcheon azure saltire-voided-argent"></div>
+                </figure>
+                <figure data-blazon="Vert, a pall voided Or">
+                  <div class="escutcheon vert pall-voided-or"></div>
+                </figure>
+                <figure data-blazon="Or, a pile voided Gules">
+                  <div class="escutcheon or pile-voided-gules"></div>
+                </figure>
+                <figure data-blazon="Sable, a bar voided Or">
+                  <div class="escutcheon sable bar-voided-or"></div>
+                </figure>
+                <figure data-blazon="Argent, a bend sinister voided Vert">
+                  <div
+                    class="escutcheon argent bend-sinister-voided-vert"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a chevron reversed voided Sable">
+                  <div
+                    class="escutcheon argent chevron-reversed-voided-sable"
+                  ></div>
+                </figure>
+                <figure data-blazon="Sable, a pall reversed voided Argent">
+                  <div
+                    class="escutcheon sable pall-reversed-voided-argent"
+                  ></div>
+                </figure>
+                <figure data-blazon="Argent, a pile reversed voided Purpure">
+                  <div
+                    class="escutcheon argent pile-reversed-voided-purpure"
+                  ></div>
+                </figure>
+              </div>
+              <p>The chief and the two and three bars can't be voided.</p>
+            </div>
           </div>
 
-          <h3 id="lines">Lines</h3>
-          <p>
-            Any ordinary can be <code>engrailed</code>, <code>invected</code>,
-            <code>wavy</code>, <code>indented</code> or <code>embattled</code>;
-            a fess, bar, bend or chevron embattled has battlements on its upper
-            edge only.
-          </p>
-          <div class="examples">
-            <figure data-blazon="Sable, a cross engrailed Argent">
-              <div class="escutcheon sable cross-engrailed-argent"></div>
-            </figure>
-            <figure data-blazon="Argent, a bend wavy Sable">
-              <div class="escutcheon argent bend-wavy-sable"></div>
-            </figure>
-            <figure data-blazon="Or, a chief indented Azure">
-              <div class="escutcheon or chief-indented-azure"></div>
-            </figure>
-            <figure data-blazon="Argent, a cross embattled Gules">
-              <div class="escutcheon argent cross-embattled-gules"></div>
-            </figure>
-            <figure data-blazon="Gules, a chevron invected Or">
-              <div class="escutcheon gules chevron-invected-or"></div>
-            </figure>
-            <figure data-blazon="Erminois, a pile reversed wavy Gules">
-              <div class="escutcheon erminois pile-reversed-wavy-gules"></div>
-            </figure>
-            <figure data-blazon="Azure, three bars wavy Argent">
-              <div class="escutcheon azure three-bars-wavy-argent"></div>
-            </figure>
-            <figure data-blazon="Or, a fess embattled Sable">
-              <div class="escutcheon or fess-embattled-sable"></div>
-            </figure>
-            <figure data-blazon="Argent, a saltire invected Gules">
-              <div class="escutcheon argent saltire-invected-gules"></div>
-            </figure>
-            <figure data-blazon="Or, a cross wavy Azure">
-              <div class="escutcheon or cross-wavy-azure"></div>
-            </figure>
-          </div>
+          <!-- end line tabs -->
 
           <h3 id="combining">Combining</h3>
           <p>
@@ -823,11 +1261,14 @@
             </figure>
           </div>
           <p>
-            <small>
-              <strong>Fun fact:</strong> when a field has plain colours you can
-              refer to its first tincture using <code>-of-the-first</code>, as
-              in the pale above.
-            </small>
+            <strong>
+              <span aria-hidden="true" class="font-serif text-xl leading-none"
+                >☞</span
+              >
+              Fun fact:</strong
+            >
+            when a field has plain colours you can refer to its first tincture
+            using <code>-of-the-first</code>, as in the pale above.
           </p>
 
           <h3 id="fimbriation">Fimbriation</h3>
@@ -1673,23 +2114,23 @@
           </figure>
           <figure
             class="my-12"
-            data-blazon="Barry of ten Argent and Azure, a bordure Gules, on a canton Sable within a bordure Or a bend Argent charged with three mullets Azure, over all an inescutcheon Ermines, a saltire engrailed Or between four plates"
+            data-blazon="Barry of ten Argent and Sable, a bend counterchanged; impaling, per fess, Azure, a cross potent Or, and per fess Gules and Vert, a fess embattled Or, in chief three mullets Argent"
             data-size="w-72"
           >
-            <div class="escutcheon barry-of-ten-argent-azure bordure-gules">
-              <div class="canton sable bend-argent bordure-or">
-                <div class="charges on">
-                  <i class="mullet azure"></i>
-                  <i class="mullet azure"></i>
-                  <i class="mullet azure"></i>
+            <div class="escutcheon per-pale">
+              <div class="barry-of-ten-argent-sable bend-counterchanged"></div>
+              <div class="per-fess">
+                <div class="azure">
+                  <div class="charges">
+                    <i class="cross-potent or"></i>
+                  </div>
                 </div>
-              </div>
-              <div class="inescutcheon ermines saltire-engrailed-or">
-                <div class="charges between">
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
+                <div class="per-fess-gules-vert fess-embattled-or">
+                  <div class="charges in-chief">
+                    <i class="mullet argent"></i>
+                    <i class="mullet argent"></i>
+                    <i class="mullet argent"></i>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1921,6 +2362,62 @@ export default [
         }
       });
 
+      // Style tabs: one panel per line, plus voided, switched with arrow keys.
+      const lineTablist = document.getElementById("lines");
+      const lineTabs = [...lineTablist.querySelectorAll('[role="tab"]')];
+      const linePanels = lineTabs.map((tab) =>
+        document.getElementById(tab.getAttribute("aria-controls")),
+      );
+
+      function selectLine(index, focus) {
+        lineTabs.forEach((tab, i) => {
+          tab.setAttribute("aria-selected", i === index);
+          tab.tabIndex = i === index ? 0 : -1;
+          linePanels[i].hidden = i !== index;
+        });
+        if (focus) {
+          lineTabs[index].focus();
+        }
+        // Keep the tabs either side in view too, so the bar scrolls along at its ends.
+        const previous = lineTabs[index - 1];
+        const next = lineTabs[index + 1];
+        const start = previous ? previous.offsetLeft : 0;
+        const end = next
+          ? next.offsetLeft + next.offsetWidth
+          : lineTablist.scrollWidth;
+        const left = Math.min(start, lineTablist.scrollLeft);
+        lineTablist.scrollLeft = Math.max(left, end - lineTablist.clientWidth);
+      }
+
+      lineTablist.hidden = false;
+      selectLine(0, false);
+      lineTabs.forEach((tab, i) =>
+        tab.addEventListener("click", () => selectLine(i, false)),
+      );
+      lineTablist.addEventListener("keydown", (event) => {
+        const current = lineTabs.indexOf(document.activeElement);
+        const last = lineTabs.length - 1;
+        const target = {
+          ArrowRight: current === last ? 0 : current + 1,
+          ArrowLeft: current === 0 ? last : current - 1,
+          Home: 0,
+          End: last,
+        }[event.key];
+        if (current !== -1 && target !== undefined) {
+          event.preventDefault();
+          selectLine(target, true);
+        }
+      });
+
+      // The sticky tab bar sits just below the header's top row.
+      const headerRow = document.querySelector("header > div:first-child");
+      new ResizeObserver(() => {
+        document.documentElement.style.setProperty(
+          "--header-height",
+          `${headerRow.offsetHeight}px`,
+        );
+      }).observe(headerRow);
+
       // On phones, long groups of examples show only the first few.
       function visibleExamples(total) {
         return Math.min(4, total);
@@ -1940,14 +2437,25 @@ export default [
         const button = document.createElement("button");
         button.type = "button";
         button.className =
-          "sm:hidden group flex items-center justify-center gap-3 w-full -mt-2 mb-10 py-3 bg-azure text-argent text-lg rounded-sm [font-variant-caps:small-caps] tracking-wide cursor-pointer hover:text-or";
+          "show-more sm:hidden group flex items-center justify-center gap-3 w-full -mt-2 mb-10 py-3 bg-azure text-argent text-lg rounded-sm [font-variant-caps:small-caps] tracking-wide cursor-pointer hover:text-or";
         button.innerHTML = `Show ${figures.length - shown} more
           <svg class="size-5 text-or transition-transform group-hover:translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" aria-hidden="true">
             <path d="M5 9l7 7 7-7" />
           </svg>`;
         button.addEventListener("click", () => {
-          delete group.dataset.collapsed;
-          button.remove();
+          // Panels share one height so switching tabs doesn't move the page.
+          const shared = group.closest(".line-tabs")
+            ? document.querySelectorAll(
+                ".line-tabs .examples, .line-tabs .show-more",
+              )
+            : [group, button];
+          for (const item of shared) {
+            if (item.matches(".examples")) {
+              delete item.dataset.collapsed;
+            } else {
+              item.remove();
+            }
+          }
           figures[shown].querySelector("summary").focus();
         });
         group.after(button);
