@@ -26,6 +26,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `gyronny-*` crosses at the fess point, as `per-saltire-*` does, so a
   counterchanged saltire lines up with it.
+- Charges `on` an engrailed or indented ordinary are smaller, and charges
+  `between` a lined bend, pall, or embattled chevron move clear of its edge.
 
 ## [0.7.0] - 2026-11-09
 

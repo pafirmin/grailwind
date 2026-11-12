@@ -155,6 +155,9 @@ export const BETWEEN = {
   pile: { size: 20, points: [[18, 55], [82, 55]] },
 };
 
+// `on` charges shrink on lines that cut deep into the ordinary, by line.
+export const ON_SCALE = { engrailed: 0.8, indented: 0.9 };
+
 // Where charges go for "on", along the ordinary's centre line, by number of charges.
 // prettier-ignore
 export const ON = {
@@ -193,3 +196,42 @@ BETWEEN["chevron-reversed"] = {
   points: [[26, 76], [74, 76], [50, 30]],
   counts: { 6: { size: 12, points: [[26, 78], [50, 89], [74, 78], [40, 28], [60, 28], [50, 16]] } },
 };
+
+// `between` overrides where a line's edge hits a charge, by ordinary and line; the rest falls
+// back to the plain ordinary's. The sinister bend and the reversed pall are mirrored from these.
+// prettier-ignore
+export const BETWEEN_LINED = {
+  bend: {
+    engrailed: { points: [[70, 26], [24, 72]] },
+    invected: { points: [[70, 26], [24, 72]] },
+    wavy: { points: [[70, 26], [24, 72]] },
+    indented: { points: [[70, 26], [24, 72]] },
+  },
+  chevron: {
+    embattled: { counts: { 6: { size: 10, points: [[16, 13], [50, 8], [84, 13], [40, 72], [60, 72], [50, 84]] } } },
+  },
+  "chevron-reversed": {
+    embattled: { points: [[26, 76], [74, 76], [50, 24]] },
+  },
+  pall: {
+    invected: { points: [[50, 8], [18, 56], [82, 56]] },
+    wavy: { points: [[50, 8], [18, 56], [82, 56]] },
+    indented: { points: [[50, 8], [18, 56], [82, 56]] },
+    embattled: { points: [[50, 8], [18, 56], [82, 56]] },
+  },
+};
+
+const mirrorX = (points) => points.map(([x, y]) => [100 - x, y]);
+const mirrorLined = (entry, flip) => ({
+  ...entry,
+  ...(entry.points && { points: flip(entry.points) }),
+  ...(entry.counts && {
+    counts: mapValues(entry.counts, (count) => ({ ...count, points: flip(count.points) })),
+  }),
+});
+BETWEEN_LINED["bend-sinister"] = mapValues(BETWEEN_LINED.bend, (entry) =>
+  mirrorLined(entry, mirrorX),
+);
+BETWEEN_LINED["pall-reversed"] = mapValues(BETWEEN_LINED.pall, (entry) =>
+  mirrorLined(entry, mirror),
+);

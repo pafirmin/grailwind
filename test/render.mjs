@@ -2,7 +2,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { chromium, firefox } from "playwright";
-import { DIVISIONS, lineOrdinaries } from "../data.js";
+import { BETWEEN, DIVISIONS, lineOrdinaries, ON } from "../data.js";
 import { build, root } from "./build.mjs";
 
 const out = join(root, "test", ".render");
@@ -824,6 +824,10 @@ const PROBES = [
   { shield: "sable", inner: { kind: "canton", shield: "argent cross-gules" }, at: onCanton([20, 15]), expect: "argent", why: "the canton between the cross's arms" },
   { shield: "azure", inner: { kind: "canton", shield: "per-bend-or-gules" }, at: onCanton([75, 20]), expect: "or", why: "a divided canton, above the line" },
   { shield: "azure", inner: { kind: "canton", shield: "per-bend-or-gules" }, at: onCanton([20, 75]), expect: "gules", why: "a divided canton, below the line" },
+  // Lined ordinaries (012): just outside the fixed charge, where the plain layout's charge was.
+  { shield: "azure chevron-engrailed-argent", charges: "on", items: Array(3).fill("torteau"), at: [[13.67, 65], [86.33, 65]], expect: "argent", why: "engrailed shrinks the chevron's side charges" },
+  { shield: "azure bend-engrailed-argent", charges: "between", items: Array(2).fill("torteau"), at: [[30, 59], [34, 60]], expect: "azure", why: "the engrailed bend's lower charge is moved off the edge" },
+  { shield: "azure pall-invected-argent", charges: "between", items: Array(3).fill("torteau"), at: [[50, 17], [45, 16]], expect: "azure", why: "the invected pall's top charge is moved off the arms" },
   ...nested("azure", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton"),
   ...nested("azure chief-or", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton, on a shield with a chief"),
   ...nested("azure fess-or", { kind: "canton", shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on a canton, on a shield with a fess"),
@@ -892,6 +896,20 @@ const CONTACT = [
   ),
   ...VOIDED.map(([o]) => ({ shield: `azure ${o}-voided-or` })),
 ];
+// Torteaux on and between every ordinary under every line, to tune ON_SCALE and BETWEEN_LINED by
+// eye: `on` at the largest count, `between` at the default count and at six.
+const torteaux = (n) => Array(n).fill("torteau");
+const LINED_CHARGES = Object.keys(BETWEEN).flatMap((o) =>
+  LINES.filter((line) => !line || lineOrdinaries(line.slice(1)).includes(o)).flatMap((line) => {
+    const shield = `azure ${o}${line}-argent`;
+    const onCount = Math.max(...Object.keys(ON[o].counts).map(Number));
+    const counts = [BETWEEN[o].points.length, ...(BETWEEN[o].counts?.[6] ? [6] : [])];
+    return [
+      { shield, charges: "on", items: torteaux(onCount) },
+      ...counts.map((n) => ({ shield, charges: "between", items: torteaux(n) })),
+    ];
+  }),
+);
 const DIVIDED = DIVISIONS.flatMap((d) => [
   { shield: `${d}-or-azure` },
   { shield: `${d}-ermine-gules` },
@@ -952,7 +970,7 @@ const caption = (spec) =>
 
 // The CSS for every shield the probes and contact sheets draw.
 const buildShields = (dir) => {
-  const specs = [...SHIELDS, ...CONTACT, ...DIVIDED];
+  const specs = [...SHIELDS, ...CONTACT, ...LINED_CHARGES, ...DIVIDED];
   const classes = [...specs.map((s) => markup(s)), ...TINCTURES.map((t) => `<i class="${t}"></i>`)];
   writeFileSync(join(dir, "index.html"), classes.join("\n"));
   return build({ dir });
@@ -1061,6 +1079,7 @@ try {
       try {
         await contactSheet(page, css, CONTACT, 9, `contact-${name}.png`);
         await contactSheet(page, css, CHARGED, 8, `charges-${name}.png`);
+        await contactSheet(page, css, LINED_CHARGES, 6, `charges-lined-${name}.png`);
         await contactSheet(page, css, NESTED, 6, `inescutcheons-${name}.png`);
         await contactSheet(page, css, PLAIN, 8, `probes-${name}.png`);
         await contactSheet(page, css, DIVIDED, 8, `divisions-${name}.png`);

@@ -56,6 +56,8 @@ const CLASSES = [
 
 // Rules without a plain `.class {` selector, checked by pattern.
 const PATTERNS = {
+  "engrailed shrinks the chevron's on charges": /\.chevron-engrailed-or \{[^}]*--on-size: 12%;/,
+  "wavy leaves them": /\.chevron-wavy-or \{[^}]*--on-size: 15%;/,
   "bend-or publishes on points": /\.bend-or \{[^}]*--on-3-2-x: 50%;/,
   "on reads them, with a fallback":
     /\.on:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: var\(--on-3-1-x, 28%\);/,

@@ -4,11 +4,13 @@
 import plugin from "tailwindcss/plugin";
 import {
   BETWEEN,
+  BETWEEN_LINED,
   FURS,
   LINES as LINE_NAMES,
   lineOrdinaries,
   OF_THE_FIRST,
   ON,
+  ON_SCALE,
   REVERSIBLE,
   TINCTURES,
   VOIDABLE,
@@ -648,8 +650,15 @@ const betweenVars = ({ size, points, counts = {} }) => {
   return vars;
 };
 
-const onVars = ({ size, counts }) => {
-  const vars = { "--on-size": `${size}%` };
+// The plain ordinary's `between` layout, with a line's overrides on top.
+const mergeLined = (ordinary, line) => {
+  const plain = BETWEEN[ordinary];
+  const lined = BETWEEN_LINED[ordinary]?.[line];
+  return lined ? { ...plain, ...lined, counts: { ...plain.counts, ...lined.counts } } : plain;
+};
+
+const onVars = ({ size, counts }, scale = 1) => {
+  const vars = { "--on-size": `${+(size * scale).toFixed(2)}%` };
   for (const [count, points] of Object.entries(counts)) {
     points.forEach(([left, top], i) => {
       vars[`--on-${count}-${i + 1}-x`] = `${left}%`;
@@ -666,6 +675,12 @@ const layoutVars = () => {
   for (const division of Object.values(BETWEEN)) {
     const vars = betweenVars(division);
     allVars.push(...Object.keys(vars));
+  }
+
+  for (const [ordinary, lines] of Object.entries(BETWEEN_LINED)) {
+    for (const line of Object.keys(lines)) {
+      allVars.push(...Object.keys(betweenVars(mergeLined(ordinary, line))));
+    }
   }
 
   for (const division of Object.values(ON)) {
@@ -706,11 +721,11 @@ export default plugin(({ addBase, addUtilities, theme }) => {
 
   // Isolated, so an ordinary in a quarter paints under the shield's own ordinary.
   // The chief's ::after stays unraised, so charges on it stay on top.
-  const ordinaryRules = (ordinary, pseudo) => ({
+  const ordinaryRules = (ordinary, pseudo, line) => ({
     position: "relative",
     isolation: "isolate",
-    ...(BETWEEN[ordinary] && betweenVars(BETWEEN[ordinary])),
-    ...(ON[ordinary] && onVars(ON[ordinary])),
+    ...(BETWEEN[ordinary] && betweenVars(mergeLined(ordinary, line))),
+    ...(ON[ordinary] && onVars(ON[ordinary], ON_SCALE[line] ?? 1)),
     // With a chief, everything else is drawn in the field below it.
     ...(ordinary === "chief" && {
       "--field-top": "30%",
@@ -791,11 +806,15 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         if (!lineOrdinaries(name).includes(ordinary)) {
           continue;
         }
-        utilities[`.${ordinary}-${name}-${tincture}`] = ordinaryRules(ordinary, {
-          ...placed,
-          "background-color": colour,
-          "clip-path": lined(name, line),
-        });
+        utilities[`.${ordinary}-${name}-${tincture}`] = ordinaryRules(
+          ordinary,
+          {
+            ...placed,
+            "background-color": colour,
+            "clip-path": lined(name, line),
+          },
+          name,
+        );
       }
     }
 
@@ -810,10 +829,14 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         if (!lineOrdinaries(name).includes(ordinary)) {
           continue;
         }
-        utilities[`.${ordinary}-${name}-${fur}`] = ordinaryRules(ordinary, {
-          ...pseudo,
-          "clip-path": lined(name, line),
-        });
+        utilities[`.${ordinary}-${name}-${fur}`] = ordinaryRules(
+          ordinary,
+          {
+            ...pseudo,
+            "clip-path": lined(name, line),
+          },
+          name,
+        );
       }
     }
 
