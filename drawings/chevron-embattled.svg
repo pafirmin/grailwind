@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 100 120"
+   width="500"
+   height="600"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="chevron-embattled.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <inkscape:path-effect
+       center_point="50,64.19"
+       end_point="50,117.6"
+       start_point="50,10.78"
+       effect="mirror_symmetry"
+       id="path-effect1"
+       is_visible="true"
+       lpeversion="1.2"
+       lpesatellites=""
+       mode="free"
+       discard_orig_path="false"
+       fuse_paths="true"
+       oposite_fuse="false"
+       split_items="false"
+       split_open="false"
+       link_styles="false" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.71615687"
+     inkscape:cx="82.384185"
+     inkscape:cy="314.17698"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="outline-layer" />
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="FD Fig. 130"
+     id="fd"
+     sodipodi:insensitive="true">
+    <image
+       xlink:href="../reference/fox-davies/images/fig130.png"
+       x="110"
+       y="0"
+       width="100"
+       height="123"
+       id="image1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="guide"
+     id="guide"
+     sodipodi:insensitive="true">
+    <path
+       d="M 50 26.4 L 100 86.4 L 100 117.6 L 50 57.6 L 0 117.6 L 0 86.4 Z"
+       fill="none"
+       stroke="#888"
+       stroke-width="0.3"
+       id="path1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="outline"
+     id="outline-layer">
+    <path
+       id="outline"
+       d="M 50 57.6 L 0 117.6 L 0 78.46 L 3.91 81.71 L 11.59 72.49 L 6.21 68.01 L 13.89 58.79 L 19.27 63.27 L 26.95 54.06 L 21.58 49.57 L 29.26 40.36 L 34.64 44.84 L 42.32 35.62 L 36.94 31.14 L 50 15.47 L 63.06 31.14 L 57.68 35.62 L 65.36 44.84 L 70.74 40.36 L 78.42 49.57 L 73.05 54.06 L 80.73 63.27 L 86.11 58.79 L 93.79 68.01 L 88.41 72.49 L 96.09 81.71 L 100 78.46 L 100 117.6 Z"
+       fill="#cc3333"
+       fill-opacity="0.5"
+       stroke="#000000"
+       stroke-width="0.3"
+       inkscape:path-effect="#path-effect1"
+       inkscape:original-d="M 50 57.6 L 0 117.6 L 0 78.46 L 3.91 81.71 L 11.59 72.49 L 6.21 68.01 L 13.89 58.79 L 19.27 63.27 L 26.95 54.06 L 21.58 49.57 L 29.26 40.36 L 34.64 44.84 L 42.32 35.62 L 36.94 31.14 L 50 15.47" />
+  </g>
+</svg>

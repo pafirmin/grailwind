@@ -51,7 +51,7 @@ const CLASSES = [
   "chief-pean",
   "cross-engrailed-erminois",
   "fess-wavy-or",
-  "chevron-indented-or",
+  "pall-indented-or",
 ];
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -177,16 +177,16 @@ const PATTERNS = {
 };
 
 const EXPECTED = {
-  // Indented waits for the cornered ordinaries' artwork (064).
+  // A cornered ordinary takes indented, drawn by hand (064).
   "grailwind.css": {
     "bg-blue-500": true,
     "per-pale-ermine-ermines": false,
-    "chevron-indented-or": false,
+    "pall-indented-or": true,
   },
   "strict.css": {
     "bg-blue-500": false,
     "per-pale-ermine-ermines": false,
-    "chevron-indented-or": false,
+    "pall-indented-or": true,
   },
 };
 

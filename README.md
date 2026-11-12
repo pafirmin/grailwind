@@ -61,8 +61,7 @@ tinctures replace Tailwind's colours entirely.
   `per-pale`, `per-fess` and `quarterly` for layout.
 - **Ordinaries:** `fess-or`, `chevron-gules`, `cross-argent`, `chief-azure`,
   `two-bars-or` and more, with `fimbriated-*` for a narrow border,
-  `fess-engrailed-or` and the like for an engrailed, invected or wavy edge
-  (indented or embattled on the pale, fess, bars, bend and chief),
+  `fess-engrailed-or` and the like for an engrailed, invected, wavy, indented or embattled edge,
   `cross-voided-argent` and the like to show the field through it,
   `pile-reversed-or` (also the chevron and pall) to turn one upside down,
   `chief-ermine` and the like in a fur, or `chevron-counterchanged` and the like

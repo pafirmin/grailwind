@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 100 120"
+   width="500"
+   height="600"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="pile-indented.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <inkscape:path-effect
+       effect="mirror_symmetry"
+       start_point="50,0"
+       end_point="50,120"
+       center_point="50,60"
+       id="path-effect1"
+       is_visible="true"
+       lpeversion="1.2"
+       lpesatellites=""
+       mode="vertical"
+       discard_orig_path="false"
+       fuse_paths="true"
+       oposite_fuse="false"
+       split_items="false"
+       split_open="false"
+       link_styles="false" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.55872513"
+     inkscape:cx="834.04159"
+     inkscape:cy="17.897888"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="outline-layer" />
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="FD Fig. 188"
+     id="fd"
+     sodipodi:insensitive="true">
+    <image
+       xlink:href="../reference/fox-davies/images/fig188.png"
+       x="110"
+       y="0"
+       width="100"
+       height="123"
+       id="image1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="guide"
+     id="guide"
+     sodipodi:insensitive="true">
+    <path
+       d="M 0 0 L 16.35 0 L 50 36.34 L 83.65 0 L 100 0 L 100 17.66 L 66.35 54 L 100 90.34 L 100 120 L 94.76 120 L 50 71.66 L 5.24 120 L 0 120 L 0 90.34 L 33.65 54 L 0 17.66 Z"
+       fill="none"
+       stroke="#888"
+       stroke-width="0.3"
+       id="path1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="outline"
+     id="outline-layer">
+    <path
+       id="outline"
+       d="M 50,40.34 L 47.26,28.43 L 38.11,28.43 L 38.11,18.55 L 28.96,18.55 L 28.96,8.67 L 19.81,8.67 L 19.81,0 L 0,0 L 0,21.39 L 8.03,21.39 L 8.03,31.27 L 17.18,31.27 L 17.18,41.15 L 26.33,41.15 L 26.33,51.04 L 37.35,54 L 26.33,56.96 L 26.33,66.85 L 17.18,66.85 L 17.18,76.73 L 8.03,76.73 L 8.03,86.61 L 0,86.61 L 0,120 L 9.64,120 L 10.66,119.09 L 10.66,109.21 L 19.81,109.21 L 19.81,99.33 L 28.96,99.33 L 28.96,89.45 L 38.11,89.45 L 38.11,79.57 L 47.26,79.57 L 50,67.66 L 52.74,79.57 L 61.89,79.57 L 61.89,89.45 L 71.04,89.45 L 71.04,99.33 L 80.19,99.33 L 80.19,109.21 L 89.34,109.21 L 89.34,119.09 L 90.36,120 L 100,120 L 100,86.61 L 91.97,86.61 L 91.97,76.73 L 82.82,76.73 L 82.82,66.85 L 73.67,66.85 L 73.67,56.96 L 62.65,54 L 73.67,51.04 L 73.67,41.15 L 82.82,41.15 L 82.82,31.27 L 91.97,31.27 L 91.97,21.39 L 100,21.39 L 100,0 L 80.19,0 L 80.19,8.67 L 71.04,8.67 L 71.04,18.55 L 61.89,18.55 L 61.89,28.43 L 52.74,28.43 Z"
+       fill="#cc3333"
+       fill-opacity="0.5"
+       stroke="#000000"
+       stroke-width="0.3"
+       inkscape:path-effect="#path-effect1"
+       inkscape:original-d="M 50,40.34 L 47.26,28.43 L 38.11,28.43 L 38.11,18.55 L 28.96,18.55 L 28.96,8.67 L 19.81,8.67 L 19.81,0 L 0,0 L 0,21.39 L 8.03,21.39 L 8.03,31.27 L 17.18,31.27 L 17.18,41.15 L 26.33,41.15 L 26.33,51.04 L 37.35,54 L 26.33,56.96 L 26.33,66.85 L 17.18,66.85 L 17.18,76.73 L 8.03,76.73 L 8.03,86.61 L 0,86.61 L 0,120 L 9.64,120 L 10.66,119.09 L 10.66,109.21 L 19.81,109.21 L 19.81,99.33 L 28.96,99.33 L 28.96,89.45 L 38.11,89.45 L 38.11,79.57 L 47.26,79.57 L 50,67.66" />
+  </g>
+</svg>

@@ -2,6 +2,7 @@
 // through an SVG path to a CSS shape().
 import { convertPath, outlineOf, parseName } from "../drawings/build.mjs";
 import { lineOrdinaries } from "../data.js";
+import { PATHS } from "../paths.js";
 import {
   draftOutline,
   DRAWN,
@@ -174,6 +175,11 @@ check(
     () => outlineOf(svg("", 'transform="translate(1,2)"'), "x.svg"),
     "Store transformation: Optimized",
   ),
+);
+
+check(
+  "the chevron embattled isn't flipped onto the chevron reversed's outer edges",
+  !("chevron-reversed-embattled" in DRAWN) || "chevron-reversed-embattled" in PATHS,
 );
 
 // The generator can't draw these lines round a corner, so a cornered ordinary takes them only

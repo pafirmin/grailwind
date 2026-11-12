@@ -232,6 +232,10 @@ const PROBES = [
   { shield: "azure bend-sinister-engrailed-or", at: [41.9, 41.3], expect: "azure", why: "a bite in the bend sinister" },
   { shield: "azure chevron-engrailed-or", at: [20.56, 75.21], expect: "azure", why: "a bite in the chevron" },
   { shield: "azure cross-engrailed-or", at: [81, 36.9], expect: "azure", why: "a bite in the cross" },
+  // Drawn (drawings/cross-engrailed.svg), after FD Fig. 156: each inner corner is one round
+  // scallop of radius 5 on the plain corner, a knob of field wrapping it.
+  { shield: "azure cross-engrailed-or", at: [[40, 36.67], [60, 36.67], [40, 53.33], [60, 53.33]], expect: "azure", why: "a round knob of field at each of the cross engrailed's inner corners" },
+  { shield: "azure cross-engrailed-or", at: [[44, 40], [56, 40], [44, 50], [56, 50]], expect: "or", why: "the cross engrailed solid beyond each corner's knob" },
   { shield: "azure saltire-engrailed-or", at: [85.79, 65.15], expect: "azure", why: "a bite in the saltire" },
   { shield: "azure pall-engrailed-or", at: [12.5, 22.1], expect: "azure", why: "a bite in the pall" },
   { shield: "azure pall-engrailed-or", at: [52.5, 34], expect: "or", why: "the pall engrailed is solid at its junction" },
@@ -366,6 +370,55 @@ const PROBES = [
   { shield: "azure pile-reversed-embattled-or", at: [[26.55, 71.36], [73.45, 71.36]], expect: "azure", why: "a crenel on each side of the pile reversed, opposite" },
   { shield: "azure pile-reversed-embattled-or", at: [50, 18.5], expect: "or", why: "the embattled pile reversed ends in a plain point" },
   { shield: "azure pile-reversed-embattled-or", at: [50, 14], expect: "azure", why: "no sliver above the embattled pile reversed's tip" },
+  // Drawn (drawings/pile-indented.svg), after FD Fig. 147: right-angled teeth 13.24 along, point
+  // opposite point, ending in a kite and a tip at (50, 104.91).
+  { shield: "azure pile-indented-or", at: [[30.44, 37.84], [69.56, 37.84]], expect: "or", why: "a point on each side of the pile indented, opposite" },
+  { shield: "azure pile-indented-or", at: [[33.96, 42.7], [66.04, 42.7]], expect: "azure", why: "a notch on each side of the pile indented, opposite" },
+  { shield: "azure pile-indented-or", at: [[45.5, 74.58], [54.5, 74.58]], expect: "azure", why: "the notches at the neck of the pile indented's kite" },
+  { shield: "azure pile-indented-or", at: [50, 81.67], expect: "or", why: "the pile indented's kite" },
+  { shield: "azure pile-indented-or", at: [50, 90], expect: "azure", why: "nothing below the pile indented's tip" },
+  { shield: "azure pile-reversed-indented-or", at: [50, 18.33], expect: "or", why: "the pile reversed indented's kite" },
+  { shield: "azure pile-reversed-indented-or", at: [50, 10], expect: "azure", why: "nothing above the pile reversed indented's tip" },
+  // Drawn (drawings/chevron-embattled.svg), after FD Fig. 130: merlons 12 along and 7 out from the
+  // upper edges, crenels on them, and a tower on the peak where the merlon tops meet.
+  { shield: "azure chevron-embattled-or", at: [[28.11, 39.33], [71.89, 39.33]], expect: "or", why: "a merlon on each upper edge of the chevron, opposite" },
+  { shield: "azure chevron-embattled-or", at: [[20.43, 47.02], [79.57, 47.02]], expect: "azure", why: "a crenel on each upper edge of the chevron, opposite" },
+  { shield: "azure chevron-embattled-or", at: [50, 16.67], expect: "or", why: "the tower on the chevron embattled's peak" },
+  { shield: "azure chevron-embattled-or", at: [50, 10], expect: "azure", why: "nothing above the chevron embattled's tower" },
+  { shield: "azure chevron-embattled-or", at: [[25, 71.25], [75, 71.25]], expect: "or", why: "a chevron embattled is plain below, inside" },
+  { shield: "azure chevron-embattled-or", at: [[25, 74.75], [75, 74.75]], expect: "azure", why: "a chevron embattled is plain below" },
+  // Drawn (drawings/chevron-reversed-embattled.svg), with no FD figure: the chevron's merlons on the
+  // inner V, which faces up, and crenel floors meeting in the valley at (50, 62.4).
+  { shield: "azure chevron-reversed-embattled-or", at: [[41.17, 38.62], [58.83, 38.62]], expect: "or", why: "a merlon on each inner edge of the chevron reversed, opposite" },
+  { shield: "azure chevron-reversed-embattled-or", at: [[33.49, 30.93], [66.51, 30.93]], expect: "azure", why: "a crenel on each inner edge of the chevron reversed, opposite" },
+  { shield: "azure chevron-reversed-embattled-or", at: [50, 45.83], expect: "azure", why: "the crenel in the chevron reversed embattled's valley" },
+  { shield: "azure chevron-reversed-embattled-or", at: [50, 55], expect: "or", why: "the chevron reversed embattled under its valley" },
+  { shield: "azure chevron-reversed-embattled-or", at: [[25, 50], [75, 50]], expect: "or", why: "a chevron reversed embattled is plain below, inside" },
+  { shield: "azure chevron-reversed-embattled-or", at: [[25, 56.25], [75, 56.25]], expect: "azure", why: "a chevron reversed embattled is plain below" },
+  // Drawn (drawings/chevron-wavy.svg), after FD Fig. 133: an ogee, its peaks at y 28.14 and 60.81 on
+  // the centre line; at x 25 the band runs from y 54.3 to 91.9.
+  { shield: "azure chevron-wavy-or", at: [50, 33.33], expect: "or", why: "the wavy chevron's peak" },
+  { shield: "azure chevron-wavy-or", at: [50, 20.83], expect: "azure", why: "nothing above the wavy chevron's peak" },
+  { shield: "azure chevron-wavy-or", at: [50, 53.33], expect: "azure", why: "the field under the wavy chevron's inner peak" },
+  { shield: "azure chevron-wavy-or", at: [[25, 62.33], [75, 62.33]], expect: "or", why: "the wavy chevron's arms, opposite" },
+  { shield: "azure chevron-wavy-or", at: [[25, 41.67], [75, 41.67], [25, 79.6], [75, 79.6]], expect: "azure", why: "the field either side of the wavy chevron's arms" },
+  { shield: "azure chevron-wavy-or", at: [[34, 65.56], [66, 65.56]], expect: "or", why: "the wavy chevron's arms sweep low inside, after FD" },
+  { shield: "azure chevron-reversed-wavy-or", at: [[34, 34.44], [66, 34.44]], expect: "or", why: "the wavy chevron reversed's arms sweep high inside, after FD" },
+  { shield: "azure chevron-reversed-wavy-or", at: [50, 66.67], expect: "or", why: "the wavy chevron reversed's point" },
+  { shield: "azure chevron-reversed-wavy-or", at: [50, 79.17], expect: "azure", why: "nothing below the wavy chevron reversed's point" },
+  { shield: "azure chevron-reversed-wavy-or", at: [[25, 37.67], [75, 37.67]], expect: "or", why: "the wavy chevron reversed's arms, opposite" },
+  // Drawn (drawings/chevron-indented.svg), after FD Fig. 132: level stairs 9.15 along and 11 down, a
+  // pinnacle on each peak, and the inner edge the outer one moved down 31.2, pinnacle under pinnacle.
+  { shield: "azure chevron-indented-or", at: [50, 28.33], expect: "or", why: "the chevron indented's pinnacle" },
+  { shield: "azure chevron-indented-or", at: [50, 18.33], expect: "azure", why: "nothing above the chevron indented's pinnacle" },
+  { shield: "azure chevron-indented-or", at: [50, 53.33], expect: "azure", why: "the field's pinnacle under the chevron indented" },
+  { shield: "azure chevron-indented-or", at: [[38, 35], [62, 35]], expect: "or", why: "a step on each upper edge of the chevron indented, opposite" },
+  { shield: "azure chevron-indented-or", at: [[32.5, 36.67], [67.5, 36.67]], expect: "azure", why: "the field beside each upper step, opposite" },
+  { shield: "azure chevron-indented-or", at: [[32.5, 63.33], [67.5, 63.33]], expect: "or", why: "a step on each lower edge of the chevron indented, opposite" },
+  { shield: "azure chevron-indented-or", at: [[41, 60.83], [59, 60.83]], expect: "azure", why: "the field under each lower step, opposite" },
+  { shield: "azure chevron-reversed-indented-or", at: [50, 71.67], expect: "or", why: "the chevron reversed indented's pinnacle" },
+  { shield: "azure chevron-reversed-indented-or", at: [50, 81.67], expect: "azure", why: "nothing below the chevron reversed indented's pinnacle" },
+  { shield: "azure chevron-reversed-indented-or", at: [[38, 65], [62, 65]], expect: "or", why: "a step on each lower edge of the chevron reversed indented, opposite" },
   // Drawn (drawings/cross-indented.svg), after FD Fig. 159: point opposite point across the limb and
   // across each arm. Turns every 5.9, 3.4 either side of the plain edge.
   { shield: "azure cross-indented-or", at: [[36.5, 19.67], [63.5, 19.67]], expect: "or", why: "a point on each side of the cross's limb, opposite" },
@@ -373,6 +426,59 @@ const PROBES = [
   { shield: "azure cross-indented-or", at: [[17.7, 33.75], [17.7, 56.25], [82.3, 33.75], [82.3, 56.25]], expect: "or", why: "a point on each edge of the cross's arms, opposite" },
   { shield: "azure cross-indented-or", at: [[11.8, 36.25], [11.8, 53.75], [88.2, 36.25], [88.2, 53.75]], expect: "azure", why: "a notch on each edge of the cross's arms, opposite" },
   { shield: "azure cross-indented-or", at: [[42, 38.33], [58, 38.33], [42, 51.67], [58, 51.67]], expect: "or", why: "the cross indented is solid inside its corners" },
+  // Drawn (drawings/cross-embattled.svg), after FD Fig. 158: merlon opposite merlon, 10.4 along and 7
+  // out, centred on the plain edges. Counted out from a crenel in each inner corner.
+  { shield: "azure cross-embattled-or", at: [[36.5, 25], [63.5, 25]], expect: "or", why: "a merlon on each side of the cross's limb, opposite" },
+  { shield: "azure cross-embattled-or", at: [[36.5, 16.25], [63.5, 16.25]], expect: "azure", why: "a crenel on each side of the cross's limb, opposite" },
+  { shield: "azure cross-embattled-or", at: [[26, 33.75], [26, 56.25], [74, 33.75], [74, 56.25]], expect: "or", why: "a merlon on each edge of the cross's arms, opposite" },
+  { shield: "azure cross-embattled-or", at: [[38, 35], [62, 35], [38, 55], [62, 55]], expect: "azure", why: "a crenel in each of the cross embattled's inner corners" },
+  { shield: "azure cross-embattled-or", at: [[5, 33.75], [95, 33.75]], expect: "or", why: "the cross embattled's arms end on a merlon" },
+  { shield: "azure cross-embattled-or", at: [[39, 96.83], [61, 96.83]], expect: "or", why: "a third merlon just showing in base" },
+  // Drawn (drawings/pall-embattled.svg), after the saltire embattled: merlons 10.4 along and 7 out,
+  // centred, counted out from a crenel in each inner corner, the foot's corners included.
+  { shield: "azure pall-embattled-or", at: [[41.17, 19.08], [58.83, 19.08]], expect: "or", why: "a merlon on the inner edge of each arm of the pall, opposite" },
+  { shield: "azure pall-embattled-or", at: [[33.67, 13.07], [66.33, 13.07]], expect: "azure", why: "a crenel on the inner edge of each arm of the pall, opposite" },
+  { shield: "azure pall-embattled-or", at: [[27.82, 36.13], [72.18, 36.13]], expect: "or", why: "a merlon on the flank edge of each arm of the pall, opposite" },
+  { shield: "azure pall-embattled-or", at: [[20.32, 30.13], [79.68, 30.13]], expect: "azure", why: "a crenel on the flank edge of each arm of the pall, opposite" },
+  { shield: "azure pall-embattled-or", at: [[36.5, 56], [63.5, 56]], expect: "or", why: "a merlon on each side of the pall's foot, opposite" },
+  { shield: "azure pall-embattled-or", at: [[36.5, 64.67], [63.5, 64.67]], expect: "azure", why: "a crenel on each side of the pall's foot, opposite" },
+  { shield: "azure pall-embattled-or", at: [[50, 27.5], [39.5, 44.58], [60.5, 44.58]], expect: "azure", why: "a crenel in each of the pall embattled's inner corners" },
+  { shield: "azure pall-reversed-embattled-or", at: [[36.5, 44], [63.5, 44]], expect: "or", why: "a merlon on each side of the pall reversed's foot, opposite" },
+  { shield: "azure pall-reversed-embattled-or", at: [50, 72.5], expect: "azure", why: "a crenel in the pall reversed embattled's inner corner" },
+  // Drawn (drawings/pall-wavy.svg): one wavy band from dexter chief bending into base, the sinister
+  // arm its mirror laid over it, the corners where their edges cross. Spots from a pixel diff
+  // against the generated pall, solid for 3 px around.
+  { shield: "azure pall-wavy-or", at: [[62, 86.67], [37, 65.42], [71, 37.08], [73, 7.5]], expect: "or", why: "the pall wavy's bands, where the generated pall's lie elsewhere" },
+  { shield: "azure pall-wavy-or", at: [[37.5, 86.67], [61.5, 64.17], [89.5, 22.08]], expect: "azure", why: "the field beside the pall wavy's bands, where the generated pall's lie" },
+  { shield: "azure pall-wavy-or", at: [50, 23.33], expect: "azure", why: "the field above the pall wavy's top corner" },
+  { shield: "azure pall-wavy-or", at: [50, 33.33], expect: "or", why: "the pall wavy below its top corner" },
+  { shield: "azure pall-reversed-wavy-or", at: [[62, 13.33], [37, 34.58]], expect: "or", why: "the pall reversed wavy's bands, flipped" },
+  { shield: "azure pall-reversed-wavy-or", at: [[37.5, 13.33], [61.5, 35.83]], expect: "azure", why: "the field beside the pall reversed wavy's bands" },
+  // Drawn (drawings/pall-indented.svg): the saltire indented's stairs on the arms and its dart in
+  // the top corner, the cross indented's teeth on the foot, and a shared notch at each lower corner.
+  { shield: "azure pall-indented-or", at: [[36, 15], [64, 15]], expect: "or", why: "a step on the inner edge of each arm of the pall indented" },
+  { shield: "azure pall-indented-or", at: [[40.5, 17.5], [59.5, 17.5]], expect: "azure", why: "the field beside each inner step of the pall indented" },
+  { shield: "azure pall-indented-or", at: [[34.5, 41.17], [65.5, 41.17]], expect: "or", why: "a step on the flank edge of each arm of the pall indented" },
+  { shield: "azure pall-indented-or", at: [[30, 38.75], [70, 38.75]], expect: "azure", why: "the field beside each flank step of the pall indented" },
+  { shield: "azure pall-indented-or", at: [[36.6, 57.8], [63.4, 57.8]], expect: "or", why: "a point on each side of the pall's foot, opposite" },
+  { shield: "azure pall-indented-or", at: [[39.4, 62.72], [60.6, 62.72]], expect: "azure", why: "a notch on each side of the pall's foot, opposite" },
+  { shield: "azure pall-indented-or", at: [50, 23.33], expect: "azure", why: "the dart of field in the pall indented's top corner" },
+  { shield: "azure pall-reversed-indented-or", at: [[36.6, 42.2], [63.4, 42.2]], expect: "or", why: "a point on each side of the pall reversed's foot, opposite" },
+  { shield: "azure pall-reversed-indented-or", at: [50, 76.67], expect: "azure", why: "the dart of field in the pall reversed indented's corner" },
+  // Drawn (drawings/saltire-indented.svg), after FD Fig. 188: level treads 9.15 along and risers 9.88
+  // up each arm, and a dart of field 5.5 wide in each inner corner, its tip 4 past the plain corner.
+  { shield: "azure saltire-indented-or", at: [[36, 17.5], [64, 17.5], [36, 72.5], [64, 72.5]], expect: "or", why: "a step on the inner edge of each arm of the saltire indented" },
+  { shield: "azure saltire-indented-or", at: [[40.5, 20], [59.5, 20], [40.5, 70], [59.5, 70]], expect: "azure", why: "the field beside each inner step of the saltire indented" },
+  { shield: "azure saltire-indented-or", at: [[19.5, 32.33], [80.5, 32.33], [19.5, 57.67], [80.5, 57.67]], expect: "or", why: "a step on the flank edge of each arm of the saltire indented" },
+  { shield: "azure saltire-indented-or", at: [[14.8, 30], [85.2, 30], [14.8, 60], [85.2, 60]], expect: "azure", why: "the field beside each flank step of the saltire indented" },
+  { shield: "azure saltire-indented-or", at: [[50, 26.67], [31, 45], [69, 45], [50, 63.33]], expect: "azure", why: "a dart of field in each of the saltire indented's inner corners" },
+  // Drawn (drawings/saltire-embattled.svg), after FD Fig. 187: the cross's rule along each arm,
+  // merlons 10.4 along and 7 out, centred, counted out from a crenel in each inner corner.
+  { shield: "azure saltire-embattled-or", at: [[41.97, 23.05], [58.03, 23.05], [41.97, 66.95], [58.03, 66.95]], expect: "or", why: "a merlon on the inner edge of each arm of the saltire, opposite" },
+  { shield: "azure saltire-embattled-or", at: [[34.9, 16.69], [65.1, 16.69], [34.9, 73.31], [65.1, 73.31]], expect: "azure", why: "a crenel on the inner edge of each arm of the saltire, opposite" },
+  { shield: "azure saltire-embattled-or", at: [[25.25, 37.44], [74.75, 37.44], [25.25, 52.56], [74.75, 52.56]], expect: "or", why: "a merlon on the flank edge of each arm of the saltire, opposite" },
+  { shield: "azure saltire-embattled-or", at: [[18.18, 31.08], [81.82, 31.08], [18.18, 58.92], [81.82, 58.92]], expect: "azure", why: "a crenel on the flank edge of each arm of the saltire, opposite" },
+  { shield: "azure saltire-embattled-or", at: [[50, 32.5], [36, 45], [64, 45], [50, 57.5]], expect: "azure", why: "a crenel in each of the saltire embattled's inner corners" },
   { shield: "gules pile-reversed-azure fimbriated-argent", at: [[31.03, 60], [68.97, 60], [50, 12]], expect: "argent", why: "the pile reversed's fimbriation, on each side and above the tip" },
   { shield: "gules pile-reversed-azure fimbriated-argent", at: [[34.03, 60], [65.97, 60], [50, 99], [50, 70], [50, 40], [50, 20]], expect: "azure", why: "the pile reversed itself, just inside each side and up its centre line" },
   { shield: "gules pile-reversed-azure fimbriated-argent", at: [[27.88, 60], [72.12, 60], [20, 20]], expect: "gules", why: "the field beyond the pile reversed's fimbriation" },

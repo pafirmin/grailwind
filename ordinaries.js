@@ -618,13 +618,14 @@ const flipPath = (segments) =>
   });
 
 // Drawn shapes by `ordinary-line`, each reversible one also upside down as `ordinary-reversed-line`
-// unless it was drawn too.
+// unless it was drawn too. Upper-only battlements would flip onto the lower edges, so those aren't.
 const DRAWN = { ...PATHS };
 for (const key of Object.keys(PATHS)) {
   const name = LINE_NAMES.find((line) => key.endsWith(`-${line}`));
   const ordinary = key.slice(0, -name.length - 1);
   const reversedKey = `${ordinary}-reversed-${name}`;
-  if (REVERSIBLE.includes(ordinary) && !(reversedKey in PATHS)) {
+  const upperOnly = name === "embattled" && UPPER_ONLY.includes(ordinary);
+  if (REVERSIBLE.includes(ordinary) && !upperOnly && !(reversedKey in PATHS)) {
     DRAWN[reversedKey] = flipPath(PATHS[key]);
   }
 }

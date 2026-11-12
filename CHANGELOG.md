@@ -8,9 +8,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Indented and embattled ordinaries on the pale, fess, bars, bend and chief,
-  e.g. `chief-indented-azure` and `fess-embattled-sable`. A fess, bar or bend
-  embattled has battlements on its upper edge only.
+- Indented and embattled ordinaries, e.g. `chief-indented-azure` and
+  `cross-embattled-gules`. A fess, bar, bend or chevron embattled has
+  battlements on its upper edge only. The chevron, cross, saltire, pall and
+  pile take them with hand-drawn corners.
 
 ### Changed
 
@@ -18,6 +19,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   of the shield), the cross's limbs are equal, the saltire is wider and crosses
   at the fess point (as does `per-saltire-*`), and the pile is wider. The
   pall's arms and foot are equal, and its arms meet above the fess point.
+- The wavy chevron and pall, and the engrailed cross and pile, are hand-drawn,
+  with clean corners and tips.
 
 ## [0.7.0] - 2026-11-09
 
