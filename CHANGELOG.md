@@ -10,6 +10,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Counterchanged charges `on` a counterchanged ordinary showed the ordinary's
   swapped field and vanished. They now show the field's own tinctures.
+- `chevronny-*` in a part of a split shield (a `per-pale` half, a `per-fess`
+  chief) broke at the centre line. It now follows the part, as `per-chevron`
+  does, and the arms meet.
 
 ## [0.8.0] - 2026-11-12
 

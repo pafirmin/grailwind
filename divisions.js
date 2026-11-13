@@ -50,31 +50,36 @@ const bendy = (to, pieces) => (a, b) => {
   return layer(`linear-gradient(to ${to}, ${stops.join(", ")})`);
 };
 
-// The direction of `to bottom right` on the shield (aspect-ratio 5 / 6 in grailwind.css), so
-// chevronny's lines run parallel to per chevron's, the field's diagonals.
-const CHEVRON_ANGLE = 180 - (Math.atan(6 / 5) * 180) / Math.PI;
-
-// A half box is 75% as long as the whole along this angle (45/sqrt(61) over 60/sqrt(61)).
-// Plain, the sinister half sits over a full-width dexter layer, which hides the centre seam.
-// With a fur the layers can't overlap, as the transparent stripes would show the layer below.
+// Four tiles, each half the box, so the lines follow the box's own proportions: a part of the
+// shield is the whole one squeezed to fit, as per chevron's are. A tile's lines run parallel to its
+// diagonal, dexter tiles `to bottom right` and sinister ones `to bottom left`.
+// The period is 300/n of a tile's gradient line, which keeps a stripe's width on the whole shield.
+// A lower tile starts half a gradient line further on, so its lines continue the upper tile's.
+// Plain, the dexter and lower tiles overlap the others by 1px, hiding the seams. With a fur the
+// transparent stripes would show the tile beneath, so they butt.
 const chevronny = (pieces) => (a, b, fur) => {
-  const stripe = (angle, length) =>
-    `repeating-linear-gradient(${angle}deg, ${a} 0 calc(${length}% / ${pieces}), ${b} 0 calc(${2 * length}% / ${pieces}))`;
-  const sinister = stripe(-CHEVRON_ANGLE, 100);
+  const period = 300 / pieces;
+  const lowerStart = (period - (50 % period)) % period;
+  const stripe = (to, start) =>
+    `repeating-linear-gradient(to bottom ${to}, ${a} ${start}% ${start + period / 2}%, ${b} 0 ${start + period}%)`;
+  const overlap = fur ? "50%" : "calc(50% + 1px)";
 
-  return fur
-    ? {
-        "background-image": [stripe(CHEVRON_ANGLE, 100), sinister].join(", "),
-        "background-size": "50% 100%",
-        "background-position": "left, right",
-        "background-repeat": "no-repeat",
-      }
-    : {
-        "background-image": [sinister, stripe(CHEVRON_ANGLE, 75)].join(", "),
-        "background-size": "50% 100%, 100% 100%",
-        "background-position": "right, left",
-        "background-repeat": "no-repeat",
-      };
+  return {
+    "background-image": [
+      stripe("left", 0),
+      stripe("left", lowerStart),
+      stripe("right", 0),
+      stripe("right", lowerStart),
+    ].join(", "),
+    "background-size": [
+      `50% 50%`,
+      `50% ${overlap}`,
+      `${overlap} 50%`,
+      `${overlap} ${overlap}`,
+    ].join(", "),
+    "background-position": "right top, right bottom, left top, left bottom",
+    "background-repeat": "no-repeat",
+  };
 };
 
 const DIVISIONS = {

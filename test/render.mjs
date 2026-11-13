@@ -144,6 +144,11 @@ const bothSides = (pieces, chosen) =>
   chosen.flatMap((piece) =>
     ["dexter", "sinister"].map((side) => chevronnyPiece(pieces, piece, side)),
   );
+// Whole-shield points squeezed into a part: the dexter or sinister half, or the per-fess chief.
+const inDexter = (points) => points.map(([x, y]) => [x / 2, y]);
+const inSinister = (points) => points.map(([x, y]) => [50 + x / 2, y]);
+const inChief = (points) => points.map(([x, y]) => [x, 0.45 * y]);
+const bothHalves = (points) => [...inDexter(points), ...inSinister(points)];
 // Chequy is 5 across and 6 down; the dexter chief square is the first tincture.
 const chequySquare = (col, row) => [20 * col + 10, (100 / 6) * row + 100 / 12];
 const gap = (shield, charges, n) => ({ shield, charges, items: bezants(n), expect: "azure" });
@@ -742,7 +747,7 @@ const PROBES = [
   { shield: "bendy-sinister-of-eight-or-gules", at: [bendyFlank(8, 3, 0.88, 90, true), bendyFlank(8, 5, 0.12, 8, true)], expect: "gules", why: "bendy sinister of eight: gules in pieces 4 and 6 near the flanks, parallel to per bend sinister" },
   { shield: "chevronny-of-eight-or-gules", at: ["dexter", "sinister"].map((side) => chevronnyFlank(8, 2, 0.88, side)), expect: "or", why: "chevronny of eight: or in piece 3 near the flanks, parallel to per chevron" },
   { shield: "chevronny-of-eight-or-gules", at: ["dexter", "sinister"].map((side) => chevronnyFlank(8, 3, 0.88, side)), expect: "gules", why: "chevronny of eight: gules in piece 4 near the flanks, parallel to per chevron" },
-  { shield: "chevronny-or-gules", at: ["dexter", "sinister"].map((side) => chevronnyFlank(6, 1, 0.5, side)), expect: "gules", why: "chevronny: gules in piece 2 at the flanks, the sinister layer over the dexter" },
+  { shield: "chevronny-or-gules", at: ["dexter", "sinister"].map((side) => chevronnyFlank(6, 1, 0.5, side)), expect: "gules", why: "chevronny: gules in piece 2 at the flanks" },
 
   // Chevronny: lines parallel to per chevron's, the first tincture in the chief corners.
   { shield: "chevronny-or-gules", at: bothSides(6, [0, 2, 4]), expect: "or", why: "chevronny: or in pieces 1, 3 and 5, on both sides" },
@@ -753,6 +758,31 @@ const PROBES = [
   { shield: "chevronny-or-gules w-[305px]!", at: [[49.8, 10], [50.2, 10], [49.8, 20], [50.2, 20], [49.8, 60], [50.2, 60]], expect: "or", why: "chevronny: no seam down the centre in the or piece" },
   { shield: "chevronny-gules-ermine", at: [furSpot(1, 1), furSpot(5, 1)], expect: "sable", why: "chevronny with a fur: spots in piece 2 on both sides" },
   { shield: "chevronny-gules-ermine", at: bothSides(6, [0, 2]), expect: "gules", why: "chevronny with a fur: gules in pieces 1 and 3" },
+  { shield: "per-pale", quarters: ["chevronny-or-gules", "chevronny-or-gules"], at: bothHalves(bothSides(6, [0, 2, 4])), expect: "or", why: "chevronny of six in a per-pale half: or in pieces 1, 3 and 5, on both sides" },
+  { shield: "per-fess", quarters: ["chevronny-or-gules", "gules"], at: inChief(bothSides(6, [0, 2, 4])), expect: "or", why: "chevronny of six in a per-fess chief: or in pieces 1, 3 and 5" },
+  { shield: "per-pale", quarters: ["chevronny-or-gules", "chevronny-or-gules"], at: bothHalves(bothSides(6, [1, 3])), expect: "gules", why: "chevronny of six in a per-pale half: gules in pieces 2 and 4, on both sides" },
+  { shield: "per-fess", quarters: ["chevronny-or-gules", "gules"], at: inChief(bothSides(6, [1, 3, 5])), expect: "gules", why: "chevronny of six in a per-fess chief: gules in pieces 2, 4 and 6" },
+  { shield: "per-pale", quarters: ["chevronny-of-eight-or-gules", "chevronny-of-eight-or-gules"], at: bothHalves(bothSides(8, [0, 4, 6])), expect: "or", why: "chevronny of eight in a per-pale half: or in pieces 1, 5 and 7, on both sides" },
+  { shield: "per-fess", quarters: ["chevronny-of-eight-or-gules", "gules"], at: inChief(bothSides(8, [0, 4, 6])), expect: "or", why: "chevronny of eight in a per-fess chief: or in pieces 1, 5 and 7" },
+  { shield: "per-pale", quarters: ["chevronny-of-eight-or-gules", "chevronny-of-eight-or-gules"], at: bothHalves(bothSides(8, [1, 5])), expect: "gules", why: "chevronny of eight in a per-pale half: gules in pieces 2 and 6, on both sides" },
+  { shield: "per-fess", quarters: ["chevronny-of-eight-or-gules", "gules"], at: inChief(bothSides(8, [1, 5, 7])), expect: "gules", why: "chevronny of eight in a per-fess chief: gules in pieces 2, 6 and 8" },
+  { shield: "per-pale", quarters: ["chevronny-of-eight-or-gules", "chevronny-of-eight-or-gules"], at: bothHalves(["dexter", "sinister"].map((side) => chevronnyFlank(8, 2, 0.88, side))), expect: "or", why: "chevronny of eight in a per-pale half: or in piece 3 near the flanks, at the part's own angle" },
+  { shield: "per-pale", quarters: ["chevronny-of-eight-or-gules", "chevronny-of-eight-or-gules"], at: bothHalves(["dexter", "sinister"].map((side) => chevronnyFlank(8, 3, 0.88, side))), expect: "gules", why: "chevronny of eight in a per-pale half: gules in piece 4 near the flanks, at the part's own angle" },
+  { shield: "per-pale", quarters: ["chevronny-or-gules", "chevronny-or-gules"], at: bothHalves([[49, 10], [51, 10], [49, 60], [51, 60]]), expect: "or", why: "chevronny in a per-pale half: or in pieces 1 and 5 beside the centre line, at the part's own angle" },
+  { shield: "per-pale", quarters: ["chevronny-or-gules", "chevronny-or-gules"], at: bothHalves([[49, 30], [51, 30], [49, 45], [51, 45], [49, 80], [51, 80]]), expect: "gules", why: "chevronny in a per-pale half: gules in pieces 4 and 6 beside the centre line, at the part's own angle" },
+  { shield: "per-pale", quarters: ["chevronny-gules-ermine", "chevronny-gules-ermine"], at: bothHalves([[49, 10], [51, 10], [49, 60], [51, 60]]), expect: "gules", why: "chevronny with a fur in a per-pale half: gules beside the centre line, at the part's own angle" },
+  { shield: "per-fess", quarters: ["chevronny-gules-ermine", "gules"], at: inChief(bothSides(6, [0, 2])), expect: "gules", why: "chevronny with a fur in a per-fess chief: gules in pieces 1 and 3" },
+  // Seams show only where a tile boundary falls mid-pixel. At 306px a per-pale half's centre
+  // (W/4) is at 76.5, its half-height (0.6W) at 183.6 and the chief's half-height (0.27W) at 82.6.
+  // The chief's centre (W/2) needs an odd width: 305px puts it at 152.5.
+  { shield: "per-pale w-[306px]!", quarters: ["chevronny-or-gules", "chevronny-or-gules"], at: bothHalves([[49.8, 30], [50.2, 30], [49.8, 45], [50.2, 45], [49.8, 80], [50.2, 80]]), expect: "gules", why: "chevronny: no seam down the centre of a per-pale half, in the gules piece" },
+  { shield: "per-pale w-[306px]!", quarters: ["chevronny-or-gules", "chevronny-or-gules"], at: bothHalves([[49.8, 10], [50.2, 10], [49.8, 20], [50.2, 20], [49.8, 60], [50.2, 60]]), expect: "or", why: "chevronny: no seam down the centre of a per-pale half, in the or piece" },
+  { shield: "per-pale w-[306px]!", quarters: ["chevronny-or-gules", "chevronny-or-gules"], at: bothHalves([[30, 49.8], [30, 50.2], [40, 49.8], [40, 50.2]]), expect: "gules", why: "chevronny: no seam across the middle of a per-pale half, in the gules piece" },
+  { shield: "per-pale w-[306px]!", quarters: ["chevronny-or-gules", "chevronny-or-gules"], at: bothHalves([[8, 49.8], [8, 50.2], [14, 49.8], [14, 50.2]]), expect: "or", why: "chevronny: no seam across the middle of a per-pale half, in the or piece" },
+  { shield: "per-fess w-[305px]!", quarters: ["chevronny-or-gules", "gules"], at: inChief([[49.8, 30], [50.2, 30], [49.8, 45], [50.2, 45], [49.8, 80], [50.2, 80]]), expect: "gules", why: "chevronny: no seam down the centre of a per-fess chief, in the gules piece" },
+  { shield: "per-fess w-[305px]!", quarters: ["chevronny-or-gules", "gules"], at: inChief([[49.8, 10], [50.2, 10], [49.8, 20], [50.2, 20], [49.8, 60], [50.2, 60]]), expect: "or", why: "chevronny: no seam down the centre of a per-fess chief, in the or piece" },
+  { shield: "per-fess w-[306px]!", quarters: ["chevronny-or-gules", "gules"], at: inChief([[30, 49.8], [30, 50.2], [40, 49.8], [40, 50.2]]), expect: "gules", why: "chevronny: no seam across the middle of a per-fess chief, in the gules piece" },
+  { shield: "per-fess w-[306px]!", quarters: ["chevronny-or-gules", "gules"], at: inChief([[8, 49.8], [8, 50.2], [14, 49.8], [14, 50.2]]), expect: "or", why: "chevronny: no seam across the middle of a per-fess chief, in the or piece" },
 
   // Chequy: 5 across and 6 down, the first tincture in the dexter chief square.
   { shield: "chequy-or-azure", at: [chequySquare(0, 0), chequySquare(2, 0), chequySquare(4, 0), chequySquare(1, 1), chequySquare(3, 3), chequySquare(2, 4)], expect: "or", why: "chequy: or in the dexter chief square and alternately" },
@@ -1036,7 +1066,15 @@ const probe = async (page, css) => {
     ...TINCTURES.map((t) => `<div class="swatch ${t}" data-swatch="${t}"></div>`),
     ...SHIELDS.map((s, i) => markup(s, ` data-shield="${i}"`)),
   ].join("\n");
-  await page.setContent(grid(css, WIDTH, cells));
+  // Whole-pixel rows, at least the tallest probe shield (306px wide, 367.2px tall), so each
+  // shield starts on a whole y and a seam probe doesn't depend on the rows above it. The replace
+  // must match grid()'s gap text.
+  await page.setContent(
+    grid(css, WIDTH, cells).replace(
+      "gap: 20px;",
+      "gap: 20px; grid-auto-rows: 368px; align-items: start;",
+    ),
+  );
 
   const boxes = await page.evaluate(() =>
     [...document.querySelectorAll("[data-swatch], [data-shield]")].map((el) => {
