@@ -100,12 +100,47 @@ export const VOIDABLE = [
   ...REVERSIBLE.map(reversed),
 ];
 
-// Each fur's [ground, spot] tinctures.
+// The vair family: plain vair and potent are argent and azure, and the -y forms take a metal and a
+// colour, metal first as blazon writes them.
+const VAIRS = ["vair", "counter-vair", "potent", "counter-potent"];
+const VAIRY = {
+  vair: "vairy",
+  "counter-vair": "counter-vairy",
+  potent: "potenty",
+  "counter-potent": "counter-potenty",
+};
+
+// Each fur's pattern: ermine's spots, or the vair family's panes.
+export const FUR_PATTERNS = {
+  ermine: "ermine",
+  ermines: "ermine",
+  erminois: "ermine",
+  pean: "ermine",
+  ...Object.fromEntries(VAIRS.map((pattern) => [pattern, pattern])),
+  ...Object.fromEntries(
+    VAIRS.flatMap((pattern) =>
+      METALS.flatMap((metal) =>
+        COLOURS.map((colour) => [`${VAIRY[pattern]}-${metal}-${colour}`, pattern]),
+      ),
+    ),
+  ),
+};
+
+// Each fur's [ground, drawn] tinctures: ermine's spots, or the vair family's panes that point up in
+// the top row, which is the first tincture blazoned.
 export const FURS = {
   ermine: ["argent", "sable"],
   ermines: ["sable", "argent"],
   erminois: ["or", "sable"],
   pean: ["sable", "or"],
+  ...Object.fromEntries(VAIRS.map((pattern) => [pattern, ["azure", "argent"]])),
+  ...Object.fromEntries(
+    VAIRS.flatMap((pattern) =>
+      METALS.flatMap((metal) =>
+        COLOURS.map((colour) => [`${VAIRY[pattern]}-${metal}-${colour}`, [colour, metal]]),
+      ),
+    ),
+  ),
 };
 
 // The points of the shield, as [left%, top%], for placing a single charge, e.g. `in-dexter-chief`.

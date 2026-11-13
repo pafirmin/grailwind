@@ -52,6 +52,9 @@ const CLASSES = [
   "cross-engrailed-erminois",
   "fess-wavy-or",
   "pall-indented-or",
+  "vair",
+  "potent",
+  "fur-5",
 ];
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -167,13 +170,20 @@ const PATTERNS = {
   "a fur division leaves the fur's half transparent":
     /\.per-pale-ermine-gules \{[^}]*background-image: linear-gradient\(to right, transparent 50%, var\(--color-gules\) 50%\), url\("data:/,
   "fur quarterly doesn't overlap":
-    /\.quarterly-azure-ermine \{[^}]*background-size: 100% 45%, 100% calc\(100% - 45%\), calc\(100% \/ 6\) auto, 100% 100%;/,
+    /\.quarterly-azure-ermine \{[^}]*background-size: 100% 45%, 100% calc\(100% - 45%\), calc\(100% \/ var\(--fur-across, 6\)\) auto, 100% 100%;/,
   "a fur division counterchanges":
     /\.per-pale-ermine-gules \{[^}]*--counterchange-image: linear-gradient\(to right, var\(--color-gules\) 50%, transparent 50%\), url\("data:/,
   "a fur ordinary paints the fur":
     /\.fess-ermine \{[^]*?&::before \{[^}]*background-color: var\(--color-argent\);[^}]*background-image: url\("data:[^"]*%23141414[^}]*clip-path: polygon\(0 30%, 100% 30%, 100% 60%, 0 60%\);/,
   // [^{]* keeps the match inside .fess-ermine's own block.
   "a fur ordinary isn't fimbriated": /\.fess-ermine \{[^{]*&::before \{(?:(?!fimbriat)[^}])*\}/,
+  "fur-<n> sets the tiles across": /\.fur-5 \{\s*--fur-across: 5;\s*\}/,
+  "ermine's offset follows the tiles across":
+    /\.ermine \{[^}]*background-size: calc\(100% \/ var\(--fur-across, 6\)\) auto;\s*background-position: calc\(-100% \/ \(4 \* \(var\(--fur-across, 6\) - 1\)\)\) calc\(-100% \/ \(4 \* \(var\(--fur-across, 6\) - 1\)\)\);/,
+  "vair is 4 across from the top left, its argent panes on an azure ground":
+    /\.vair \{[^}]*background-color: var\(--color-azure\);[^}]*background-image: url\("data:image\/svg\+xml,[^"]*%23[^"]*"\);\s*background-size: calc\(100% \/ var\(--fur-across, 4\)\) auto;\s*background-position: 0 0;/,
+  "potent is 3 across":
+    /\.potent \{[^}]*background-size: calc\(100% \/ var\(--fur-across, 3\)\) auto;/,
   "an engrailed fur ordinary falls back to a polygon":
     /\.cross-engrailed-erminois \{[^]*?&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(/,
 };

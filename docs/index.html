@@ -380,8 +380,9 @@
 
           <h3 id="furs">Furs</h3>
           <p>
-            Furs are patterns: spots of one tincture on another. Use them like a
-            tincture, on the field, an ordinary or a charge.
+            Furs are patterns: the ermines' spots, or vair's rows of bell-shaped
+            panes. Use them like a tincture, on the field, an ordinary or a
+            charge.
           </p>
           <div class="flex flex-wrap gap-6 my-8">
             <figure class="w-24 text-center">
@@ -414,27 +415,76 @@
                 <code>pean</code><br /><span class="text-sm">or on sable</span>
               </figcaption>
             </figure>
+            <figure class="w-24 text-center">
+              <div class="escutcheon vair"></div>
+              <figcaption class="mt-2">
+                <code>vair</code><br /><span class="text-sm"
+                  >argent and azure</span
+                >
+              </figcaption>
+            </figure>
+            <figure class="w-24 text-center">
+              <div class="escutcheon potent"></div>
+              <figcaption class="mt-2">
+                <code>potent</code><br /><span class="text-sm"
+                  >argent and azure</span
+                >
+              </figcaption>
+            </figure>
           </div>
           <p>
             In a divided field, a fur goes in either part, as in
             <code>per-pale-ermine-gules</code> (but presently only one of the
             two can be a fur). Generally, ermine and erminois count as metals,
-            ermines and pean as colours.
+            ermines and pean as colours. Vair in other tinctures is
+            <em>vairy</em>, a metal then a colour, as in
+            <code>vairy-or-gules</code>, and likewise <code>counter-vair</code>,
+            <code>counter-vairy-*</code>, <code>potenty-*</code>,
+            <code>counter-potent</code> and <code>counter-potenty-*</code>.
           </p>
           <div class="examples">
-            <figure data-blazon="Quarterly Azure and Pean, a bend Or">
-              <div class="escutcheon quarterly-azure-pean bend-or"></div>
+            <figure data-blazon="Vair">
+              <div class="escutcheon vair"></div>
             </figure>
-            <figure data-blazon="Per pale Ermine and Gules">
-              <div class="escutcheon per-pale-ermine-gules"></div>
+            <figure data-blazon="Menu-vair">
+              <div class="escutcheon vair fur-5"></div>
+            </figure>
+            <figure data-blazon="Vairy Or and Gules">
+              <div class="escutcheon vairy-or-gules"></div>
             </figure>
             <figure data-blazon="Azure, a chief Ermine">
               <div class="escutcheon azure chief-ermine"></div>
             </figure>
+            <figure data-blazon="Quarterly Azure and Pean, a bend Or">
+              <div class="escutcheon quarterly-azure-pean bend-or"></div>
+            </figure>
             <figure data-blazon="Gules, a cross engrailed Erminois">
               <div class="escutcheon gules cross-engrailed-erminois"></div>
             </figure>
+            <figure data-blazon="Quarterly Vair and Counter-vair">
+              <div class="escutcheon quarterly">
+                <div class="vair"></div>
+                <div class="counter-vair"></div>
+                <div class="counter-vair"></div>
+                <div class="vair"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Counter-potent">
+              <div class="escutcheon counter-potent"></div>
+            </figure>
           </div>
+          <p>
+            <strong>
+              <span aria-hidden="true" class="font-serif text-xl leading-none"
+                >☞</span
+              >
+              Fun fact:</strong
+            >
+            French armory sizes vair by its rows: <em>beffroi</em> is large and
+            <em>menu-vair</em> small. <code>fur-&lt;n&gt;</code> sets the number
+            of tiles across, so try <code>fur-3</code> for beffroi or
+            <code>fur-6</code> for menu-vair, as above. It works on ermine too.
+          </p>
         </section>
 
         <section id="shield">
@@ -699,7 +749,7 @@
               aria-label="Style"
               id="lines"
               hidden
-              class="sticky top-(--header-height) lg:top-0 z-[5] argent shadow-sm lg:shadow-none flex overflow-x-auto motion-safe:scroll-smooth whitespace-nowrap -mx-6 px-6"
+              class="sticky top-(--header-height) lg:top-0 z-[5] argent shadow-[0_4px_4px_-4px_rgb(0_0_0/0.15)] lg:shadow-none flex overflow-x-auto motion-safe:scroll-smooth whitespace-nowrap -mx-6 px-6"
             >
               <button
                 type="button"

@@ -56,6 +56,16 @@ run("rule-of-tincture", rule, {
     // Engrailed and fur ordinaries aren't fimbriated, so the fimbriation touches nothing.
     `<div class="escutcheon gules fess-ermine fimbriated-gules"></div>`,
     `<div class="escutcheon azure fess-engrailed-or fimbriated-azure"></div>`,
+    // The vair family has no single ground, so it isn't checked by default.
+    `<div class="escutcheon vair chief-or"></div>`,
+    `<div class="escutcheon vair chief-gules"></div>`,
+    `<div class="escutcheon vairy-or-gules fess-azure"></div>`,
+    `<div class="escutcheon gules fess-counter-potent"></div>`,
+    // `cross-potent` is the charge, not a cross of the fur potent.
+    {
+      code: `<div class="escutcheon azure fess-or"><div class="charges on"><i class="cross-potent gules"></i></div></div>`,
+      options: [{ furs: { potent: "colour" } }],
+    },
     { code: `<div class="escutcheon ermine fess-argent"></div>`, options: [{ furs: "exempt" }] },
     {
       code: `<div class="escutcheon ermine fess-argent"></div>`,
@@ -195,6 +205,13 @@ run("rule-of-tincture", rule, {
         error(
           "`fess-argent` puts a fess Argent on Ermine: metal on metal (ermine counts as a metal)",
         ),
+      ],
+    },
+    {
+      code: `<div class="escutcheon vair chief-or"></div>`,
+      options: [{ furs: { vair: "metal" } }],
+      errors: [
+        error("`chief-or` puts a chief Or on Vair: metal on metal (vair counts as a metal)"),
       ],
     },
     {

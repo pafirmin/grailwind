@@ -72,10 +72,17 @@ const charged = (shield, charges, size, points, why) =>
     expect: "or",
     why: points.length > 1 ? `${why}, charge ${i + 1}` : why,
   }));
-// A fur's tile, as % of the shield: 6 across, and 5:6 like the shield, so the same % down.
-const FUR_TILE = 100 / 6;
-const furSpot = (k, j) => [FUR_TILE * (k + 0.25), FUR_TILE * (j + 0.25) + FUR_TILE / 10];
-const furGround = (k, j) => [FUR_TILE * (k + 0.75), FUR_TILE * (j + 0.25)];
+// An ermine tile, as % of the shield: 6 across by default, and 5:6 like the shield, so the same %
+// down.
+const ermineAt = (across) => {
+  const tile = 100 / across;
+  return {
+    spot: (k, j) => [tile * (k + 0.25), tile * (j + 0.25) + tile / 10],
+    ground: (k, j) => [tile * (k + 0.75), tile * (j + 0.25)],
+  };
+};
+const { spot: furSpot, ground: furGround } = ermineAt(6);
+const ermine4 = ermineAt(4);
 // A point is kept off the shield's rounded base, which is tighter near the flanks.
 const onShield = (x, y) => y >= 4 && y <= (x < 20 || x > 80 ? 75 : 96);
 // Bendy's n equal pieces cover the visible part of the shield, the last running to the edge.
@@ -646,6 +653,35 @@ const PROBES = [
   { shield: "pean", at: furSpot(1, 1), expect: "or", why: "a pean spot" },
   { shield: "pean", at: furGround(1, 1), expect: "sable", why: "the pean ground" },
 
+  { shield: "ermine fur-4", at: ermine4.spot(1, 1), expect: "sable", why: "a spot at 4 across" },
+  { shield: "ermine fur-4", at: ermine4.ground(1, 1), expect: "argent", why: "the ground at 4 across" },
+
+  // Vair, 4 across: a tile is 25% wide and two rows high, a row 80px (22.22%) of the 360px shield.
+  // Argent bells point up in the top row, centred at (j + 0.5) × 25%, with azure between them.
+  { shield: "vair", at: [[12.5, 6], [37.5, 6], [62.5, 6], [87.5, 6]], expect: "argent", why: "4 whole argent bells across the top" },
+  { shield: "vair", at: [[25, 6], [50, 6], [75, 6]], expect: "azure", why: "azure bells between them" },
+  { shield: "vair", at: [3, 33.33], expect: "argent", why: "a half pane at the dexter flank in row 2" },
+  { shield: "vair", at: [12.5, 33.33], expect: "azure", why: "row 2 is offset half a pane" },
+  { shield: "counter-vair", at: [[12.5, 20], [12.5, 25]], expect: "argent", why: "counter-vair's argent bases meet at the row join" },
+  { shield: "counter-vair", at: [12.5, 33.33], expect: "argent", why: "counter-vair's row 2 isn't offset" },
+  { shield: "counter-vair", at: [25, 33.33], expect: "azure", why: "counter-vair's azure between in row 2" },
+  { shield: "vair fur-5", at: [[10, 6], [30, 6], [50, 6], [70, 6], [90, 6]], expect: "argent", why: "5 whole bells across at fur-5" },
+  { shield: "vair fur-5", at: [[20, 6], [40, 6], [60, 6], [80, 6]], expect: "azure", why: "azure between them at fur-5" },
+  { shield: "vairy-or-gules", at: [[12.5, 6], [37.5, 6]], expect: "or", why: "vairy's or bells point up" },
+  { shield: "vairy-or-gules", at: [25, 6], expect: "gules", why: "vairy's gules bells between" },
+  // Potent, 3 across: a tile 100px wide and 120px high, the crossbar 30px high and the stem 30px.
+  { shield: "potent", at: [8.33, 4.17], expect: "argent", why: "potent's crossbar" },
+  { shield: "potent", at: [16.67, 12.5], expect: "argent", why: "potent's stem" },
+  { shield: "potent", at: [[8.33, 12.5], [31.67, 4.17]], expect: "azure", why: "beside the stem and between the crossbars" },
+  { shield: "potent", at: [16.67, 20], expect: "azure", why: "potent's row 2 is offset half a pane" },
+  { shield: "counter-potent", at: [16.67, 20], expect: "argent", why: "counter-potent's stems meet at the row join" },
+  { shield: "counter-potent", at: [8.33, 20], expect: "azure", why: "beside counter-potent's row 2 stem" },
+  { shield: "per-pale-vair-gules", at: [12.5, 6], expect: "argent", why: "vair on the dexter" },
+  { shield: "per-pale-vair-gules", at: [[75, 6], [75, 50]], expect: "gules", why: "gules on the sinister" },
+  { shield: "gules fess-vair", at: [12.5, 50], expect: "argent", why: "a bell on a vair fess" },
+  { shield: "gules fess-vair", at: [25, 50], expect: "azure", why: "between the bells on a vair fess" },
+  { shield: "gules fess-vair", at: [50, 15], expect: "gules", why: "the field above a vair fess" },
+
   // A charge is two tiles across, centred, so a spot sits at its centre.
   { shield: "gules", charges: "", items: ["mullet ermine"], at: [50, 47.5], expect: "sable", why: "a spot at the charge's centre" },
   { shield: "gules", charges: "", items: ["mullet ermine"], at: [50, 39.17], expect: "argent", why: "the fur's ground in the mullet" },
@@ -966,7 +1002,26 @@ const LINED_CHARGES = Object.keys(BETWEEN).flatMap((o) =>
 const DIVIDED = DIVISIONS.flatMap((d) => [
   { shield: `${d}-or-azure` },
   { shield: `${d}-ermine-gules` },
+  { shield: `${d}-vair-gules` },
 ]);
+// Every vair family pattern, at its default density and at 3 and 6 across.
+const VAIRS = [
+  "vair",
+  "counter-vair",
+  "potent",
+  "counter-potent",
+  "vairy-or-gules",
+  "counter-vairy-argent-vert",
+  "potenty-or-sable",
+  "counter-potenty-argent-gules",
+];
+const FURRED = [
+  ...VAIRS.flatMap((fur) => ["", " fur-3", " fur-6"].map((n) => ({ shield: `${fur}${n}` }))),
+  { shield: "gules fess-vair" },
+  { shield: "or chief-potent" },
+  { shield: "per-bend-vair-or" },
+  { shield: "gules", charges: "", items: ["mullet vair"] },
+];
 // Tile edges at % positions fall mid-pixel at this width, where seams show.
 const ODD_WIDTH = 155;
 // `more` is a second charges container, as { charges, items }.
@@ -1023,7 +1078,7 @@ const caption = (spec) =>
 
 // The CSS for every shield the probes and contact sheets draw.
 const buildShields = (dir) => {
-  const specs = [...SHIELDS, ...CONTACT, ...LINED_CHARGES, ...DIVIDED];
+  const specs = [...SHIELDS, ...CONTACT, ...LINED_CHARGES, ...DIVIDED, ...FURRED];
   const classes = [...specs.map((s) => markup(s)), ...TINCTURES.map((t) => `<i class="${t}"></i>`)];
   writeFileSync(join(dir, "index.html"), classes.join("\n"));
   return build({ dir });
@@ -1144,6 +1199,7 @@ try {
         await contactSheet(page, css, NESTED, 6, `inescutcheons-${name}.png`);
         await contactSheet(page, css, PLAIN, 8, `probes-${name}.png`);
         await contactSheet(page, css, DIVIDED, 8, `divisions-${name}.png`);
+        await contactSheet(page, css, FURRED, 6, `furs-${name}.png`);
         await contactSheet(page, css, DIVIDED, 8, `divisions-odd-${name}.png`, ODD_WIDTH);
       } catch (error) {
         console.error(`  (no contact sheet for ${name}: ${error.message})`);

@@ -5,6 +5,7 @@ import plugin from "tailwindcss/plugin";
 import {
   BETWEEN,
   BETWEEN_LINED,
+  CHARGES,
   FURS,
   LINES as LINE_NAMES,
   lineOrdinaries,
@@ -831,10 +832,13 @@ export default plugin(({ addBase, addUtilities, theme }) => {
     // A plain polygon, without the fimbriation vars, so fimbriated-* can't reach a fur ordinary.
     for (const fur of Object.keys(FURS)) {
       const pseudo = { ...placed, ...furBackground(fur, theme) };
-      utilities[`.${ordinary}-${fur}`] = ordinaryRules(ordinary, {
-        ...pseudo,
-        "clip-path": plain,
-      });
+      // `cross-potent` is the charge, not a cross of the fur potent.
+      if (!CHARGES.includes(`${ordinary}-${fur}`)) {
+        utilities[`.${ordinary}-${fur}`] = ordinaryRules(ordinary, {
+          ...pseudo,
+          "clip-path": plain,
+        });
+      }
       for (const [name, line] of Object.entries(LINES)) {
         if (!lineOrdinaries(name).includes(ordinary)) {
           continue;

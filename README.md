@@ -53,7 +53,8 @@ tinctures replace Tailwind's colours entirely.
 
 - **Tinctures:** a tincture on its own sets the background (`azure`), and
   Tailwind's prefixes work as usual (`text-or`). There are also the furs `ermine`,
-  `ermines`, `erminois` and `pean`, which work in divisions too.
+  `ermines`, `erminois`, `pean`, `vair` and `potent` (with `vairy-or-gules` and the like), which
+  work in divisions too, and `fur-<n>` sets their density.
 - **The shield:** `escutcheon`, plus `bordure-*`, `inescutcheon` (a small shield at the centre)
   and `canton` (a ninth of the shield in dexter chief), each with its own field and charges.
 - **Divided fields:** `per-pale-or-gules`, `quarterly-azure-argent`,

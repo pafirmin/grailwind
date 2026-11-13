@@ -7,6 +7,7 @@ import {
   CHARGES,
   COLOURS,
   DIVISIONS,
+  FUR_PATTERNS,
   FURS,
   LINES,
   lineOrdinaries,
@@ -38,7 +39,10 @@ const ORDINARY_CLASSES = new Map();
 for (const ordinary of ORDINARIES) {
   for (const tincture of PAINT) {
     const fur = FUR.has(tincture);
-    ORDINARY_CLASSES.set(`${ordinary}-${tincture}`, { ordinary, tincture, fur });
+    // `cross-potent` is the charge, not a cross of the fur potent.
+    if (!CHARGE.has(`${ordinary}-${tincture}`)) {
+      ORDINARY_CLASSES.set(`${ordinary}-${tincture}`, { ordinary, tincture, fur });
+    }
     for (const line of LINES.filter((l) => lineOrdinaries(l).includes(ordinary))) {
       ORDINARY_CLASSES.set(`${ordinary}-${line}-${tincture}`, { ordinary, tincture, fur, line });
     }
@@ -87,19 +91,19 @@ export const isFimbriable = (o) => !o.counterchanged && !o.line && !o.fur && !o.
 
 export const isFur = (tincture) => FUR.has(tincture);
 
-const groundKind = (fur) => kind(FURS[fur][0]);
+// The ermines count by their ground. The vair family has no single ground, so it's exempt.
+const byDefault = (fur) => (FUR_PATTERNS[fur] === "ermine" ? kind(FURS[fur][0]) : "exempt");
 
 // What the rule's `furs` option makes of one fur: "metal", "colour" or "exempt". The rule's
 // schema has already checked the option.
 const furChoice = (fur, option) => {
   if (option === "ground") {
-    return groundKind(fur);
+    return byDefault(fur);
   }
   if (option === "exempt") {
     return "exempt";
   }
-  // A map: a fur left out counts by its ground.
-  return option[fur] ?? groundKind(fur);
+  return option[fur] ?? byDefault(fur);
 };
 
 // Each fur's kind for kind() and sameKind(). Exempt is null, which they treat as "no check".

@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Vair and potent, e.g. `vair`, `counter-vair`, `potent` and `vairy-or-gules`.
+- `fur-<n>` sets how many tiles of a fur go across, e.g. `fur-3` for beffroi.
+
+### Changed
+
+- `@grailwind/eslint-plugin` 0.1.0-beta.5 needs `grailwind` 0.9.x. The vair
+  family isn't checked by the rule of tincture unless the `furs` option names
+  it.
+
 ## [0.8.1] - 2026-11-13
 
 ### Fixed

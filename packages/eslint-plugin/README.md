@@ -13,7 +13,7 @@ npm install --save-dev @grailwind/eslint-plugin@beta
 ```
 
 It reads the tinctures, ordinaries and charges from your installed `grailwind`, so it needs
-`grailwind` 0.8.x. For typos and other class errors, see
+`grailwind` 0.9.x. For typos and other class errors, see
 [Linting](https://github.com/pafirmin/grailwind#linting) in the Grailwind README.
 
 ## Setup
@@ -75,17 +75,19 @@ Counterchanged ordinaries and charges take the field's tinctures swapped, so the
 `of-the-first` is checked as the shield's first tincture, and reported if it can't be seen.
 
 Furs count by their ground: `ermine` and `erminois` as metals, `ermines` and `pean` as colours.
-`ermine fess-argent` is metal on metal. Authorities differ, so the `furs` option changes this:
+`ermine fess-argent` is metal on metal. The vair family (`vair`, `potent`, `vairy-or-gules` and
+the like) has no single ground, so it isn't checked. Authorities differ, so the `furs` option
+changes this:
 
 ```js
 "grailwind/rule-of-tincture": ["error", { furs: "ground" }]   // the default
 "grailwind/rule-of-tincture": ["error", { furs: "exempt" }]   // furs go with anything
 "grailwind/rule-of-tincture": ["error", {
-  furs: { ermine: "metal", erminois: "exempt", ermines: "colour", pean: "colour" },
+  furs: { ermine: "metal", erminois: "exempt", ermines: "colour", pean: "colour", vair: "metal" },
 }]
 ```
 
-A fur left out of the map counts by its ground.
+A fur left out of the map counts as it does by default.
 
 ### `charges-in-container`
 
