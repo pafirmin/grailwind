@@ -3,38 +3,38 @@ import { run } from "./run.js";
 
 run("one-ordinary", rule, {
   valid: [
-    `<div class="escutcheon or chevron-gules chief-azure"></div>`,
-    `<div class="escutcheon or fess-gules bordure-azure"></div>`,
+    `<div class="heater"><div class="or chevron-gules chief-azure"></div></div>`,
+    `<div class="heater"><div class="or fess-gules bordure-azure"></div></div>`,
     `<div class="charges in-pale"><i class="mullet in-chief-point"></i></div>`,
     `<div class="charges between"></div>`,
     // Only a `charges` container is arranged.
     `<div class="between on"></div>`,
-    `<div class="escutcheon or fess-engrailed-gules chief-ermine"></div>`,
+    `<div class="heater"><div class="or fess-engrailed-gules chief-ermine"></div></div>`,
     // Pointed charges on their own, or in their own container.
     `<div class="charges"><i class="mullet in-dexter-chief"></i><i class="mullet in-sinister-chief"></i></div>`,
-    `<div class="escutcheon azure"><div class="charges"><i class="mullet"></i><i class="mullet"></i></div><div class="charges"><i class="crescent in-dexter-chief"></i></div></div>`,
+    `<div class="heater"><div class="azure"><div class="charges"><i class="mullet"></i><i class="mullet"></i></div><div class="charges"><i class="crescent in-dexter-chief"></i></div></div></div>`,
   ],
   invalid: [
     {
-      code: `<div class="escutcheon or fess-azure chevron-gules"></div>`,
+      code: `<div class="heater"><div class="or fess-azure chevron-gules"></div></div>`,
       errors: [
         { message: "`fess-azure` and `chevron-gules` both draw an ordinary; only one will show." },
       ],
     },
     {
-      code: `<div class="escutcheon or bend-or bend-sable"></div>`,
+      code: `<div class="heater"><div class="or bend-or bend-sable"></div></div>`,
       errors: [{ messageId: "ordinaries" }],
     },
     {
-      code: `<div class="escutcheon azure cross-voided-or fess-gules"></div>`,
+      code: `<div class="heater"><div class="azure cross-voided-or fess-gules"></div></div>`,
       errors: [{ messageId: "ordinaries" }],
     },
     {
-      code: `<div class="escutcheon azure pile-reversed-or chevron-reversed-engrailed-gules"></div>`,
+      code: `<div class="heater"><div class="azure pile-reversed-or chevron-reversed-engrailed-gules"></div></div>`,
       errors: [{ messageId: "ordinaries" }],
     },
     {
-      code: `<div class="escutcheon or chief-or chief-azure"></div>`,
+      code: `<div class="heater"><div class="or chief-or chief-azure"></div></div>`,
       errors: [{ message: "`chief-or` and `chief-azure` both draw a chief; only one will show" }],
     },
     {
@@ -55,15 +55,15 @@ run("one-ordinary", rule, {
     },
 
     {
-      code: `<div class="escutcheon or fess-engrailed-azure chevron-gules"></div>`,
+      code: `<div class="heater"><div class="or fess-engrailed-azure chevron-gules"></div></div>`,
       errors: [{ messageId: "ordinaries" }],
     },
     {
-      code: `<div class="escutcheon azure fess-ermine bend-invected-or"></div>`,
+      code: `<div class="heater"><div class="azure fess-ermine bend-invected-or"></div></div>`,
       errors: [{ messageId: "ordinaries" }],
     },
     {
-      code: `<div class="escutcheon or chief-ermine chief-azure"></div>`,
+      code: `<div class="heater"><div class="or chief-ermine chief-azure"></div></div>`,
       errors: [{ messageId: "chiefs" }],
     },
     {

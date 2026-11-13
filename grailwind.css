@@ -78,13 +78,20 @@
   syntax: "*";
   inherits: false;
 }
-/* A field's first tincture. The escutcheon copies it to --the-first, which inherits,
+/* A field's first tincture. The heater's field copies it to --the-first, which inherits,
  * so a canton's own field can't change it. */
 @property --field-first {
   syntax: "*";
   inherits: false;
 }
-/* A field's own bordure width, 0 without one. The shield copies it to --outer-inset, which
+/* The shield's first tincture, on the heater, for a bordure ring of the first. It inherits, so
+ * the ring on a frame's ::after sees it, an inescutcheon's included: of the first is the
+ * shield's. */
+@property --frame-first {
+  syntax: "*";
+  inherits: true;
+}
+/* A field's own bordure width, 0 without one. A frame's field copies it to --outer-inset, which
  * inherits, so a canton can step out over the shield's bordure and not its own. */
 @property --bordure-inset {
   syntax: "<length>";
@@ -117,30 +124,51 @@
 @utility or {
   background-color: var(--color-or);
   --field-first: var(--color-or);
+  .heater:has(> &) {
+    --frame-first: var(--color-or);
+  }
 }
 @utility argent {
   background-color: var(--color-argent);
   --field-first: var(--color-argent);
+  .heater:has(> &) {
+    --frame-first: var(--color-argent);
+  }
 }
 @utility gules {
   background-color: var(--color-gules);
   --field-first: var(--color-gules);
+  .heater:has(> &) {
+    --frame-first: var(--color-gules);
+  }
 }
 @utility azure {
   background-color: var(--color-azure);
   --field-first: var(--color-azure);
+  .heater:has(> &) {
+    --frame-first: var(--color-azure);
+  }
 }
 @utility vert {
   background-color: var(--color-vert);
   --field-first: var(--color-vert);
+  .heater:has(> &) {
+    --frame-first: var(--color-vert);
+  }
 }
 @utility purpure {
   background-color: var(--color-purpure);
   --field-first: var(--color-purpure);
+  .heater:has(> &) {
+    --frame-first: var(--color-purpure);
+  }
 }
 @utility sable {
   background-color: var(--color-sable);
   --field-first: var(--color-sable);
+  .heater:has(> &) {
+    --frame-first: var(--color-sable);
+  }
 }
 /* The field's first tincture, for charges and for a canton or inescutcheon field. */
 @utility of-the-first {
@@ -159,9 +187,10 @@
 
   /* On a shield, each part is a coat of its own: what's in it is placed, stacked and
    * counterchanged within it. */
-  &:is(.escutcheon, .escutcheon *) > * {
+  &:is(.heater, .heater *) > * {
     position: relative;
     contain: layout;
+    --layer-inset: 0px;
   }
 }
 
@@ -173,7 +202,7 @@
 
   /* On a shield, two parts split at the fess point, FESS_POINT in divisions.js.
    * More parts stay equal. */
-  &:is(.escutcheon, .escutcheon *) {
+  &:is(.heater, .heater *) {
     &:has(> :last-child:nth-child(2)) {
       grid-template-rows: 45fr 55fr;
     }
@@ -182,6 +211,7 @@
     & > * {
       position: relative;
       contain: layout;
+      --layer-inset: 0px;
     }
   }
 }
@@ -200,13 +230,14 @@
   }
 
   /* On a shield, split at the fess point, as per-fess. */
-  &:is(.escutcheon, .escutcheon *) {
+  &:is(.heater, .heater *) {
     grid-template-rows: 45fr 55fr;
 
     /* See per-pale. */
     & > * {
       position: relative;
       contain: layout;
+      --layer-inset: 0px;
     }
   }
 }
@@ -215,37 +246,62 @@
  * Subordinaries
  * ------------------------------------------------------------------------- */
 
-/* Bordure: a border in a given tincture, e.g. `bordure-or`. */
+/* Bordure, e.g. `bordure-or`: a border, so what's inside it lays out within it. On a frame's
+ * field the border is transparent, and a ring on the frame's ::after (see ordinaries.js)
+ * paints it, following the frame's outline. Anywhere else, such as on a part of a divided
+ * field or a canton, the border is painted. */
 @utility bordure-* {
   border-style: solid;
   border-width: var(--bordure-width, 0.75rem);
   border-color: --value(--color-*);
   --bordure-inset: var(--bordure-width, 0.75rem);
+
+  :is(.heater, .inescutcheon) > & {
+    border-color: transparent;
+  }
+  :is(.heater, .inescutcheon):has(> &)::after {
+    content: "";
+    background-color: --value(--color-*);
+  }
 }
 @utility bordure-of-the-first {
   border-style: solid;
   border-width: var(--bordure-width, 0.75rem);
   border-color: var(--the-first, transparent);
   --bordure-inset: var(--bordure-width, 0.75rem);
+
+  :is(.heater, .inescutcheon) > & {
+    border-color: transparent;
+  }
+  :is(.heater, .inescutcheon):has(> &)::after {
+    content: "";
+    background-color: var(--frame-first, transparent);
+  }
 }
 
-/* Inescutcheon: a shield a third as wide, centred on the fess point (50%, 45%),
- * over everything else on the shield. As both are 5:6, it's a third as tall too. */
+/* Inescutcheon: a heater a third as wide round its own field, centred on the fess point
+ * (50%, 45%), over everything else on the shield. As both are 5:6, it's a third as tall too.
+ * Its field takes the shield's first, as "of the first" means the shield's. */
 @utility inescutcheon {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   width: 33%;
   left: 33.5%;
   top: 28.5%;
+  display: grid;
   aspect-ratio: 5 / 6;
   overflow: clip;
-  overflow-clip-margin: border-box;
-  border-radius: 0 0 50% 50% / 0 0 45% 45%;
-  box-shadow: 0 0 0 2px var(--color-sable);
   contain: layout;
-  /* In proportion with the shield's own bordure. */
-  --bordure-width: 0.25rem;
-  --outer-inset: var(--bordure-inset);
+  container-type: inline-size;
+  /* A third of the shield's, as cqw is the inescutcheon's own width. */
+  --bordure-width: 6.25cqw;
+
+  /* See heater. */
+  & > * {
+    position: relative;
+    --outer-inset: var(--bordure-inset);
+    --layer-inset: var(--bordure-inset);
+  }
 }
 
 /* Canton: a third of the shield each way in dexter chief, so a ninth of it, and
@@ -253,7 +309,7 @@
  * ordinary and charge, as a later addition to the arms, and over the bordure. */
 @utility canton {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   width: calc((100% + 2 * var(--outer-inset, 0px)) / 3);
   left: calc(-1 * var(--outer-inset, 0px));
   top: calc(-1 * var(--outer-inset, 0px));
@@ -262,26 +318,36 @@
   overflow: clip;
   overflow-clip-margin: border-box;
   contain: layout;
-  --bordure-width: 0.25rem;
+  --layer-inset: 0px;
+  /* A third of the shield's, as cqw is the shield's width. */
+  --bordure-width: calc(6.25cqw / 3);
 }
 
 /* ---------------------------------------------------------------------------
  * The shield itself
  * ------------------------------------------------------------------------- */
 
-/* Escutcheon: a shield shape to draw arms in. */
-@utility escutcheon {
+/* Heater: a pointed shield round its one child, the field, which carries the blazon. The
+ * outline and the clip are in ordinaries.js, from drawings/heater.svg. */
+@utility heater {
   position: relative;
+  display: grid;
   aspect-ratio: 5 / 6;
-  /* At the border's edge, so a canton or chief can surmount the bordure. */
   overflow: clip;
-  overflow-clip-margin: border-box;
-  border-radius: 0 0 50% 50% / 0 0 45% 45%;
-  box-shadow: 0 0 0 2px var(--color-sable);
   /* The containing block for counterchanged charges' fixed layers. */
   contain: layout;
-  --the-first: var(--field-first);
-  --outer-inset: var(--bordure-inset);
+  container-type: inline-size;
+  /* 0.75rem at w-48. */
+  --bordure-width: 6.25cqw;
+
+  /* The field. A canton steps out over its bordure, and a counterchanged charge's fixed layer
+   * in by it, to the field's padding box. */
+  & > * {
+    position: relative;
+    --the-first: var(--field-first);
+    --outer-inset: var(--bordure-inset);
+    --layer-inset: var(--bordure-inset);
+  }
 }
 
 /* ---------------------------------------------------------------------------

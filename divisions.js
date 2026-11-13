@@ -4,6 +4,7 @@
 import plugin from "tailwindcss/plugin";
 import { FURS, TINCTURES } from "./data.js";
 import { furLayers } from "./furs.js";
+import { PATHS } from "./paths.js";
 
 // The fess point, in % down the shield: horizontal lines of partition pass through it, as the
 // cross and fess do.
@@ -26,16 +27,40 @@ const stripes = (to, pieces) => (a, b) => {
   };
 };
 
-// How much of the corner-to-corner extent the shield covers: the base corner is cut away by the
-// border-radius of 0 0 50% 50% / 0 0 45% 45% and the 5:6 aspect ratio in grailwind.css. It runs
-// from the chief corner the bands start in to the tangent on the base curve.
-const BENDY_VISIBLE = (() => {
-  const [width, height] = [5, 6];
-  const [radiusX, radiusY] = [width / 2, 0.45 * height];
-  const [centreX, centreY] = [width / 2, height - radiusY];
-  const tangent = Math.sqrt((height * radiusX) ** 2 + (width * radiusY) ** 2);
-  return (width * height - height * centreX + width * centreY + tangent) / (2 * width * height);
-})();
+/**
+ * Points along a drawn outline's curves and lines, densely, in fractions of its box.
+ * @param {Array[]} segments The drawing's segments, as in paths.js, in real units (100 × 120).
+ * @returns {number[][]} [x, y] points, each 0 to 1.
+ */
+const outlineFractions = (segments) => {
+  const points = [];
+  let from = [0, 0];
+  for (const [command, ...n] of segments) {
+    if (command === "M" || command === "L") {
+      from = [n[0], n[1]];
+      points.push(from);
+    } else if (command === "C") {
+      for (let i = 1; i <= 1000; i++) {
+        const t = i / 1000;
+        const [a, b, c, d] = [(1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3];
+        points.push([
+          a * from[0] + b * n[0] + c * n[2] + d * n[4],
+          a * from[1] + b * n[1] + c * n[3] + d * n[5],
+        ]);
+      }
+      from = [n[4], n[5]];
+    } else if (command !== "Z") {
+      throw new Error(`bendy can't read ${command} in the heater's outline`);
+    }
+  }
+  return points.map(([x, y]) => [x / 100, y / 120]);
+};
+
+// How much of the corner-to-corner extent the shield covers, as the heater's base cuts the far
+// corner away. On the 5:6 shield, a point's distance along the extent is (x + y) / 2 in fractions
+// of the width and height, so it runs from the chief corner the bands start in to where a band's
+// line is tangent to the base (drawings/heater.svg).
+const BENDY_VISIBLE = Math.max(...outlineFractions(PATHS.heater).map(([x, y]) => (x + y) / 2));
 
 // Diagonal bands parallel to per bend, `pieces` equal ones across the visible part of the shield,
 // the last running to the edge. Explicit stops, not a repeating gradient, so a canton's square
@@ -295,6 +320,17 @@ const field = (layers, color) =>
     "--field",
   );
 
+/**
+ * A field's first tincture, and the shield's, for a bordure ring of the first (see grailwind.css).
+ * Only the heater sets it, as an inescutcheon's "of the first" is the shield's.
+ * @param {string} colour The first tincture's CSS colour.
+ * @returns {Record<string, unknown>} The declarations, with the heater's as a nested rule.
+ */
+const firstTincture = (colour) => ({
+  "--field-first": colour,
+  ".heater:has(> &)": { "--frame-first": colour },
+});
+
 // The field with its tinctures swapped, for counterchanged ordinaries to paint.
 const counterchange = (rules) =>
   Object.fromEntries(
@@ -321,7 +357,7 @@ export default plugin(({ addUtilities, theme }) => {
           ...unswapped,
           ...field(toLayers(unswapped), unswapped["background-color"]),
           ...counterchange(background(b, a)),
-          "--field-first": a,
+          ...firstTincture(a),
         };
       }
     }
@@ -341,7 +377,7 @@ export default plugin(({ addUtilities, theme }) => {
             ...joinLayers(layers, "background"),
             ...field(layers),
             ...counterchange(withFur(division, second, first, theme)),
-            ...(!FURS[first] && { "--field-first": `var(--color-${first})` }),
+            ...(!FURS[first] && firstTincture(`var(--color-${first})`)),
           };
         }
       }

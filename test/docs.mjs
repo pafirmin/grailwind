@@ -13,7 +13,9 @@ const blocks = html
 const panels = blocks.map((block) => ({
   id: block.match(/id="panel-([\w-]+)"/)[1],
   figures: [
-    ...block.matchAll(/<figure\s+data-blazon="([^"]+)"\s*>\s*<div\s+class="escutcheon ([^"]+)"/g),
+    ...block.matchAll(
+      /<figure\s+data-blazon="([^"]+)"\s*>\s*<div\s+class="heater">\s*<div\s+class="([^"]+)"/g,
+    ),
   ].map(([, blazon, classes]) => {
     const [field, ordinaryClass] = classes.split(" ");
     return { blazon, field, ordinaryClass };

@@ -6,6 +6,7 @@ import {
   BETWEEN,
   BETWEEN_LINED,
   CHARGES,
+  FRAMES,
   FURS,
   LINES as LINE_NAMES,
   lineOrdinaries,
@@ -604,6 +605,168 @@ const pathShape = (segments) => {
   return `shape(from ${at([startX, startY])}, ${commands.join(", ")}, close)`;
 };
 
+// Polygon points per curve or arc, where shape() isn't supported.
+const SAMPLES = 16;
+
+/**
+ * A fraction of the frame across or down, in a box inset by `inset` on every side.
+ * @param {number} fraction 0 at the frame's top or left edge, 1 at its bottom or right.
+ * @param {string|null} inset A CSS length, or null for the frame's own edge.
+ * @returns {string} A CSS length-percentage.
+ */
+const insetCoordinate = (fraction, inset) => {
+  if (!inset) {
+    return pct(fraction * 100);
+  }
+  if (num(fraction) === 0) {
+    return inset;
+  }
+  if (num(fraction) === 1) {
+    return `calc(100% - ${inset})`;
+  }
+  return `calc(${inset} + ${num(fraction)} * (100% - 2 * ${inset}))`;
+};
+
+/**
+ * A drawing's point, in real units, in the frame inset by `inset`.
+ * @param {number[]} point [x, y] in real units (W × H).
+ * @param {string|null} inset A CSS length, or null for the frame's own edge.
+ * @returns {string} A CSS position.
+ */
+const insetPoint = ([x, y], inset) =>
+  `${insetCoordinate(x / W, inset)} ${insetCoordinate(y / H, inset)}`;
+
+/**
+ * An arc's radius, scaled with the inset box as its points are.
+ * @param {number} radius In real units.
+ * @param {number} across W for a horizontal radius, H for a vertical one.
+ * @param {string|null} inset A CSS length, or null for the frame's own edge.
+ * @returns {string} A CSS length-percentage.
+ */
+const insetRadius = (radius, across, inset) =>
+  inset ? `calc(${num(radius / across)} * (100% - 2 * ${inset}))` : pct((radius * 100) / across);
+
+/**
+ * A drawn outline's shape() commands after its start, in the frame inset by `inset`.
+ * @param {Array[]} segments The drawing's segments, as in paths.js, ending in ["Z"].
+ * @param {string|null} inset A CSS length, or null for the frame's own edge.
+ * @returns {string[]} The commands, ending in "close".
+ */
+const insetCommands = (segments, inset) =>
+  segments.slice(1).map(([command, ...n]) => {
+    switch (command) {
+      case "L":
+        return `line to ${insetPoint([n[0], n[1]], inset)}`;
+      case "C":
+        return `curve to ${insetPoint([n[4], n[5]], inset)} with ${insetPoint([n[0], n[1]], inset)} / ${insetPoint([n[2], n[3]], inset)}`;
+      case "A": {
+        const [rx, ry, rotation, large, sweep, x, y] = n;
+        return [
+          `arc to ${insetPoint([x, y], inset)} of ${insetRadius(rx, W, inset)} ${insetRadius(ry, H, inset)}`,
+          sweep ? "cw" : "ccw",
+          large ? "large" : "",
+          rotation ? `rotate ${rotation}deg` : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+      }
+      case "Z":
+        return "close";
+      default:
+        throw new Error(`a frame's outline can't use ${command}`);
+    }
+  });
+
+/**
+ * Points along an SVG arc, after its start, from its endpoint form (SVG 1.1, F.6.5).
+ * @param {number[]} from The arc's start, in real units.
+ * @param {number[]} arc [rx, ry, rotation, large, sweep, x, y], as in paths.js.
+ * @returns {number[][]} SAMPLES points, the last at the arc's end.
+ */
+const arcPoints = (from, [rx, ry, rotation, large, sweep, x, y]) => {
+  const angle = (rotation * Math.PI) / 180;
+  const [cos, sin] = [Math.cos(angle), Math.sin(angle)];
+  const [dx, dy] = [(from[0] - x) / 2, (from[1] - y) / 2];
+  const [x1, y1] = [cos * dx + sin * dy, -sin * dx + cos * dy];
+  // Radii too small to reach are scaled up, as SVG does.
+  const scale = Math.max(1, Math.sqrt((x1 * x1) / (rx * rx) + (y1 * y1) / (ry * ry)));
+  const [radiusX, radiusY] = [rx * scale, ry * scale];
+  const numerator = Math.max(
+    0,
+    radiusX ** 2 * radiusY ** 2 - radiusX ** 2 * y1 ** 2 - radiusY ** 2 * x1 ** 2,
+  );
+  const sign = large === sweep ? -1 : 1;
+  const factor =
+    sign * Math.sqrt(numerator / (radiusX ** 2 * y1 ** 2 + radiusY ** 2 * x1 ** 2) || 0);
+  const [cx1, cy1] = [(factor * radiusX * y1) / radiusY, (-factor * radiusY * x1) / radiusX];
+  const centre = [
+    cos * cx1 - sin * cy1 + (from[0] + x) / 2,
+    sin * cx1 + cos * cy1 + (from[1] + y) / 2,
+  ];
+  const start = Math.atan2((y1 - cy1) / radiusY, (x1 - cx1) / radiusX);
+  let sweepAngle = Math.atan2((-y1 - cy1) / radiusY, (-x1 - cx1) / radiusX) - start;
+  if (sweep && sweepAngle < 0) {
+    sweepAngle += 2 * Math.PI;
+  } else if (!sweep && sweepAngle > 0) {
+    sweepAngle -= 2 * Math.PI;
+  }
+  return Array.from({ length: SAMPLES }, (_, i) => {
+    const theta = start + (sweepAngle * (i + 1)) / SAMPLES;
+    const [ex, ey] = [radiusX * Math.cos(theta), radiusY * Math.sin(theta)];
+    return [centre[0] + cos * ex - sin * ey, centre[1] + sin * ex + cos * ey];
+  });
+};
+
+/**
+ * A drawn outline as polygon points, its curves and arcs sampled.
+ * @param {Array[]} segments The drawing's segments, as in paths.js.
+ * @returns {number[][]} Points in real units, starting at the move.
+ */
+const outlinePoints = (segments) => {
+  const points = [[segments[0][1], segments[0][2]]];
+  for (const [command, ...n] of segments.slice(1)) {
+    const from = points.at(-1);
+    if (command === "L") {
+      points.push([n[0], n[1]]);
+    } else if (command === "C") {
+      for (let i = 1; i <= SAMPLES; i++) {
+        const t = i / SAMPLES;
+        const [a, b, c, d] = [(1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3];
+        points.push([
+          a * from[0] + b * n[0] + c * n[2] + d * n[4],
+          a * from[1] + b * n[1] + c * n[3] + d * n[5],
+        ]);
+      }
+    } else if (command === "A") {
+      points.push(...arcPoints(from, n));
+    }
+  }
+  return points;
+};
+
+/**
+ * A frame's clip-paths from its drawing: the outline, and rings just inside it. Each is a polygon
+ * fallback, then the shape().
+ * @param {Array[]} segments The drawing's segments, as in paths.js.
+ * @returns {{ outer: string[], ring: (inset: string) => string[] }} The outline, and a ring
+ *   `inset` wide: the outline minus the outline mapped into a box inset by `inset`.
+ */
+const frameOutline = (segments) => {
+  const points = outlinePoints(segments);
+  const start = [segments[0][1], segments[0][2]];
+  const loop = (inset) => [...points, points[0]].map((p) => insetPoint(p, inset)).join(", ");
+  return {
+    outer: [
+      `polygon(${points.map((p) => insetPoint(p, null)).join(", ")})`,
+      `shape(from ${insetPoint(start, null)}, ${insetCommands(segments, null).join(", ")})`,
+    ],
+    ring: (inset) => [
+      `polygon(evenodd, ${loop(null)}, ${loop(inset)})`,
+      `shape(evenodd from ${insetPoint(start, null)}, ${insetCommands(segments, null).join(", ")}, move to ${insetPoint(start, inset)}, ${insetCommands(segments, inset).join(", ")})`,
+    ],
+  };
+};
+
 // The same shape upside down, for an ordinary's reversed form.
 const flipPath = (segments) =>
   segments.map(([command, ...n]) => {
@@ -622,9 +785,14 @@ const flipPath = (segments) =>
 
 // Drawn shapes by `ordinary-line`, each reversible one also upside down as `ordinary-reversed-line`
 // unless it was drawn too. Upper-only battlements would flip onto the lower edges, so those aren't.
-const DRAWN = { ...PATHS };
+// Shield outlines, such as the heater, have no line and aren't ordinaries.
+const DRAWN = {};
 for (const key of Object.keys(PATHS)) {
   const name = LINE_NAMES.find((line) => key.endsWith(`-${line}`));
+  if (!name) {
+    continue;
+  }
+  DRAWN[key] = PATHS[key];
   const ordinary = key.slice(0, -name.length - 1);
   const reversedKey = `${ordinary}-reversed-${name}`;
   const upperOnly = name === "embattled" && UPPER_ONLY.includes(ordinary);
@@ -701,17 +869,56 @@ const PAINTS = [
   [OF_THE_FIRST, "var(--the-first, transparent)"],
 ];
 
-export { draftOutline, DRAWN, flipPath, generatedShape, ORDINARIES, pathShape, svgPath };
+// Any frame, e.g. the heater, and a frame's field as `${FRAME} > *`.
+const FRAME = `:is(${FRAMES.map((frame) => `.${frame}`).join(", ")})`;
+
+// The outline's width, just inside the frame's edge.
+const OUTLINE_WIDTH = "2px";
+
+export {
+  draftOutline,
+  DRAWN,
+  flipPath,
+  frameOutline,
+  generatedShape,
+  ORDINARIES,
+  pathShape,
+  svgPath,
+};
 
 export default plugin(({ addBase, addUtilities, theme }) => {
   // Unset on an inescutcheon, a canton or a part of a divided shield, so it can't inherit its
   // shield's layout. In the base layer, so an ordinary on it still sets its own.
   addBase({
-    ".inescutcheon, .canton, :is(.escutcheon, .escutcheon *):is(.quarterly, .per-pale, .per-fess) > *":
+    ".inescutcheon, .inescutcheon > *, .canton, :is(.heater, .heater *):is(.quarterly, .per-pale, .per-fess) > *":
       Object.fromEntries(layoutVars().map((name) => [name, "initial"])),
   });
 
   const utilities = {};
+
+  // The frame's shape. Inside it, from the bottom: the field's ordinaries (1), its charges, the
+  // bordure's ring (2, set by bordure-*), the chief (3) and its charges (4), a canton or
+  // inescutcheon (5), and the outline (6). Every frame is drawn as a heater.
+  const heater = frameOutline(PATHS.heater);
+  for (const frame of FRAMES) {
+    utilities[`.${frame}`] = {
+      "clip-path": heater.outer,
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        inset: "0",
+        "z-index": "6",
+        "background-color": "var(--color-sable)",
+        "clip-path": heater.ring(OUTLINE_WIDTH),
+      },
+      "&::after": {
+        position: "absolute",
+        inset: "0",
+        "z-index": "2",
+        "clip-path": heater.ring("var(--bordure-width)"),
+      },
+    };
+  }
 
   for (const [tincture, colour] of PAINTS) {
     utilities[`.fimbriated-${tincture}`] = {
@@ -720,11 +927,10 @@ export default plugin(({ addBase, addUtilities, theme }) => {
     };
   }
 
-  // Isolated, so an ordinary in a quarter paints under the shield's own ordinary.
-  // The chief's ::after stays unraised, so charges on it stay on top.
+  // Isolated, so an ordinary in a quarter paints under the shield's own ordinary. A frame's field
+  // isn't, so the frame's bordure ring can go between its ordinaries and its chief.
   const ordinaryRules = (ordinary, pseudo, line) => ({
     position: "relative",
-    isolation: "isolate",
     ...(BETWEEN[ordinary] && betweenVars(mergeLined(ordinary, line))),
     ...(ON[ordinary] && onVars(ON[ordinary], ON_SCALE[line] ?? 1)),
     // With a chief, everything else is drawn in the field below it.
@@ -737,9 +943,11 @@ export default plugin(({ addBase, addUtilities, theme }) => {
     [PSEUDO[ordinary] ?? "&::before"]: {
       content: '""',
       position: "absolute",
-      ...(!PSEUDO[ordinary] && { "z-index": "1" }),
+      // The chief goes over a frame's bordure ring, and its charges over it.
+      "z-index": PSEUDO[ordinary] ? "3" : "1",
       ...pseudo,
     },
+    [`&:not(${FRAME} > *)`]: { isolation: "isolate" },
   });
 
   for (const [ordinary, vertices] of Object.entries(ORDINARIES)) {

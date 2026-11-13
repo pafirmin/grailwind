@@ -4,7 +4,7 @@ import { Linter } from "eslint";
 import plugin from "../src/index.js";
 
 const lint = (options) =>
-  new Linter().verify("<div className='escutcheon ermine fess-argent' />", {
+  new Linter().verify("<div className='heater'><div className='ermine fess-argent' /></div>", {
     languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
     plugins: { grailwind: plugin },
     rules: { "grailwind/rule-of-tincture": ["error", options] },

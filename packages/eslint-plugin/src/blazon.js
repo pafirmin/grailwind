@@ -7,6 +7,7 @@ import {
   CHARGES,
   COLOURS,
   DIVISIONS,
+  FRAMES,
   FUR_PATTERNS,
   FURS,
   LINES,
@@ -150,6 +151,36 @@ export function ordinariesOf(classes) {
 
 export const isDivided = (classes) => [...classes].some((cls) => DIVISION_CLASSES.has(cls));
 
+/**
+ * The frame an element is, e.g. `heater` or `inescutcheon`, or undefined.
+ * @param {Set<string>} classes The element's classes.
+ * @returns {string|undefined} The frame's class.
+ */
+export const frameOf = (classes) => FRAMES.find((frame) => classes.has(frame));
+
+/**
+ * The classes that belong on a field: its tincture or division, its ordinaries, chief and
+ * bordure, and their fimbriation.
+ * @param {Set<string>} classes The element's classes.
+ * @returns {string[]} Those of `classes` that do.
+ */
+export const fieldClassesOf = (classes) =>
+  [...classes].filter(
+    (cls) =>
+      PAINT.has(cls) ||
+      DIVISIONS.includes(cls) ||
+      DIVISION_CLASSES.has(cls) ||
+      ORDINARY_CLASSES.has(cls) ||
+      FIMBRIATIONS.has(cls),
+  );
+
+/**
+ * A frame's field: its one child element.
+ * @param {object} el A frame, from getElements().
+ * @returns {object|null} The field, or null if the frame hasn't exactly one child element.
+ */
+export const fieldOf = (el) => (el.children.length === 1 ? el.children[0] : null);
+
 // The single bare tincture of a plain field. A divided field, or none, has no tincture.
 export function fieldTincture(classes) {
   if (isDivided(classes)) {
@@ -196,11 +227,12 @@ const fieldFirst = (classes) => {
   return division ? DIVISION_CLASSES.get(division) : fieldTincture(classes);
 };
 
-// `of-the-first` on an element: the nearest escutcheon's or quarter's first (not a canton's).
-// Null if the shield can't be seen.
+// `of-the-first` on an element: the nearest shield's or quarter's first (not a canton's, nor an
+// inescutcheon's). A shield's field is the child of its frame. Null if the shield can't be seen.
 export function firstOf(el) {
   for (let node = el; node && node !== UNKNOWN; node = node.parent) {
-    if (node.classes?.has("escutcheon") || node.parent?.classes?.has("quarterly")) {
+    const frame = node.parent?.classes && frameOf(node.parent.classes);
+    if ((frame && frame !== "inescutcheon") || node.parent?.classes?.has("quarterly")) {
       const first = fieldFirst(node.classes);
       return first === OF_THE_FIRST ? null : first;
     }

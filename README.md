@@ -11,11 +11,13 @@ Heraldic blazon for [Tailwind CSS](https://tailwindcss.com). Draw coats of
 arms, or style anything else, in the language heralds have used for 800 years:
 
 ```html
-<div class="escutcheon azure chevron-or">
-  <div class="charges between">
-    <i class="mullet argent"></i>
-    <i class="mullet argent"></i>
-    <i class="mullet argent"></i>
+<div class="heater">
+  <div class="azure chevron-or">
+    <div class="charges between">
+      <i class="mullet argent"></i>
+      <i class="mullet argent"></i>
+      <i class="mullet argent"></i>
+    </div>
   </div>
 </div>
 ```
@@ -55,8 +57,9 @@ tinctures replace Tailwind's colours entirely.
   Tailwind's prefixes work as usual (`text-or`). There are also the furs `ermine`,
   `ermines`, `erminois`, `pean`, `vair` and `potent` (with `vairy-or-gules` and the like), which
   work in divisions too, and `fur-<n>` sets their density.
-- **The shield:** `escutcheon`, plus `bordure-*`, `inescutcheon` (a small shield at the centre)
-  and `canton` (a ninth of the shield in dexter chief), each with its own field and charges.
+- **The shield:** `heater`, a pointed shield round its one child, the field, plus `bordure-*`,
+  `inescutcheon` (a small shield at the centre) and `canton` (a ninth of the shield in dexter
+  chief), each with its own field and charges.
 - **Divided fields:** `per-pale-or-gules`, `quarterly-azure-argent`,
   `gyronny-or-sable`, `barry-argent-azure`, `bendy-argent-gules`, `chequy-or-azure` and more, or
   `per-pale`, `per-fess` and `quarterly` for layout.

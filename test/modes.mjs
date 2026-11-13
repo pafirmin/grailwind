@@ -35,7 +35,8 @@ const CLASSES = [
   "chevron-counterchanged",
   "chief-counterchanged",
   "quarterly-or-gules",
-  "escutcheon",
+  "heater",
+  "inescutcheon",
   "charges",
   "fess-engrailed-or",
   "chief-invected-azure",
@@ -93,9 +94,9 @@ const PATTERNS = {
   "grid quarterly stays equal off a shield":
     /\.quarterly \{\s*display: grid;[^}]*grid-template-rows: 1fr 1fr;/,
   "grid quarterly splits at the fess point on a shield":
-    /\.quarterly \{[^]*?&:is\(\.escutcheon, \.escutcheon \*\) \{\s*grid-template-rows: 45fr 55fr;/,
+    /\.quarterly \{[^]*?&:is\(\.heater, \.heater \*\) \{\s*grid-template-rows: 45fr 55fr;/,
   "grid per-fess splits at the fess point on a shield, in two parts only":
-    /\.per-fess \{[^]*?&:is\(\.escutcheon, \.escutcheon \*\) \{\s*&:has\(> :last-child:nth-child\(2\)\) \{\s*grid-template-rows: 45fr 55fr;/,
+    /\.per-fess \{[^]*?&:is\(\.heater, \.heater \*\) \{\s*&:has\(> :last-child:nth-child\(2\)\) \{\s*grid-template-rows: 45fr 55fr;/,
   "counterchange vars don't inherit":
     /@property --counterchange-image \{\s*syntax: "\*";\s*inherits: false;/,
   "a counterchanged ordinary pulls them from its shield":
@@ -106,32 +107,74 @@ const PATTERNS = {
     /\.chevron-counterchanged \{[^]*?clip-path: polygon\(50% calc\(22% \+ var\(--field-top, 0%\) \* 0\.78\),/,
   "a counterchanged ordinary isn't fimbriated":
     /\.chevron-counterchanged \{[^]*?&::before \{(?:(?!fimbriat)[^}])*\}/,
-  "an ordinary is isolated": /\.bend-sable \{[^}]*isolation: isolate;/,
+  "an ordinary is isolated, but not on a frame's field":
+    /\.bend-sable \{[^]*?&:not\(:is\(\.heater, \.inescutcheon\) > \*\) \{\s*isolation: isolate;/,
   "an ordinary paints over a quarter's own": /\.bend-sable \{[^]*?&::before \{[^}]*z-index: 1;/,
   "a counterchanged ordinary does too":
     /\.chevron-counterchanged \{[^]*?&::before \{[^}]*z-index: 1;/,
-  "the chief stays under charges on it": /\.chief-or \{[^]*?&::after \{(?:(?!z-index)[^}])*\}/,
+  "the chief goes over a frame's bordure ring": /\.chief-or \{[^]*?&::after \{[^}]*z-index: 3;/,
+  "charges in chief go over the chief": /\.in-chief\.charges \{\s*z-index: 4;/,
+  "a charge at a chief point raises its container over the chief":
+    /\.charges:has\( > \.in-chief-point\) \{\s*z-index: 4;/,
+  "a charge elsewhere doesn't": /^(?![^]*\.charges:has\( > \.in-base-point\))/,
   "a canton doesn't inherit its shield's layout":
-    /\.inescutcheon, \.canton[,\s][^{]*\{[^}]*--field-top: initial;/,
+    /\.inescutcheon, \.inescutcheon > \*, \.canton[,\s][^{]*\{[^}]*--field-top: initial;/,
   "a part of a divided shield doesn't inherit its shield's layout":
     /:is\(\.quarterly, \.per-pale, \.per-fess\) > \* \{[^}]*--field-top: initial;/,
   "a part is contained only on a shield, not in a page layout":
-    /\.per-pale \{[^}]*&:is\(\.escutcheon, \.escutcheon \*\) > \* \{[^}]*contain: layout;/,
+    /\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > \* \{[^}]*contain: layout;/,
   "in-bend-sinister runs from sinister chief":
     /\.in-bend-sinister:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: 78%;\s*top: 16%;/,
   "in-chief takes the chief's points":
     /\.in-chief:has\( > :nth-child\(3\):last-child\) > :nth-child\(2\) \{\s*left: 50%;\s*top: var\(--chief-points-y, 15%\);/,
-  "the escutcheon holds charges' fixed layers": /\.escutcheon \{[^}]*contain: layout;/,
-  "the escutcheon starts the count of the first":
-    /\.escutcheon \{[^}]*--the-first: var\(--field-first\);/,
+  "the heater holds charges' fixed layers": /\.heater \{[^}]*contain: layout;/,
+  "the heater's field starts the count of the first":
+    /\.heater \{[^]*?& > \* \{[^}]*--the-first: var\(--field-first\);/,
+  "an inescutcheon's field doesn't, as of the first is the shield's":
+    /\.inescutcheon \{[^{}]*& > \* \{(?:(?!--the-first)[^}])*\}/,
+  "the heater is a container, for its ring's cqw":
+    /\.heater \{[^}]*container-type: inline-size;\s*--bordure-width: 6\.25cqw;/,
+  "so is an inescutcheon, so its ring is a third as wide":
+    /\.inescutcheon \{[^}]*container-type: inline-size;\s*--bordure-width: 6\.25cqw;/,
+  "a frame clips to a polygon, then to its shape()":
+    /\.heater \{\s*clip-path: polygon\(0 0, 100% 0, 100% 55%,[^;]*\);\s*clip-path: shape\(from 0 0, line to 100% 0, line to 100% 55%, curve to 50% 100% with[^;]*\);/,
+  "an inescutcheon is a frame too":
+    /\.inescutcheon \{\s*clip-path: polygon\([^;]*\);\s*clip-path: shape\(/,
+  "a frame's outline is a 2px ring on top":
+    /\.heater \{\s*clip-path:[^]*?&::before \{[^}]*z-index: 6;\s*background-color: var\(--color-sable\);\s*clip-path: polygon\(evenodd, [^;]*\);\s*clip-path: shape\(evenodd from 0 0, [^;]*, close, move to 2px 2px, line to calc\(100% - 2px\) 2px,/,
+  "a frame's bordure ring sits under the chief, its width a var":
+    /\.heater \{\s*clip-path:[^]*?&::after \{[^}]*z-index: 2;\s*clip-path: polygon\(evenodd, [^;]*\);\s*clip-path: shape\(evenodd from 0 0, [^;]*move to var\(--bordure-width\) var\(--bordure-width\),/,
+  "a bordure is a border, so what's inside it lays out within it":
+    /\.bordure-or \{\s*border-style: solid;\s*border-width: var\(--bordure-width, 0\.75rem\);\s*border-color: var\(--color-or\);/,
+  "on a frame's field the border is transparent":
+    /\.bordure-or \{[^}]*:is\(\.heater, \.inescutcheon\) > & \{\s*border-color: transparent;/,
+  "and the frame's ring paints it":
+    /\.bordure-or \{[^]*?:is\(\.heater, \.inescutcheon\):has\( ?> &\)::after \{\s*content: "";\s*background-color: var\(--color-or\);/,
+  "a frame's ring of the first is the shield's first":
+    /\.bordure-of-the-first \{[^]*?:is\(\.heater, \.inescutcheon\):has\( ?> &\)::after \{\s*content: "";\s*background-color: var\(--frame-first, transparent\);/,
+  "a frame's first inherits, to reach its ::after":
+    /@property --frame-first \{\s*syntax: "\*";\s*inherits: true;/,
+  "a tincture sets its frame's first":
+    /\.gules \{[^}]*\.heater:has\( ?> &\) \{\s*--frame-first: var\(--color-gules\);/,
+  "an inescutcheon doesn't, so it inherits the shield's":
+    /^(?![^]*\.inescutcheon[^{,]*:has\( ?> &\) \{\s*--frame-first)/,
+  "a division sets its frame's first":
+    /\.per-pale-or-gules \{[^}]*\.heater:has\( ?> &\) \{\s*--frame-first: var\(--color-or\);/,
+  "a canton's bordure is a third of the shield's":
+    /\.canton \{[^}]*--bordure-width: calc\(6\.25cqw \/ 3\);/,
+  "no .escutcheon selector is left": /^(?![^]*\.escutcheon\b)/,
   "each quarter starts its own":
     /\.quarterly \{[^}]*& > \* \{\s*--the-first: var\(--field-first\);/,
   "a field's bordure width doesn't inherit":
     /@property --bordure-inset \{\s*syntax: "<length>";\s*inherits: false;\s*initial-value: 0px;/,
-  "a bordure publishes its width":
+  "a bordure as a border publishes its width":
     /\.bordure-of-the-first \{[^}]*--bordure-inset: var\(--bordure-width, 0\.75rem\);/,
-  "the escutcheon passes its bordure width down":
-    /\.escutcheon \{[^}]*--outer-inset: var\(--bordure-inset\);/,
+  "a frame's field passes its bordure width down":
+    /\.heater \{[^]*?& > \* \{[^}]*--outer-inset: var\(--bordure-inset\);/,
+  "a counterchanged charge's layer steps in by the field's bordure":
+    /\.heater \{[^]*?& > \* \{[^}]*--layer-inset: var\(--bordure-inset\);/,
+  "but not in a canton or a part of a divided shield, which hold their own layers":
+    /\.canton \{[^}]*--layer-inset: 0px;[^]*\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > \* \{[^}]*--layer-inset: 0px;|\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > \* \{[^}]*--layer-inset: 0px;[^]*\.canton \{[^}]*--layer-inset: 0px;/,
   "a quarter has no bordure to surmount": /\.quarterly \{[^}]*& > \* \{[^}]*--outer-inset: 0px;/,
   "the chief pulls its own element's bordure width":
     /\.chief-or \{[^]*?&::after \{[^}]*--bordure-inset: inherit;[^}]*clip-path: polygon\(calc\(-1 \* var\(--bordure-inset\)\)[^;]*\) content-box;/,
@@ -147,7 +190,7 @@ const PATTERNS = {
     /\.charges \{[^]*?& > \* \{(?:(?!translate)[^}])*margin: calc\(var\(--charge-width\) \/ -2\) 0 0 calc\(var\(--charge-width\) \/ -2\);/,
   "charges pass the swap down": /\.charges \{[^}]*--counterchange-image: inherit;/,
   "a counterchanged charge has a fixed layer":
-    /\.charges > \.counterchanged \{[^]*?&::before \{[^}]*position: fixed;[^}]*background-image: var\(--on-counterchange-image, var\(--counterchange-image\)\);/,
+    /\.charges > \.counterchanged \{[^]*?&::before \{[^}]*position: fixed;\s*inset: var\(--layer-inset, 0px\);[^}]*background-image: var\(--on-counterchange-image, var\(--counterchange-image\)\);/,
   "counterchanged on the container applies to each charge":
     /\.counterchanged\.charges > \* \{[^]*?&::before \{[^}]*position: fixed;/,
   "the chief isn't fimbriated": /\.chief-or \{[^]*?&::after \{(?:(?!fimbriat)[^}])*\}/,
@@ -232,7 +275,7 @@ const DATA_CLASSES = [
 
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly per-pale per-fess"></div>`,
+  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly per-pale per-fess bordure-or"></div>`,
 );
 
 let checks = 0;
@@ -272,7 +315,10 @@ try {
     "and a fur division's": /\.per-pale-ermine-gules \{[^}]*%2300ff00/.test(themed),
   };
   // Tailwind only emits the theme variables that generated CSS uses.
-  writeFileSync(join(dir, "erminois.html"), `<div class="escutcheon erminois"></div>`);
+  writeFileSync(
+    join(dir, "erminois.html"),
+    `<div class="heater"><div class="erminois"></div></div>`,
+  );
   furChecks["a fur alone still defines its ground's colour"] = /--color-or: #f5c518;/.test(
     await build({ dir, source: "erminois.html" }),
   );

@@ -141,7 +141,7 @@
   }
 
   /* Examples: the shield and its blazon centred over the code. */
-  figure[data-blazon] > .escutcheon {
+  figure[data-blazon] > .heater {
     @apply mx-auto;
   }
 

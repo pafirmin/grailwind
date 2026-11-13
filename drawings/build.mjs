@@ -14,6 +14,7 @@ const pathsFile = join(root, "paths.js");
 
 // Fox-Davies figure for each drawing. The pall takes the saltire's.
 const FIGURES = {
+  heater: 210,
   "chevron-wavy": 133,
   "chevron-indented": 132,
   "chevron-embattled": 130,
@@ -168,6 +169,9 @@ export const outlineOf = (svg, file) => {
   throw new Error(`${file}: no <path id="outline">`);
 };
 
+// Shield outlines, drawn whole rather than as an ordinary with a line.
+const OUTLINES = ["heater"];
+
 // Splits a drawing's name, e.g. "pile-engrailed", into its ordinary and line.
 export const parseName = (name, where) => {
   const line = LINES.find((l) => name.endsWith(`-${l}`));
@@ -185,7 +189,9 @@ const readDrawings = () => {
   const paths = {};
   for (const file of files.sort()) {
     const key = file.slice(0, -4);
-    parseName(key, `drawings/${file}`);
+    if (!OUTLINES.includes(key)) {
+      parseName(key, `drawings/${file}`);
+    }
     paths[key] = convertPath(
       outlineOf(readFileSync(join(dir, file), "utf8"), `drawings/${file}`),
       `drawings/${file}`,

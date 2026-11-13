@@ -155,15 +155,16 @@ const inheritOnCounterchange = Object.fromEntries(
   COUNTERCHANGE.map((n) => [`--on-counterchange-${n}`, "inherit"]),
 );
 
-// A layer the size of the shield, as the escutcheon is the containing block
-// for fixed positioning. The charge's mask cuts it to shape.
+// A layer the size of the field, as the heater (or a part of a divided shield, or a canton) is
+// the containing block for fixed positioning, and the field lies inside its bordure by
+// --layer-inset. The charge's mask cuts it to shape.
 const counterchanged = {
   ...inheritCounterchange,
   ...inheritOnCounterchange,
   "&::before": {
     content: '""',
     position: "fixed",
-    inset: "0",
+    inset: "var(--layer-inset, 0px)",
     ...inheritCounterchange,
     ...inheritOnCounterchange,
     ...Object.fromEntries(
@@ -211,7 +212,7 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   const charges = {
     position: "absolute",
     inset: "var(--field-top, 0%) 0 0",
-    // Above the chief, which is painted last, so charges can sit on it.
+    // Above the field's ordinaries. Charges on the chief go higher, with it (see below).
     "z-index": "1",
     ...inheritCounterchange,
     "& > *": {
@@ -241,8 +242,11 @@ export default plugin(({ addUtilities, matchUtilities }) => {
     utilities[`.${name}`] = arrangement;
   }
 
+  // Charges on the chief go over it (z 3), which goes over a frame's bordure ring (z 2).
+  const onChief = { "z-index": "4" };
+
   for (const [name, counts] of Object.entries(ALONG)) {
-    const arrangement = {};
+    const arrangement = name === "in-chief" ? { "&.charges": onChief } : {};
     for (const [count, points] of Object.entries(counts)) {
       points.forEach((point, i) => {
         arrangement[`&${hasCount(count)} > :nth-child(${i + 1})`] = atPoint(point);
@@ -294,7 +298,10 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   utilities[".on"] = { "&": inheritOnCounterchange, ...on };
 
   for (const name of Object.keys(POINTS)) {
-    utilities[`.in-${name}`] = { ".charges > &": atPoint(name) };
+    utilities[`.in-${name}`] = {
+      ".charges > &": atPoint(name),
+      ...(CHIEF_POINTS.has(name) && { ".charges:has(> &)": onChief }),
+    };
   }
 
   // The whole field, under the ordinaries and the chief. A custom charge has no tile, so it

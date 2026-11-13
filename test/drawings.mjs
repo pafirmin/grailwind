@@ -7,6 +7,7 @@ import {
   draftOutline,
   DRAWN,
   flipPath,
+  frameOutline,
   generatedShape,
   pathShape,
   svgPath,
@@ -108,6 +109,26 @@ check(
   JSON.stringify(parseName("bend-sinister-embattled", "x.svg")) ===
     JSON.stringify({ ordinary: "bend-sinister", line: "embattled" }),
 );
+
+{
+  // The upper half of an ellipse filling the box: its middle sample is the top centre.
+  const dome = frameOutline([["M", 0, 60], ["A", 50, 60, 0, 0, 1, 100, 60], ["Z"]]);
+  check(
+    "a frame's polygon samples its arcs",
+    dome.outer[0].startsWith("polygon(0 50%, ") && dome.outer[0].includes(", 50% 0, "),
+    `  ${dome.outer[0]}`,
+  );
+  check(
+    "a frame's ring scales its arcs' radii with the inset box",
+    dome
+      .ring("2px")[1]
+      .endsWith(
+        "move to 2px calc(2px + 0.5 * (100% - 2 * 2px)), arc to calc(100% - 2px) calc(2px + 0.5 * (100% - 2 * 2px)) of calc(0.5 * (100% - 2 * 2px)) calc(0.5 * (100% - 2 * 2px)) cw, close)",
+      ),
+    `  ${dome.ring("2px")[1]}`,
+  );
+}
+check("the heater is a frame, not an ordinary", !("heater" in DRAWN) && "heater" in PATHS);
 
 const SQUARE = [["M", 10, 20], ["L", 30, 20], ["L", 30, 40], ["L", 10, 40], ["Z"]];
 const CONVERSIONS = {

@@ -63,7 +63,9 @@
       class="azure text-argent sticky top-0 z-10 flex flex-col max-h-dvh lg:static"
     >
       <div class="w-full mx-auto max-w-6xl px-6 py-4 flex items-center gap-4">
-        <div class="escutcheon w-9 gyronny-or-gules" aria-hidden="true"></div>
+        <div class="heater w-9" aria-hidden="true">
+          <div class="gyronny-or-gules"></div>
+        </div>
         <a
           href="#"
           class="font-serif text-2xl no-underline text-or hover:text-argent"
@@ -226,11 +228,13 @@
             data-blazon="Azure, a chevron Or between three mullets Argent"
             data-size="w-48"
           >
-            <div class="escutcheon azure chevron-or">
-              <div class="charges between">
-                <i class="mullet argent"></i>
-                <i class="mullet argent"></i>
-                <i class="mullet argent"></i>
+            <div class="heater">
+              <div class="azure chevron-or">
+                <div class="charges between">
+                  <i class="mullet argent"></i>
+                  <i class="mullet argent"></i>
+                  <i class="mullet argent"></i>
+                </div>
               </div>
             </div>
           </figure>
@@ -310,13 +314,17 @@
 
           <div class="flex flex-wrap gap-6 my-8">
             <figure class="w-24 text-center">
-              <div class="escutcheon or"></div>
+              <div class="heater">
+                <div class="or"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>or</code><br /><span class="text-sm">gold, metal</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon argent"></div>
+              <div class="heater">
+                <div class="argent"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>argent</code><br /><span class="text-sm"
                   >silver, metal</span
@@ -324,31 +332,41 @@
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon gules"></div>
+              <div class="heater">
+                <div class="gules"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>gules</code><br /><span class="text-sm">red</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure"></div>
+              <div class="heater">
+                <div class="azure"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>azure</code><br /><span class="text-sm">blue</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon vert"></div>
+              <div class="heater">
+                <div class="vert"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>vert</code><br /><span class="text-sm">green</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon purpure"></div>
+              <div class="heater">
+                <div class="purpure"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>purpure</code><br /><span class="text-sm">purple</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon sable"></div>
+              <div class="heater">
+                <div class="sable"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>sable</code><br /><span class="text-sm">black</span>
               </figcaption>
@@ -367,15 +385,20 @@
               data-blazon="Gules, a fess Or"
               data-note="Good: a metal on a colour."
             >
-              <div class="escutcheon gules fess-or"></div>
+              <div class="heater">
+                <div class="gules fess-or"></div>
+              </div>
             </figure>
+            <!-- eslint-disable grailwind/rule-of-tincture -- the deliberate bad example -->
             <figure
               data-blazon="Gules, a fess Azure"
               data-note="Bad: a colour on a colour."
             >
-              <!-- eslint-disable-next-line grailwind/rule-of-tincture -- the deliberate bad example -->
-              <div class="escutcheon gules fess-azure"></div>
+              <div class="heater">
+                <div class="gules fess-azure"></div>
+              </div>
             </figure>
+            <!-- eslint-enable grailwind/rule-of-tincture -->
           </div>
 
           <h3 id="furs">Furs</h3>
@@ -386,7 +409,9 @@
           </p>
           <div class="flex flex-wrap gap-6 my-8">
             <figure class="w-24 text-center">
-              <div class="escutcheon ermine"></div>
+              <div class="heater">
+                <div class="ermine"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>ermine</code><br /><span class="text-sm"
                   >sable on argent</span
@@ -394,7 +419,9 @@
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon ermines"></div>
+              <div class="heater">
+                <div class="ermines"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>ermines</code><br /><span class="text-sm"
                   >argent on sable</span
@@ -402,7 +429,9 @@
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon erminois"></div>
+              <div class="heater">
+                <div class="erminois"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>erminois</code><br /><span class="text-sm"
                   >sable on or</span
@@ -410,13 +439,17 @@
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon pean"></div>
+              <div class="heater">
+                <div class="pean"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>pean</code><br /><span class="text-sm">or on sable</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon vair"></div>
+              <div class="heater">
+                <div class="vair"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>vair</code><br /><span class="text-sm"
                   >argent and azure</span
@@ -424,7 +457,9 @@
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon potent"></div>
+              <div class="heater">
+                <div class="potent"></div>
+              </div>
               <figcaption class="mt-2">
                 <code>potent</code><br /><span class="text-sm"
                   >argent and azure</span
@@ -444,33 +479,49 @@
           </p>
           <div class="examples">
             <figure data-blazon="Vair">
-              <div class="escutcheon vair"></div>
-            </figure>
-            <figure data-blazon="Menu-vair">
-              <div class="escutcheon vair fur-5"></div>
-            </figure>
-            <figure data-blazon="Vairy Or and Gules">
-              <div class="escutcheon vairy-or-gules"></div>
-            </figure>
-            <figure data-blazon="Azure, a chief Ermine">
-              <div class="escutcheon azure chief-ermine"></div>
-            </figure>
-            <figure data-blazon="Quarterly Azure and Pean, a bend Or">
-              <div class="escutcheon quarterly-azure-pean bend-or"></div>
-            </figure>
-            <figure data-blazon="Gules, a cross engrailed Erminois">
-              <div class="escutcheon gules cross-engrailed-erminois"></div>
-            </figure>
-            <figure data-blazon="Quarterly Vair and Counter-vair">
-              <div class="escutcheon quarterly">
-                <div class="vair"></div>
-                <div class="counter-vair"></div>
-                <div class="counter-vair"></div>
+              <div class="heater">
                 <div class="vair"></div>
               </div>
             </figure>
+            <figure data-blazon="Menu-vair">
+              <div class="heater">
+                <div class="vair fur-5"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Vairy Or and Gules">
+              <div class="heater">
+                <div class="vairy-or-gules"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Azure, a chief Ermine">
+              <div class="heater">
+                <div class="azure chief-ermine"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Quarterly Azure and Pean, a bend Or">
+              <div class="heater">
+                <div class="quarterly-azure-pean bend-or"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Gules, a cross engrailed Erminois">
+              <div class="heater">
+                <div class="gules cross-engrailed-erminois"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Quarterly Vair and Counter-vair">
+              <div class="heater">
+                <div class="quarterly">
+                  <div class="vair"></div>
+                  <div class="counter-vair"></div>
+                  <div class="counter-vair"></div>
+                  <div class="vair"></div>
+                </div>
+              </div>
+            </figure>
             <figure data-blazon="Counter-potent">
-              <div class="escutcheon counter-potent"></div>
+              <div class="heater">
+                <div class="counter-potent"></div>
+              </div>
             </figure>
           </div>
           <p>
@@ -490,8 +541,9 @@
         <section id="shield">
           <h2>The shield</h2>
           <p>
-            <code>escutcheon</code> gives an element a shield shape. Size it
-            however you like, e.g. <code>escutcheon w-40</code>.
+            <code>heater</code> draws a shield round its one child, the field,
+            which carries the blazon. Size it however you like, e.g.
+            <code>heater w-40</code>. Its outline is drawn just inside its edge.
           </p>
           <p>
             The top is the <strong>chief</strong> and the bottom is the
@@ -507,23 +559,25 @@
             <a href="#points">named points</a> for placing charges.
           </p>
           <div
-            class="escutcheon w-64 quarterly text-sm my-8"
+            class="heater w-64 text-sm my-8"
             role="img"
             aria-label="The quarters of a shield, labelled"
           >
-            <div class="argent flex items-center justify-center">
-              Dexter chief
-            </div>
-            <div class="azure text-argent flex items-center justify-center">
-              Sinister chief
-            </div>
-            <div
-              class="azure text-argent flex items-center justify-center pb-10"
-            >
-              Dexter base
-            </div>
-            <div class="argent flex items-center justify-center pb-10">
-              Sinister base
+            <div class="quarterly">
+              <div class="argent flex items-center justify-center">
+                Dexter chief
+              </div>
+              <div class="azure text-argent flex items-center justify-center">
+                Sinister chief
+              </div>
+              <div
+                class="azure text-argent flex items-center justify-center pb-10"
+              >
+                Dexter base
+              </div>
+              <div class="argent flex items-center justify-center pb-10">
+                Sinister base
+              </div>
             </div>
           </div>
         </section>
@@ -536,43 +590,69 @@
           </p>
           <div class="examples">
             <figure data-blazon="Per pale Or and Gules">
-              <div class="escutcheon per-pale-or-gules"></div>
+              <div class="heater">
+                <div class="per-pale-or-gules"></div>
+              </div>
             </figure>
             <figure data-blazon="Per fess Azure and Argent">
-              <div class="escutcheon per-fess-azure-argent"></div>
+              <div class="heater">
+                <div class="per-fess-azure-argent"></div>
+              </div>
             </figure>
             <figure data-blazon="Per bend Vert and Or">
-              <div class="escutcheon per-bend-vert-or"></div>
+              <div class="heater">
+                <div class="per-bend-vert-or"></div>
+              </div>
             </figure>
             <figure data-blazon="Quarterly Or and Gules">
-              <div class="escutcheon quarterly-or-gules"></div>
+              <div class="heater">
+                <div class="quarterly-or-gules"></div>
+              </div>
             </figure>
             <figure data-blazon="Per saltire Azure and Or">
-              <div class="escutcheon per-saltire-azure-or"></div>
+              <div class="heater">
+                <div class="per-saltire-azure-or"></div>
+              </div>
             </figure>
             <figure data-blazon="Per chevron Argent and Gules">
-              <div class="escutcheon per-chevron-argent-gules"></div>
+              <div class="heater">
+                <div class="per-chevron-argent-gules"></div>
+              </div>
             </figure>
             <figure data-blazon="Gyronny of eight Or and Sable">
-              <div class="escutcheon gyronny-or-sable"></div>
+              <div class="heater">
+                <div class="gyronny-or-sable"></div>
+              </div>
             </figure>
             <figure data-blazon="Paly of eight Or and Gules">
-              <div class="escutcheon paly-of-eight-or-gules"></div>
+              <div class="heater">
+                <div class="paly-of-eight-or-gules"></div>
+              </div>
             </figure>
             <figure data-blazon="Barry of six Argent and Azure">
-              <div class="escutcheon barry-argent-azure"></div>
+              <div class="heater">
+                <div class="barry-argent-azure"></div>
+              </div>
             </figure>
             <figure data-blazon="Bendy Argent and Gules">
-              <div class="escutcheon bendy-argent-gules"></div>
+              <div class="heater">
+                <div class="bendy-argent-gules"></div>
+              </div>
             </figure>
             <figure data-blazon="Chequy Or and Azure">
-              <div class="escutcheon chequy-or-azure"></div>
+              <div class="heater">
+                <div class="chequy-or-azure"></div>
+              </div>
             </figure>
             <figure data-blazon="Chevronny Or and Vert">
-              <div class="escutcheon chevronny-or-vert"></div>
+              <div class="heater">
+                <div class="chevronny-or-vert"></div>
+              </div>
             </figure>
             <figure data-blazon="Per bend sinister Gules and Argent">
-              <div class="escutcheon per-bend-sinister-gules-argent"></div>
+              <div class="heater">
+                <div class="per-bend-sinister-gules-argent"></div>
+              </div>
             </figure>
           </div>
           <p>
@@ -601,39 +681,45 @@
           </p>
           <div class="examples">
             <figure data-blazon="Per pale Or and Gules">
-              <div class="escutcheon per-pale">
-                <div class="or"></div>
-                <div class="gules"></div>
+              <div class="heater">
+                <div class="per-pale">
+                  <div class="or"></div>
+                  <div class="gules"></div>
+                </div>
               </div>
             </figure>
             <figure
               data-blazon="Quarterly: 1 and 4 per fess Or and Azure, 2 and 3 Gules"
             >
-              <div class="escutcheon quarterly">
-                <div class="per-fess-or-azure"></div>
-                <div class="gules"></div>
-                <div class="gules"></div>
-                <div class="per-fess-or-azure"></div>
+              <div class="heater">
+                <div class="quarterly">
+                  <div class="per-fess-or-azure"></div>
+                  <div class="gules"></div>
+                  <div class="gules"></div>
+                  <div class="per-fess-or-azure"></div>
+                </div>
               </div>
             </figure>
             <figure
               data-blazon="Quarterly: 1 and 4 Azure, three fleurs-de-lis Or; 2 and 3 Ermine"
             >
-              <div class="escutcheon quarterly">
-                <div class="azure">
-                  <div class="charges">
-                    <i class="fleur-de-lis or"></i>
-                    <i class="fleur-de-lis or"></i>
-                    <i class="fleur-de-lis or"></i>
+              <div class="heater">
+                <div class="quarterly">
+                  <div class="azure">
+                    <div class="charges">
+                      <i class="fleur-de-lis or"></i>
+                      <i class="fleur-de-lis or"></i>
+                      <i class="fleur-de-lis or"></i>
+                    </div>
                   </div>
-                </div>
-                <div class="ermine"></div>
-                <div class="ermine"></div>
-                <div class="azure">
-                  <div class="charges">
-                    <i class="fleur-de-lis or"></i>
-                    <i class="fleur-de-lis or"></i>
-                    <i class="fleur-de-lis or"></i>
+                  <div class="ermine"></div>
+                  <div class="ermine"></div>
+                  <div class="azure">
+                    <div class="charges">
+                      <i class="fleur-de-lis or"></i>
+                      <i class="fleur-de-lis or"></i>
+                      <i class="fleur-de-lis or"></i>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -642,47 +728,67 @@
 
           <h3 id="bordure">Bordure</h3>
           <p>
-            <code>bordure-or</code>, or any other tincture, adds a border. A
-            canton or a chief goes over it.
+            <code>bordure-or</code>, or any other tincture, adds a bordure that
+            follows the shield's outline. A canton or a chief goes over it. On a
+            part of a divided field or a canton, it's a plain border. To change
+            its width, set <code>--bordure-width</code> on the
+            <code>heater</code>.
           </p>
           <div class="examples">
             <figure data-blazon="Vert, a bordure Argent">
-              <div class="escutcheon vert bordure-argent"></div>
+              <div class="heater">
+                <div class="vert bordure-argent"></div>
+              </div>
             </figure>
             <figure data-blazon="Per pale Sable and Purpure, a bordure Or">
-              <div class="escutcheon per-pale-sable-purpure bordure-or"></div>
+              <div class="heater">
+                <div class="per-pale-sable-purpure bordure-or"></div>
+              </div>
             </figure>
             <figure data-blazon="Sable, a bordure Or, a canton Argent">
-              <div class="escutcheon sable bordure-or">
-                <div class="canton argent"></div>
+              <div class="heater">
+                <div class="sable bordure-or">
+                  <div class="canton argent"></div>
+                </div>
               </div>
             </figure>
             <figure data-blazon="Sable, a bordure Or, a chief Argent">
-              <div class="escutcheon sable bordure-or chief-argent"></div>
+              <div class="heater">
+                <div class="sable bordure-or chief-argent"></div>
+              </div>
             </figure>
           </div>
 
           <h3 id="inescutcheon">Inescutcheon</h3>
           <p>
             <code>inescutcheon</code> is a small shield placed at the centre of
-            the arms. It paints over everything else on the shield, and takes
-            its own field, ordinaries and charges.
+            the arms. Like <code>heater</code>, it goes round its one child, its
+            own field, with that field's ordinaries and charges. It paints over
+            everything else on the shield.
           </p>
           <div class="examples">
             <figure data-blazon="Azure, an inescutcheon Or">
-              <div class="escutcheon azure">
-                <div class="inescutcheon or"></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="inescutcheon">
+                    <div class="or"></div>
+                  </div>
+                </div>
               </div>
             </figure>
             <figure
               data-blazon="Gules, a fess Argent, over all on an inescutcheon Azure three fleurs-de-lis Or"
             >
-              <div class="escutcheon gules fess-argent">
-                <div class="inescutcheon azure">
-                  <div class="charges">
-                    <i class="fleur-de-lis or"></i>
-                    <i class="fleur-de-lis or"></i>
-                    <i class="fleur-de-lis or"></i>
+              <div class="heater">
+                <div class="gules fess-argent">
+                  <div class="inescutcheon">
+                    <div class="azure">
+                      <div class="charges">
+                        <i class="fleur-de-lis or"></i>
+                        <i class="fleur-de-lis or"></i>
+                        <i class="fleur-de-lis or"></i>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -699,31 +805,39 @@
           </p>
           <div class="examples">
             <figure data-blazon="Argent, a canton Sable">
-              <div class="escutcheon argent">
-                <div class="canton sable"></div>
+              <div class="heater">
+                <div class="argent">
+                  <div class="canton sable"></div>
+                </div>
               </div>
             </figure>
             <figure data-blazon="Sable, on a canton Argent a cross Gules">
-              <div class="escutcheon sable">
-                <div class="canton argent cross-gules"></div>
+              <div class="heater">
+                <div class="sable">
+                  <div class="canton argent cross-gules"></div>
+                </div>
               </div>
             </figure>
             <figure
               data-blazon="Argent, a bend Azure, on a canton Gules three bezants"
             >
-              <div class="escutcheon argent bend-azure">
-                <div class="canton gules">
-                  <div class="charges">
-                    <i class="bezant"></i>
-                    <i class="bezant"></i>
-                    <i class="bezant"></i>
+              <div class="heater">
+                <div class="argent bend-azure">
+                  <div class="canton gules">
+                    <div class="charges">
+                      <i class="bezant"></i>
+                      <i class="bezant"></i>
+                      <i class="bezant"></i>
+                    </div>
                   </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Azure, a chief Or, a canton Ermine">
-              <div class="escutcheon azure chief-or">
-                <div class="canton ermine"></div>
+              <div class="heater">
+                <div class="azure chief-or">
+                  <div class="canton ermine"></div>
+                </div>
               </div>
             </figure>
           </div>
@@ -823,52 +937,84 @@
             >
               <div class="examples">
                 <figure data-blazon="Azure, a fess Or">
-                  <div class="escutcheon azure fess-or"></div>
+                  <div class="heater">
+                    <div class="azure fess-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a bend Sable">
-                  <div class="escutcheon or bend-sable"></div>
+                  <div class="heater">
+                    <div class="or bend-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, a chevron Argent">
-                  <div class="escutcheon gules chevron-argent"></div>
+                  <div class="heater">
+                    <div class="gules chevron-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a cross Gules">
-                  <div class="escutcheon argent cross-gules"></div>
+                  <div class="heater">
+                    <div class="argent cross-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pale Argent">
-                  <div class="escutcheon vert pale-argent"></div>
+                  <div class="heater">
+                    <div class="vert pale-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Azure, a saltire Argent">
-                  <div class="escutcheon azure saltire-argent"></div>
+                  <div class="heater">
+                    <div class="azure saltire-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a chief Azure">
-                  <div class="escutcheon or chief-azure"></div>
+                  <div class="heater">
+                    <div class="or chief-azure"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pall Or">
-                  <div class="escutcheon vert pall-or"></div>
+                  <div class="heater">
+                    <div class="vert pall-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a pile Gules">
-                  <div class="escutcheon or pile-gules"></div>
+                  <div class="heater">
+                    <div class="or pile-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a bar Or">
-                  <div class="escutcheon sable bar-or"></div>
+                  <div class="heater">
+                    <div class="sable bar-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, two bars Or">
-                  <div class="escutcheon gules two-bars-or"></div>
+                  <div class="heater">
+                    <div class="gules two-bars-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Purpure, three bars Argent">
-                  <div class="escutcheon purpure three-bars-argent"></div>
+                  <div class="heater">
+                    <div class="purpure three-bars-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a bend sinister Vert">
-                  <div class="escutcheon argent bend-sinister-vert"></div>
+                  <div class="heater">
+                    <div class="argent bend-sinister-vert"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a chevron reversed Sable">
-                  <div class="escutcheon argent chevron-reversed-sable"></div>
+                  <div class="heater">
+                    <div class="argent chevron-reversed-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a pall reversed Argent">
-                  <div class="escutcheon sable pall-reversed-argent"></div>
+                  <div class="heater">
+                    <div class="sable pall-reversed-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a pile reversed Purpure">
-                  <div class="escutcheon argent pile-reversed-purpure"></div>
+                  <div class="heater">
+                    <div class="argent pile-reversed-purpure"></div>
+                  </div>
                 </figure>
               </div>
             </div>
@@ -880,64 +1026,86 @@
             >
               <div class="examples">
                 <figure data-blazon="Azure, a fess engrailed Or">
-                  <div class="escutcheon azure fess-engrailed-or"></div>
+                  <div class="heater">
+                    <div class="azure fess-engrailed-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a bend engrailed Sable">
-                  <div class="escutcheon or bend-engrailed-sable"></div>
+                  <div class="heater">
+                    <div class="or bend-engrailed-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, a chevron engrailed Argent">
-                  <div class="escutcheon gules chevron-engrailed-argent"></div>
+                  <div class="heater">
+                    <div class="gules chevron-engrailed-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a cross engrailed Gules">
-                  <div class="escutcheon argent cross-engrailed-gules"></div>
+                  <div class="heater">
+                    <div class="argent cross-engrailed-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pale engrailed Argent">
-                  <div class="escutcheon vert pale-engrailed-argent"></div>
+                  <div class="heater">
+                    <div class="vert pale-engrailed-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Azure, a saltire engrailed Argent">
-                  <div class="escutcheon azure saltire-engrailed-argent"></div>
+                  <div class="heater">
+                    <div class="azure saltire-engrailed-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a chief engrailed Azure">
-                  <div class="escutcheon or chief-engrailed-azure"></div>
+                  <div class="heater">
+                    <div class="or chief-engrailed-azure"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pall engrailed Or">
-                  <div class="escutcheon vert pall-engrailed-or"></div>
+                  <div class="heater">
+                    <div class="vert pall-engrailed-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a pile engrailed Gules">
-                  <div class="escutcheon or pile-engrailed-gules"></div>
+                  <div class="heater">
+                    <div class="or pile-engrailed-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a bar engrailed Or">
-                  <div class="escutcheon sable bar-engrailed-or"></div>
+                  <div class="heater">
+                    <div class="sable bar-engrailed-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, two bars engrailed Or">
-                  <div class="escutcheon gules two-bars-engrailed-or"></div>
+                  <div class="heater">
+                    <div class="gules two-bars-engrailed-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Purpure, three bars engrailed Argent">
-                  <div
-                    class="escutcheon purpure three-bars-engrailed-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="purpure three-bars-engrailed-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a bend sinister engrailed Vert">
-                  <div
-                    class="escutcheon argent bend-sinister-engrailed-vert"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent bend-sinister-engrailed-vert"></div>
+                  </div>
                 </figure>
                 <figure
                   data-blazon="Argent, a chevron reversed engrailed Sable"
                 >
-                  <div
-                    class="escutcheon argent chevron-reversed-engrailed-sable"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent chevron-reversed-engrailed-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a pall reversed engrailed Argent">
-                  <div
-                    class="escutcheon sable pall-reversed-engrailed-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="sable pall-reversed-engrailed-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a pile reversed engrailed Purpure">
-                  <div
-                    class="escutcheon argent pile-reversed-engrailed-purpure"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent pile-reversed-engrailed-purpure"></div>
+                  </div>
                 </figure>
               </div>
             </div>
@@ -949,62 +1117,84 @@
             >
               <div class="examples">
                 <figure data-blazon="Azure, a fess invected Or">
-                  <div class="escutcheon azure fess-invected-or"></div>
+                  <div class="heater">
+                    <div class="azure fess-invected-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a bend invected Sable">
-                  <div class="escutcheon or bend-invected-sable"></div>
+                  <div class="heater">
+                    <div class="or bend-invected-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, a chevron invected Argent">
-                  <div class="escutcheon gules chevron-invected-argent"></div>
+                  <div class="heater">
+                    <div class="gules chevron-invected-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a cross invected Gules">
-                  <div class="escutcheon argent cross-invected-gules"></div>
+                  <div class="heater">
+                    <div class="argent cross-invected-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pale invected Argent">
-                  <div class="escutcheon vert pale-invected-argent"></div>
+                  <div class="heater">
+                    <div class="vert pale-invected-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Azure, a saltire invected Argent">
-                  <div class="escutcheon azure saltire-invected-argent"></div>
+                  <div class="heater">
+                    <div class="azure saltire-invected-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a chief invected Azure">
-                  <div class="escutcheon or chief-invected-azure"></div>
+                  <div class="heater">
+                    <div class="or chief-invected-azure"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pall invected Or">
-                  <div class="escutcheon vert pall-invected-or"></div>
+                  <div class="heater">
+                    <div class="vert pall-invected-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a pile invected Gules">
-                  <div class="escutcheon or pile-invected-gules"></div>
+                  <div class="heater">
+                    <div class="or pile-invected-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a bar invected Or">
-                  <div class="escutcheon sable bar-invected-or"></div>
+                  <div class="heater">
+                    <div class="sable bar-invected-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, two bars invected Or">
-                  <div class="escutcheon gules two-bars-invected-or"></div>
+                  <div class="heater">
+                    <div class="gules two-bars-invected-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Purpure, three bars invected Argent">
-                  <div
-                    class="escutcheon purpure three-bars-invected-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="purpure three-bars-invected-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a bend sinister invected Vert">
-                  <div
-                    class="escutcheon argent bend-sinister-invected-vert"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent bend-sinister-invected-vert"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a chevron reversed invected Sable">
-                  <div
-                    class="escutcheon argent chevron-reversed-invected-sable"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent chevron-reversed-invected-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a pall reversed invected Argent">
-                  <div
-                    class="escutcheon sable pall-reversed-invected-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="sable pall-reversed-invected-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a pile reversed invected Purpure">
-                  <div
-                    class="escutcheon argent pile-reversed-invected-purpure"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent pile-reversed-invected-purpure"></div>
+                  </div>
                 </figure>
               </div>
             </div>
@@ -1016,56 +1206,84 @@
             >
               <div class="examples">
                 <figure data-blazon="Azure, a fess wavy Or">
-                  <div class="escutcheon azure fess-wavy-or"></div>
+                  <div class="heater">
+                    <div class="azure fess-wavy-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a bend wavy Sable">
-                  <div class="escutcheon or bend-wavy-sable"></div>
+                  <div class="heater">
+                    <div class="or bend-wavy-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, a chevron wavy Argent">
-                  <div class="escutcheon gules chevron-wavy-argent"></div>
+                  <div class="heater">
+                    <div class="gules chevron-wavy-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a cross wavy Gules">
-                  <div class="escutcheon argent cross-wavy-gules"></div>
+                  <div class="heater">
+                    <div class="argent cross-wavy-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pale wavy Argent">
-                  <div class="escutcheon vert pale-wavy-argent"></div>
+                  <div class="heater">
+                    <div class="vert pale-wavy-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Azure, a saltire wavy Argent">
-                  <div class="escutcheon azure saltire-wavy-argent"></div>
+                  <div class="heater">
+                    <div class="azure saltire-wavy-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a chief wavy Azure">
-                  <div class="escutcheon or chief-wavy-azure"></div>
+                  <div class="heater">
+                    <div class="or chief-wavy-azure"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pall wavy Or">
-                  <div class="escutcheon vert pall-wavy-or"></div>
+                  <div class="heater">
+                    <div class="vert pall-wavy-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a pile wavy Gules">
-                  <div class="escutcheon or pile-wavy-gules"></div>
+                  <div class="heater">
+                    <div class="or pile-wavy-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a bar wavy Or">
-                  <div class="escutcheon sable bar-wavy-or"></div>
+                  <div class="heater">
+                    <div class="sable bar-wavy-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, two bars wavy Or">
-                  <div class="escutcheon gules two-bars-wavy-or"></div>
+                  <div class="heater">
+                    <div class="gules two-bars-wavy-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Purpure, three bars wavy Argent">
-                  <div class="escutcheon purpure three-bars-wavy-argent"></div>
+                  <div class="heater">
+                    <div class="purpure three-bars-wavy-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a bend sinister wavy Vert">
-                  <div class="escutcheon argent bend-sinister-wavy-vert"></div>
+                  <div class="heater">
+                    <div class="argent bend-sinister-wavy-vert"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a chevron reversed wavy Sable">
-                  <div
-                    class="escutcheon argent chevron-reversed-wavy-sable"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent chevron-reversed-wavy-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a pall reversed wavy Argent">
-                  <div class="escutcheon sable pall-reversed-wavy-argent"></div>
+                  <div class="heater">
+                    <div class="sable pall-reversed-wavy-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a pile reversed wavy Purpure">
-                  <div
-                    class="escutcheon argent pile-reversed-wavy-purpure"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent pile-reversed-wavy-purpure"></div>
+                  </div>
                 </figure>
               </div>
             </div>
@@ -1077,62 +1295,84 @@
             >
               <div class="examples">
                 <figure data-blazon="Azure, a fess indented Or">
-                  <div class="escutcheon azure fess-indented-or"></div>
+                  <div class="heater">
+                    <div class="azure fess-indented-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a bend indented Sable">
-                  <div class="escutcheon or bend-indented-sable"></div>
+                  <div class="heater">
+                    <div class="or bend-indented-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, a chevron indented Argent">
-                  <div class="escutcheon gules chevron-indented-argent"></div>
+                  <div class="heater">
+                    <div class="gules chevron-indented-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a cross indented Gules">
-                  <div class="escutcheon argent cross-indented-gules"></div>
+                  <div class="heater">
+                    <div class="argent cross-indented-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pale indented Argent">
-                  <div class="escutcheon vert pale-indented-argent"></div>
+                  <div class="heater">
+                    <div class="vert pale-indented-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Azure, a saltire indented Argent">
-                  <div class="escutcheon azure saltire-indented-argent"></div>
+                  <div class="heater">
+                    <div class="azure saltire-indented-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a chief indented Azure">
-                  <div class="escutcheon or chief-indented-azure"></div>
+                  <div class="heater">
+                    <div class="or chief-indented-azure"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pall indented Or">
-                  <div class="escutcheon vert pall-indented-or"></div>
+                  <div class="heater">
+                    <div class="vert pall-indented-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a pile indented Gules">
-                  <div class="escutcheon or pile-indented-gules"></div>
+                  <div class="heater">
+                    <div class="or pile-indented-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a bar indented Or">
-                  <div class="escutcheon sable bar-indented-or"></div>
+                  <div class="heater">
+                    <div class="sable bar-indented-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, two bars indented Or">
-                  <div class="escutcheon gules two-bars-indented-or"></div>
+                  <div class="heater">
+                    <div class="gules two-bars-indented-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Purpure, three bars indented Argent">
-                  <div
-                    class="escutcheon purpure three-bars-indented-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="purpure three-bars-indented-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a bend sinister indented Vert">
-                  <div
-                    class="escutcheon argent bend-sinister-indented-vert"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent bend-sinister-indented-vert"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a chevron reversed indented Sable">
-                  <div
-                    class="escutcheon argent chevron-reversed-indented-sable"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent chevron-reversed-indented-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a pall reversed indented Argent">
-                  <div
-                    class="escutcheon sable pall-reversed-indented-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="sable pall-reversed-indented-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a pile reversed indented Purpure">
-                  <div
-                    class="escutcheon argent pile-reversed-indented-purpure"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent pile-reversed-indented-purpure"></div>
+                  </div>
                 </figure>
               </div>
             </div>
@@ -1144,64 +1384,86 @@
             >
               <div class="examples">
                 <figure data-blazon="Azure, a fess embattled Or">
-                  <div class="escutcheon azure fess-embattled-or"></div>
+                  <div class="heater">
+                    <div class="azure fess-embattled-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a bend embattled Sable">
-                  <div class="escutcheon or bend-embattled-sable"></div>
+                  <div class="heater">
+                    <div class="or bend-embattled-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, a chevron embattled Argent">
-                  <div class="escutcheon gules chevron-embattled-argent"></div>
+                  <div class="heater">
+                    <div class="gules chevron-embattled-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a cross embattled Gules">
-                  <div class="escutcheon argent cross-embattled-gules"></div>
+                  <div class="heater">
+                    <div class="argent cross-embattled-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pale embattled Argent">
-                  <div class="escutcheon vert pale-embattled-argent"></div>
+                  <div class="heater">
+                    <div class="vert pale-embattled-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Azure, a saltire embattled Argent">
-                  <div class="escutcheon azure saltire-embattled-argent"></div>
+                  <div class="heater">
+                    <div class="azure saltire-embattled-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a chief embattled Azure">
-                  <div class="escutcheon or chief-embattled-azure"></div>
+                  <div class="heater">
+                    <div class="or chief-embattled-azure"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pall embattled Or">
-                  <div class="escutcheon vert pall-embattled-or"></div>
+                  <div class="heater">
+                    <div class="vert pall-embattled-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a pile embattled Gules">
-                  <div class="escutcheon or pile-embattled-gules"></div>
+                  <div class="heater">
+                    <div class="or pile-embattled-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a bar embattled Or">
-                  <div class="escutcheon sable bar-embattled-or"></div>
+                  <div class="heater">
+                    <div class="sable bar-embattled-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, two bars embattled Or">
-                  <div class="escutcheon gules two-bars-embattled-or"></div>
+                  <div class="heater">
+                    <div class="gules two-bars-embattled-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Purpure, three bars embattled Argent">
-                  <div
-                    class="escutcheon purpure three-bars-embattled-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="purpure three-bars-embattled-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a bend sinister embattled Vert">
-                  <div
-                    class="escutcheon argent bend-sinister-embattled-vert"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent bend-sinister-embattled-vert"></div>
+                  </div>
                 </figure>
                 <figure
                   data-blazon="Argent, a chevron reversed embattled Sable"
                 >
-                  <div
-                    class="escutcheon argent chevron-reversed-embattled-sable"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent chevron-reversed-embattled-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a pall reversed embattled Argent">
-                  <div
-                    class="escutcheon sable pall-reversed-embattled-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="sable pall-reversed-embattled-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a pile reversed embattled Purpure">
-                  <div
-                    class="escutcheon argent pile-reversed-embattled-purpure"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent pile-reversed-embattled-purpure"></div>
+                  </div>
                 </figure>
               </div>
               <p>
@@ -1218,51 +1480,69 @@
             >
               <div class="examples">
                 <figure data-blazon="Azure, a fess voided Or">
-                  <div class="escutcheon azure fess-voided-or"></div>
+                  <div class="heater">
+                    <div class="azure fess-voided-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a bend voided Sable">
-                  <div class="escutcheon or bend-voided-sable"></div>
+                  <div class="heater">
+                    <div class="or bend-voided-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Gules, a chevron voided Argent">
-                  <div class="escutcheon gules chevron-voided-argent"></div>
+                  <div class="heater">
+                    <div class="gules chevron-voided-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a cross voided Gules">
-                  <div class="escutcheon argent cross-voided-gules"></div>
+                  <div class="heater">
+                    <div class="argent cross-voided-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pale voided Argent">
-                  <div class="escutcheon vert pale-voided-argent"></div>
+                  <div class="heater">
+                    <div class="vert pale-voided-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Azure, a saltire voided Argent">
-                  <div class="escutcheon azure saltire-voided-argent"></div>
+                  <div class="heater">
+                    <div class="azure saltire-voided-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Vert, a pall voided Or">
-                  <div class="escutcheon vert pall-voided-or"></div>
+                  <div class="heater">
+                    <div class="vert pall-voided-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Or, a pile voided Gules">
-                  <div class="escutcheon or pile-voided-gules"></div>
+                  <div class="heater">
+                    <div class="or pile-voided-gules"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a bar voided Or">
-                  <div class="escutcheon sable bar-voided-or"></div>
+                  <div class="heater">
+                    <div class="sable bar-voided-or"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a bend sinister voided Vert">
-                  <div
-                    class="escutcheon argent bend-sinister-voided-vert"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent bend-sinister-voided-vert"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a chevron reversed voided Sable">
-                  <div
-                    class="escutcheon argent chevron-reversed-voided-sable"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent chevron-reversed-voided-sable"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Sable, a pall reversed voided Argent">
-                  <div
-                    class="escutcheon sable pall-reversed-voided-argent"
-                  ></div>
+                  <div class="heater">
+                    <div class="sable pall-reversed-voided-argent"></div>
+                  </div>
                 </figure>
                 <figure data-blazon="Argent, a pile reversed voided Purpure">
-                  <div
-                    class="escutcheon argent pile-reversed-voided-purpure"
-                  ></div>
+                  <div class="heater">
+                    <div class="argent pile-reversed-voided-purpure"></div>
+                  </div>
                 </figure>
               </div>
               <p>The chief and the two and three bars can't be voided.</p>
@@ -1279,34 +1559,42 @@
           </p>
           <div class="examples">
             <figure data-blazon="Or, a chevron Gules, a chief Azure">
-              <div class="escutcheon or chevron-gules chief-azure"></div>
+              <div class="heater">
+                <div class="or chevron-gules chief-azure"></div>
+              </div>
             </figure>
             <figure data-blazon="Per pale Azure and Gules, a fess Or">
-              <div class="escutcheon per-pale-azure-gules fess-or"></div>
+              <div class="heater">
+                <div class="per-pale-azure-gules fess-or"></div>
+              </div>
             </figure>
             <figure data-blazon="Quarterly Or and Gules, a bend Sable">
-              <div class="escutcheon quarterly bend-sable">
-                <div class="or"></div>
-                <div class="gules"></div>
-                <div class="gules"></div>
-                <div class="or"></div>
+              <div class="heater">
+                <div class="quarterly bend-sable">
+                  <div class="or"></div>
+                  <div class="gules"></div>
+                  <div class="gules"></div>
+                  <div class="or"></div>
+                </div>
               </div>
             </figure>
             <figure
               data-blazon="Per fess Azure and Argent, a pale of the first"
             >
-              <div
-                class="escutcheon per-fess-azure-argent pale-of-the-first"
-              ></div>
+              <div class="heater">
+                <div class="per-fess-azure-argent pale-of-the-first"></div>
+              </div>
             </figure>
             <figure
               data-blazon="Quarterly: 1 and 4 Azure, a cross Argent; 2 and 3 Or; overall a bend sinister Gules"
             >
-              <div class="escutcheon quarterly bend-sinister-gules">
-                <div class="azure cross-argent"></div>
-                <div class="or"></div>
-                <div class="or"></div>
-                <div class="azure cross-argent"></div>
+              <div class="heater">
+                <div class="quarterly bend-sinister-gules">
+                  <div class="azure cross-argent"></div>
+                  <div class="or"></div>
+                  <div class="or"></div>
+                  <div class="azure cross-argent"></div>
+                </div>
               </div>
             </figure>
           </div>
@@ -1329,20 +1617,28 @@
           </p>
           <div class="examples">
             <figure data-blazon="Gules, a cross Azure fimbriated Argent">
-              <div class="escutcheon gules cross-azure fimbriated-argent"></div>
+              <div class="heater">
+                <div class="gules cross-azure fimbriated-argent"></div>
+              </div>
             </figure>
             <figure data-blazon="Vert, a saltire Gules fimbriated Or">
-              <div class="escutcheon vert saltire-gules fimbriated-or"></div>
+              <div class="heater">
+                <div class="vert saltire-gules fimbriated-or"></div>
+              </div>
             </figure>
             <figure data-blazon="Azure, a pall Gules fimbriated Or">
-              <div class="escutcheon azure pall-gules fimbriated-or"></div>
+              <div class="heater">
+                <div class="azure pall-gules fimbriated-or"></div>
+              </div>
             </figure>
             <figure
               data-blazon="Or, a chevron Sable fimbriated Argent, a chief Azure"
             >
-              <div
-                class="escutcheon or chevron-argent fimbriated-sable chief-azure"
-              ></div>
+              <div class="heater">
+                <div
+                  class="or chevron-argent fimbriated-sable chief-azure"
+                ></div>
+              </div>
             </figure>
           </div>
 
@@ -1357,56 +1653,62 @@
             <figure
               data-blazon="Per pale Argent and Gules, a chevron counterchanged"
             >
-              <div
-                class="escutcheon per-pale-argent-gules chevron-counterchanged"
-              ></div>
+              <div class="heater">
+                <div class="per-pale-argent-gules chevron-counterchanged"></div>
+              </div>
             </figure>
             <figure
               data-blazon="Quarterly Or and Gules, a cross counterchanged"
             >
-              <div
-                class="escutcheon quarterly-or-gules cross-counterchanged"
-              ></div>
+              <div class="heater">
+                <div class="quarterly-or-gules cross-counterchanged"></div>
+              </div>
             </figure>
             <figure
               data-blazon="Gyronny Argent and Azure, a saltire counterchanged"
             >
-              <div
-                class="escutcheon gyronny-argent-azure saltire-counterchanged"
-              ></div>
+              <div class="heater">
+                <div class="gyronny-argent-azure saltire-counterchanged"></div>
+              </div>
             </figure>
             <figure
               data-blazon="Per pale Argent and Azure, a chief counterchanged"
             >
-              <div
-                class="escutcheon per-pale-argent-azure chief-counterchanged"
-              ></div>
+              <div class="heater">
+                <div class="per-pale-argent-azure chief-counterchanged"></div>
+              </div>
             </figure>
             <figure
               data-blazon="Per pale Or and Gules, a cross voided counterchanged"
             >
-              <div
-                class="escutcheon per-pale-or-gules cross-voided-counterchanged"
-              ></div>
+              <div class="heater">
+                <div
+                  class="per-pale-or-gules cross-voided-counterchanged"
+                ></div>
+              </div>
             </figure>
             <figure
               data-blazon="Paly of six Or and Azure, a fess counterchanged"
             >
-              <div class="escutcheon paly-or-azure fess-counterchanged"></div>
+              <div class="heater">
+                <div class="paly-or-azure fess-counterchanged"></div>
+              </div>
             </figure>
             <figure
               data-blazon="Per fess Gules and Ermine, a pale counterchanged"
             >
-              <div
-                class="escutcheon per-fess-gules-ermine pale-counterchanged"
-              ></div>
+              <div class="heater">
+                <div class="per-fess-gules-ermine pale-counterchanged"></div>
+              </div>
             </figure>
             <figure
               data-blazon="Chevronny of eight Vert and Argent, a cross counterchanged"
             >
-              <div
-                class="escutcheon chevronny-of-eight-vert-argent cross-counterchanged"
-              ></div>
+              <div class="heater">
+                <div
+                  class="chevronny-of-eight-vert-argent cross-counterchanged"
+                ></div>
+              </div>
             </figure>
           </div>
         </section>
@@ -1419,11 +1721,13 @@
           </p>
           <div class="examples">
             <figure data-blazon="Gules, three fleurs-de-lis Or">
-              <div class="escutcheon gules">
-                <div class="charges">
-                  <i class="fleur-de-lis or"></i>
-                  <i class="fleur-de-lis or"></i>
-                  <i class="fleur-de-lis or"></i>
+              <div class="heater">
+                <div class="gules">
+                  <div class="charges">
+                    <i class="fleur-de-lis or"></i>
+                    <i class="fleur-de-lis or"></i>
+                    <i class="fleur-de-lis or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -1432,92 +1736,122 @@
           <h3 id="built-in-charges">Built-in charges</h3>
           <div class="flex flex-wrap gap-6 my-8">
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="mullet or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="mullet or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>mullet</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="roundel or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="roundel or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>roundel</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="annulet or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="annulet or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>annulet</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="lozenge or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="lozenge or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>lozenge</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="billet or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="billet or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>billet</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="crescent or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="crescent or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>crescent</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="fleur-de-lis or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="fleur-de-lis or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>fleur-de-lis</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="cross-couped or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="cross-couped or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>cross-couped</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="cross-potent or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="cross-potent or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>cross-potent</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="cross-pattee or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="cross-pattee or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>cross-pattee</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="maltese-cross or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="maltese-cross or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>maltese-cross</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="cross-crosslet or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="cross-crosslet or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>cross-crosslet</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="cross-moline or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="cross-moline or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>cross-moline</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="cross-fleury or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="cross-fleury or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>cross-fleury</code></figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon azure">
-                <div class="charges"><i class="shakefork or"></i></div>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges"><i class="shakefork or"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2"><code>shakefork</code></figcaption>
             </figure>
@@ -1528,40 +1862,50 @@
           </p>
           <div class="flex flex-wrap gap-6 my-8">
             <figure class="w-24 text-center">
-              <div class="escutcheon vert">
-                <div class="charges"><i class="bezant"></i></div>
+              <div class="heater">
+                <div class="vert">
+                  <div class="charges"><i class="bezant"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2">
                 <code>bezant</code><br /><span class="text-sm">Or</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon vert">
-                <div class="charges"><i class="plate"></i></div>
+              <div class="heater">
+                <div class="vert">
+                  <div class="charges"><i class="plate"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2">
                 <code>plate</code><br /><span class="text-sm">Argent</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon or">
-                <div class="charges"><i class="torteau"></i></div>
+              <div class="heater">
+                <div class="or">
+                  <div class="charges"><i class="torteau"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2">
                 <code>torteau</code><br /><span class="text-sm">Gules</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon or">
-                <div class="charges"><i class="hurt"></i></div>
+              <div class="heater">
+                <div class="or">
+                  <div class="charges"><i class="hurt"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2">
                 <code>hurt</code><br /><span class="text-sm">Azure</span>
               </figcaption>
             </figure>
             <figure class="w-24 text-center">
-              <div class="escutcheon or">
-                <div class="charges"><i class="pellet"></i></div>
+              <div class="heater">
+                <div class="or">
+                  <div class="charges"><i class="pellet"></i></div>
+                </div>
               </div>
               <figcaption class="mt-2">
                 <code>pellet</code><br /><span class="text-sm">Sable</span>
@@ -1582,47 +1926,53 @@
             <figure
               data-blazon="Per pale Argent and Gules, on a chevron between three roundels as many mullets, all counterchanged"
             >
-              <div
-                class="escutcheon per-pale-argent-gules chevron-counterchanged"
-              >
-                <div class="charges between counterchanged">
-                  <i class="roundel"></i>
-                  <i class="roundel"></i>
-                  <i class="roundel"></i>
-                </div>
-                <div class="charges on counterchanged">
-                  <i class="mullet"></i>
-                  <i class="mullet"></i>
-                  <i class="mullet"></i>
+              <div class="heater">
+                <div class="per-pale-argent-gules chevron-counterchanged">
+                  <div class="charges between counterchanged">
+                    <i class="roundel"></i>
+                    <i class="roundel"></i>
+                    <i class="roundel"></i>
+                  </div>
+                  <div class="charges on counterchanged">
+                    <i class="mullet"></i>
+                    <i class="mullet"></i>
+                    <i class="mullet"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Quarterly Or and Azure, a mullet counterchanged"
             >
-              <div class="escutcheon quarterly-or-azure">
-                <div class="charges charge-size-70">
-                  <i class="mullet counterchanged"></i>
+              <div class="heater">
+                <div class="quarterly-or-azure">
+                  <div class="charges charge-size-70">
+                    <i class="mullet counterchanged"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Per pale Vert and Argent, a cross potent counterchanged"
             >
-              <div class="escutcheon per-pale-vert-argent">
-                <div class="charges counterchanged charge-size-70">
-                  <i class="cross-potent or"></i>
+              <div class="heater">
+                <div class="per-pale-vert-argent">
+                  <div class="charges counterchanged charge-size-70">
+                    <i class="cross-potent or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Per fess Or and Sable, three fleurs-de-lis counterchanged"
             >
-              <div class="escutcheon per-fess-or-sable">
-                <div class="charges counterchanged">
-                  <i class="fleur-de-lis"></i>
-                  <i class="fleur-de-lis"></i>
-                  <i class="fleur-de-lis"></i>
+              <div class="heater">
+                <div class="per-fess-or-sable">
+                  <div class="charges counterchanged">
+                    <i class="fleur-de-lis"></i>
+                    <i class="fleur-de-lis"></i>
+                    <i class="fleur-de-lis"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -1638,73 +1988,89 @@
           </p>
           <div class="examples">
             <figure data-blazon="Azure, a mullet Argent">
-              <div class="escutcheon azure">
-                <div class="charges">
-                  <i class="mullet argent"></i>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges">
+                    <i class="mullet argent"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Gules, three bezants">
-              <div class="escutcheon gules">
-                <div class="charges">
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
+              <div class="heater">
+                <div class="gules">
+                  <div class="charges">
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Sable, six plates">
-              <div class="escutcheon sable">
-                <div class="charges">
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
+              <div class="heater">
+                <div class="sable">
+                  <div class="charges">
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Azure semy-de-lis Or">
-              <div class="escutcheon azure">
-                <div class="charges semy">
-                  <i class="fleur-de-lis or"></i>
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges semy">
+                    <i class="fleur-de-lis or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Or, two crescents Azure">
-              <div class="escutcheon or">
-                <div class="charges">
-                  <i class="crescent azure"></i>
-                  <i class="crescent azure"></i>
+              <div class="heater">
+                <div class="or">
+                  <div class="charges">
+                    <i class="crescent azure"></i>
+                    <i class="crescent azure"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Vert, four annulets Argent">
-              <div class="escutcheon vert">
-                <div class="charges">
-                  <i class="annulet argent"></i>
-                  <i class="annulet argent"></i>
-                  <i class="annulet argent"></i>
-                  <i class="annulet argent"></i>
+              <div class="heater">
+                <div class="vert">
+                  <div class="charges">
+                    <i class="annulet argent"></i>
+                    <i class="annulet argent"></i>
+                    <i class="annulet argent"></i>
+                    <i class="annulet argent"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Gules, five fleurs-de-lis Or">
-              <div class="escutcheon gules">
-                <div class="charges">
-                  <i class="fleur-de-lis or"></i>
-                  <i class="fleur-de-lis or"></i>
-                  <i class="fleur-de-lis or"></i>
-                  <i class="fleur-de-lis or"></i>
-                  <i class="fleur-de-lis or"></i>
+              <div class="heater">
+                <div class="gules">
+                  <div class="charges">
+                    <i class="fleur-de-lis or"></i>
+                    <i class="fleur-de-lis or"></i>
+                    <i class="fleur-de-lis or"></i>
+                    <i class="fleur-de-lis or"></i>
+                    <i class="fleur-de-lis or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Gules crusily Or, a chief Argent">
-              <div class="escutcheon gules chief-argent">
-                <div class="charges semy">
-                  <i class="cross-crosslet or"></i>
+              <div class="heater">
+                <div class="gules chief-argent">
+                  <div class="charges semy">
+                    <i class="cross-crosslet or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -1718,40 +2084,48 @@
           </p>
           <div class="examples">
             <figure data-blazon="Vert, three mullets in pale Or">
-              <div class="escutcheon vert">
-                <div class="charges in-pale">
-                  <i class="mullet or"></i>
-                  <i class="mullet or"></i>
-                  <i class="mullet or"></i>
+              <div class="heater">
+                <div class="vert">
+                  <div class="charges in-pale">
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Purpure, three annulets in fess Or">
-              <div class="escutcheon purpure">
-                <div class="charges in-fess">
-                  <i class="annulet or"></i>
-                  <i class="annulet or"></i>
-                  <i class="annulet or"></i>
+              <div class="heater">
+                <div class="purpure">
+                  <div class="charges in-fess">
+                    <i class="annulet or"></i>
+                    <i class="annulet or"></i>
+                    <i class="annulet or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Argent, three lozenges in bend Azure">
-              <div class="escutcheon argent">
-                <div class="charges in-bend">
-                  <i class="lozenge azure"></i>
-                  <i class="lozenge azure"></i>
-                  <i class="lozenge azure"></i>
+              <div class="heater">
+                <div class="argent">
+                  <div class="charges in-bend">
+                    <i class="lozenge azure"></i>
+                    <i class="lozenge azure"></i>
+                    <i class="lozenge azure"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Or, three fleurs-de-lis in bend sinister Gules"
             >
-              <div class="escutcheon or">
-                <div class="charges in-bend-sinister">
-                  <i class="fleur-de-lis gules"></i>
-                  <i class="fleur-de-lis gules"></i>
-                  <i class="fleur-de-lis gules"></i>
+              <div class="heater">
+                <div class="or">
+                  <div class="charges in-bend-sinister">
+                    <i class="fleur-de-lis gules"></i>
+                    <i class="fleur-de-lis gules"></i>
+                    <i class="fleur-de-lis gules"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -1766,80 +2140,96 @@
             <figure
               data-blazon="Argent, a fess Azure between three crescents Gules"
             >
-              <div class="escutcheon argent fess-azure">
-                <div class="charges between">
-                  <i class="crescent gules"></i>
-                  <i class="crescent gules"></i>
-                  <i class="crescent gules"></i>
+              <div class="heater">
+                <div class="argent fess-azure">
+                  <div class="charges between">
+                    <i class="crescent gules"></i>
+                    <i class="crescent gules"></i>
+                    <i class="crescent gules"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Gules, a cross Argent between four mullets Or">
-              <div class="escutcheon gules cross-argent">
-                <div class="charges between">
-                  <i class="mullet or"></i>
-                  <i class="mullet or"></i>
-                  <i class="mullet or"></i>
-                  <i class="mullet or"></i>
+              <div class="heater">
+                <div class="gules cross-argent">
+                  <div class="charges between">
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Or, a bend Azure between two billets Sable">
-              <div class="escutcheon or bend-azure">
-                <div class="charges between">
-                  <i class="billet sable"></i>
-                  <i class="billet sable"></i>
+              <div class="heater">
+                <div class="or bend-azure">
+                  <div class="charges between">
+                    <i class="billet sable"></i>
+                    <i class="billet sable"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Vert, a saltire Argent between four bezants">
-              <div class="escutcheon vert saltire-argent">
-                <div class="charges between">
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
+              <div class="heater">
+                <div class="vert saltire-argent">
+                  <div class="charges between">
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Azure, a pale Or between two fleurs-de-lis Argent"
             >
-              <div class="escutcheon azure pale-or">
-                <div class="charges between">
-                  <i class="fleur-de-lis argent"></i>
-                  <i class="fleur-de-lis argent"></i>
+              <div class="heater">
+                <div class="azure pale-or">
+                  <div class="charges between">
+                    <i class="fleur-de-lis argent"></i>
+                    <i class="fleur-de-lis argent"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Azure, a pall Argent between three fleurs-de-lis Or"
             >
-              <div class="escutcheon azure pall-argent">
-                <div class="charges between">
-                  <i class="fleur-de-lis or"></i>
-                  <i class="fleur-de-lis or"></i>
-                  <i class="fleur-de-lis or"></i>
+              <div class="heater">
+                <div class="azure pall-argent">
+                  <div class="charges between">
+                    <i class="fleur-de-lis or"></i>
+                    <i class="fleur-de-lis or"></i>
+                    <i class="fleur-de-lis or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Gules, a bend Or between six bezants">
-              <div class="escutcheon gules bend-or">
-                <div class="charges between">
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
+              <div class="heater">
+                <div class="gules bend-or">
+                  <div class="charges between">
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Azure, a fess between two mullets Or">
-              <div class="escutcheon azure fess-or">
-                <div class="charges between">
-                  <i class="mullet or"></i>
-                  <i class="mullet or"></i>
+              <div class="heater">
+                <div class="azure fess-or">
+                  <div class="charges between">
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -1852,67 +2242,81 @@
           </p>
           <div class="examples">
             <figure data-blazon="Gules, on a fess Argent three crescents Azure">
-              <div class="escutcheon gules fess-argent">
-                <div class="charges on">
-                  <i class="crescent azure"></i>
-                  <i class="crescent azure"></i>
-                  <i class="crescent azure"></i>
+              <div class="heater">
+                <div class="gules fess-argent">
+                  <div class="charges on">
+                    <i class="crescent azure"></i>
+                    <i class="crescent azure"></i>
+                    <i class="crescent azure"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Sable, on a bend Or three lozenges Gules">
-              <div class="escutcheon sable bend-or">
-                <div class="charges on">
-                  <i class="lozenge gules"></i>
-                  <i class="lozenge gules"></i>
-                  <i class="lozenge gules"></i>
+              <div class="heater">
+                <div class="sable bend-or">
+                  <div class="charges on">
+                    <i class="lozenge gules"></i>
+                    <i class="lozenge gules"></i>
+                    <i class="lozenge gules"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Argent, on a chevron Azure three bezants">
-              <div class="escutcheon argent chevron-azure">
-                <div class="charges on">
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
+              <div class="heater">
+                <div class="argent chevron-azure">
+                  <div class="charges on">
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Or, on a cross Gules five plates">
-              <div class="escutcheon or cross-gules">
-                <div class="charges on">
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
-                  <i class="plate"></i>
+              <div class="heater">
+                <div class="or cross-gules">
+                  <div class="charges on">
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                    <i class="plate"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Azure, on a saltire Argent five mullets Gules">
-              <div class="escutcheon azure saltire-argent">
-                <div class="charges on">
-                  <i class="mullet gules"></i>
-                  <i class="mullet gules"></i>
-                  <i class="mullet gules"></i>
-                  <i class="mullet gules"></i>
-                  <i class="mullet gules"></i>
+              <div class="heater">
+                <div class="azure saltire-argent">
+                  <div class="charges on">
+                    <i class="mullet gules"></i>
+                    <i class="mullet gules"></i>
+                    <i class="mullet gules"></i>
+                    <i class="mullet gules"></i>
+                    <i class="mullet gules"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Vert, on a pale Argent a fleur-de-lis Gules">
-              <div class="escutcheon vert pale-argent">
-                <div class="charges on">
-                  <i class="fleur-de-lis gules"></i>
+              <div class="heater">
+                <div class="vert pale-argent">
+                  <div class="charges on">
+                    <i class="fleur-de-lis gules"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Argent, on a pile Azure three mullets Or">
-              <div class="escutcheon argent pile-azure">
-                <div class="charges on">
-                  <i class="mullet or"></i>
-                  <i class="mullet or"></i>
-                  <i class="mullet or"></i>
+              <div class="heater">
+                <div class="argent pile-azure">
+                  <div class="charges on">
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -1926,22 +2330,24 @@
           </p>
           <div class="md:per-pale gap-12 items-center my-8 max-w-2xl">
             <div
-              class="escutcheon w-64 azure"
+              class="heater w-64"
               role="img"
               aria-label="The nine points of the shield, numbered"
             >
-              <div
-                class="charges charge-size-11 *:flex *:items-center *:justify-center *:rounded-full *:argent *:text-xs"
-              >
-                <span class="in-dexter-chief">1</span>
-                <span class="in-chief-point">2</span>
-                <span class="in-sinister-chief">3</span>
-                <span class="in-honour-point">4</span>
-                <span class="in-fess-point">5</span>
-                <span class="in-nombril-point">6</span>
-                <span class="in-dexter-base">7</span>
-                <span class="in-base-point">8</span>
-                <span class="in-sinister-base">9</span>
+              <div class="azure">
+                <div
+                  class="charges charge-size-11 *:flex *:items-center *:justify-center *:rounded-full *:argent *:text-xs"
+                >
+                  <span class="in-dexter-chief">1</span>
+                  <span class="in-chief-point">2</span>
+                  <span class="in-sinister-chief">3</span>
+                  <span class="in-honour-point">4</span>
+                  <span class="in-fess-point">5</span>
+                  <span class="in-nombril-point">6</span>
+                  <span class="in-dexter-base">7</span>
+                  <span class="in-base-point">8</span>
+                  <span class="in-sinister-base">9</span>
+                </div>
               </div>
             </div>
             <ol class="mt-8 md:mt-0 space-y-1 list-decimal pl-6">
@@ -1966,43 +2372,51 @@
             <figure
               data-blazon="Gules, a fess Argent, in dexter chief a mullet Or"
             >
-              <div class="escutcheon gules fess-argent">
-                <div class="charges">
-                  <i class="mullet or in-dexter-chief"></i>
+              <div class="heater">
+                <div class="gules fess-argent">
+                  <div class="charges">
+                    <i class="mullet or in-dexter-chief"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Or, a chevron Gules, in base a fleur-de-lis Azure"
             >
-              <div class="escutcheon or chevron-gules">
-                <div class="charges">
-                  <i class="fleur-de-lis azure in-base-point"></i>
+              <div class="heater">
+                <div class="or chevron-gules">
+                  <div class="charges">
+                    <i class="fleur-de-lis azure in-base-point"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Or, on a chief Azure three mullets Argent">
-              <div class="escutcheon or chief-azure">
-                <div class="charges in-chief">
-                  <i class="mullet argent"></i>
-                  <i class="mullet argent"></i>
-                  <i class="mullet argent"></i>
+              <div class="heater">
+                <div class="or chief-azure">
+                  <div class="charges in-chief">
+                    <i class="mullet argent"></i>
+                    <i class="mullet argent"></i>
+                    <i class="mullet argent"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Argent, a chevron Gules between three crescents Azure, on a chief Gules three mullets Argent"
             >
-              <div class="escutcheon argent chevron-gules chief-gules">
-                <div class="charges between">
-                  <i class="crescent azure"></i>
-                  <i class="crescent azure"></i>
-                  <i class="crescent azure"></i>
-                </div>
-                <div class="charges in-chief">
-                  <i class="mullet argent"></i>
-                  <i class="mullet argent"></i>
-                  <i class="mullet argent"></i>
+              <div class="heater">
+                <div class="argent chevron-gules chief-gules">
+                  <div class="charges between">
+                    <i class="crescent azure"></i>
+                    <i class="crescent azure"></i>
+                    <i class="crescent azure"></i>
+                  </div>
+                  <div class="charges in-chief">
+                    <i class="mullet argent"></i>
+                    <i class="mullet argent"></i>
+                    <i class="mullet argent"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -2018,18 +2432,22 @@
           </p>
           <div class="examples">
             <figure data-blazon="Gules, three bezants">
-              <div class="escutcheon gules">
-                <div class="charges charge-size-16">
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
-                  <i class="bezant"></i>
+              <div class="heater">
+                <div class="gules">
+                  <div class="charges charge-size-16">
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure data-blazon="Vert, a mullet Or">
-              <div class="escutcheon vert">
-                <div class="charges">
-                  <i class="mullet or charge-size-75"></i>
+              <div class="heater">
+                <div class="vert">
+                  <div class="charges">
+                    <i class="mullet or charge-size-75"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -2047,22 +2465,26 @@
           </p>
           <div class="examples">
             <figure data-blazon="Or, three hearts Gules">
-              <div class="escutcheon or">
-                <div class="charges">
-                  <i class="charge-[url(charges/heart.svg)] gules"></i>
-                  <i class="charge-[url(charges/heart.svg)] gules"></i>
-                  <i class="charge-[url(charges/heart.svg)] gules"></i>
+              <div class="heater">
+                <div class="or">
+                  <div class="charges">
+                    <i class="charge-[url(charges/heart.svg)] gules"></i>
+                    <i class="charge-[url(charges/heart.svg)] gules"></i>
+                    <i class="charge-[url(charges/heart.svg)] gules"></i>
+                  </div>
                 </div>
               </div>
             </figure>
             <figure
               data-blazon="Azure, a chevron Or between three hearts Argent"
             >
-              <div class="escutcheon azure chevron-or">
-                <div class="charges between">
-                  <i class="charge-[url(charges/heart.svg)] argent"></i>
-                  <i class="charge-[url(charges/heart.svg)] argent"></i>
-                  <i class="charge-[url(charges/heart.svg)] argent"></i>
+              <div class="heater">
+                <div class="azure chevron-or">
+                  <div class="charges between">
+                    <i class="charge-[url(charges/heart.svg)] argent"></i>
+                    <i class="charge-[url(charges/heart.svg)] argent"></i>
+                    <i class="charge-[url(charges/heart.svg)] argent"></i>
+                  </div>
                 </div>
               </div>
             </figure>
@@ -2073,9 +2495,11 @@
           </p>
           <div class="examples">
             <figure data-blazon="Argent, a rose Gules seeded Or">
-              <div class="escutcheon argent">
-                <div class="charges">
-                  <img src="charges/rose.svg" alt="" />
+              <div class="heater">
+                <div class="argent">
+                  <div class="charges">
+                    <img src="charges/rose.svg" alt="" />
+                  </div>
                 </div>
               </div>
             </figure>
@@ -2095,23 +2519,25 @@
             data-blazon="Per pale Azure and Gules, on a chevron Or between three mullets Argent three roses proper, on a chief Argent a fleur-de-lis Azure between two hearts Gules, all within a bordure Or"
             data-size="w-72"
           >
-            <div
-              class="escutcheon per-pale-azure-gules chevron-or chief-argent bordure-or"
-            >
-              <div class="charges between">
-                <i class="mullet argent"></i>
-                <i class="mullet argent"></i>
-                <i class="mullet argent"></i>
-              </div>
-              <div class="charges on">
-                <img src="charges/rose.svg" alt="" />
-                <img src="charges/rose.svg" alt="" />
-                <img src="charges/rose.svg" alt="" />
-              </div>
-              <div class="charges in-chief">
-                <i class="charge-[url(charges/heart.svg)] gules"></i>
-                <i class="fleur-de-lis azure"></i>
-                <i class="charge-[url(charges/heart.svg)] gules"></i>
+            <div class="heater">
+              <div
+                class="per-pale-azure-gules chevron-or chief-argent bordure-or"
+              >
+                <div class="charges between">
+                  <i class="mullet argent"></i>
+                  <i class="mullet argent"></i>
+                  <i class="mullet argent"></i>
+                </div>
+                <div class="charges on">
+                  <img src="charges/rose.svg" alt="" />
+                  <img src="charges/rose.svg" alt="" />
+                  <img src="charges/rose.svg" alt="" />
+                </div>
+                <div class="charges in-chief">
+                  <i class="charge-[url(charges/heart.svg)] gules"></i>
+                  <i class="fleur-de-lis azure"></i>
+                  <i class="charge-[url(charges/heart.svg)] gules"></i>
+                </div>
               </div>
             </div>
           </figure>
@@ -2120,18 +2546,20 @@
             data-blazon="Per pale Argent and Azure, a chevron between three mullets counterchanged, on a chief Gules three bezants"
             data-size="w-72"
           >
-            <div
-              class="escutcheon per-pale-argent-azure chevron-counterchanged chief-gules"
-            >
-              <div class="charges between counterchanged">
-                <i class="mullet"></i>
-                <i class="mullet"></i>
-                <i class="mullet"></i>
-              </div>
-              <div class="charges in-chief">
-                <i class="bezant"></i>
-                <i class="bezant"></i>
-                <i class="bezant"></i>
+            <div class="heater">
+              <div
+                class="per-pale-argent-azure chevron-counterchanged chief-gules"
+              >
+                <div class="charges between counterchanged">
+                  <i class="mullet"></i>
+                  <i class="mullet"></i>
+                  <i class="mullet"></i>
+                </div>
+                <div class="charges in-chief">
+                  <i class="bezant"></i>
+                  <i class="bezant"></i>
+                  <i class="bezant"></i>
+                </div>
               </div>
             </div>
           </figure>
@@ -2140,14 +2568,16 @@
             data-blazon="Quarterly Or and Gules, a cross counterchanged between four fleurs-de-lis counterchanged, within a bordure Sable"
             data-size="w-72"
           >
-            <div
-              class="escutcheon quarterly-or-gules cross-counterchanged bordure-sable"
-            >
-              <div class="charges between counterchanged">
-                <i class="fleur-de-lis"></i>
-                <i class="fleur-de-lis"></i>
-                <i class="fleur-de-lis"></i>
-                <i class="fleur-de-lis"></i>
+            <div class="heater">
+              <div
+                class="quarterly-or-gules cross-counterchanged bordure-sable"
+              >
+                <div class="charges between counterchanged">
+                  <i class="fleur-de-lis"></i>
+                  <i class="fleur-de-lis"></i>
+                  <i class="fleur-de-lis"></i>
+                  <i class="fleur-de-lis"></i>
+                </div>
               </div>
             </div>
           </figure>
@@ -2156,16 +2586,18 @@
             data-blazon="Pean, on a fess engrailed Or between three crescents Argent, three mullets Ermines"
             data-size="w-72"
           >
-            <div class="escutcheon pean fess-engrailed-or">
-              <div class="charges between">
-                <i class="crescent argent"></i>
-                <i class="crescent argent"></i>
-                <i class="crescent argent"></i>
-              </div>
-              <div class="charges on">
-                <i class="mullet ermines"></i>
-                <i class="mullet ermines"></i>
-                <i class="mullet ermines"></i>
+            <div class="heater">
+              <div class="pean fess-engrailed-or">
+                <div class="charges between">
+                  <i class="crescent argent"></i>
+                  <i class="crescent argent"></i>
+                  <i class="crescent argent"></i>
+                </div>
+                <div class="charges on">
+                  <i class="mullet ermines"></i>
+                  <i class="mullet ermines"></i>
+                  <i class="mullet ermines"></i>
+                </div>
               </div>
             </div>
           </figure>
@@ -2174,19 +2606,23 @@
             data-blazon="Barry of ten Argent and Sable, a bend counterchanged; impaling, per fess, Azure crusily Or, and per fess Gules and Vert, a fess embattled Or, in chief three mullets Argent"
             data-size="w-72"
           >
-            <div class="escutcheon per-pale">
-              <div class="barry-of-ten-argent-sable bend-counterchanged"></div>
-              <div class="per-fess">
-                <div class="azure">
-                  <div class="charges semy">
-                    <i class="cross-crosslet or"></i>
+            <div class="heater">
+              <div class="per-pale">
+                <div
+                  class="barry-of-ten-argent-sable bend-counterchanged"
+                ></div>
+                <div class="per-fess">
+                  <div class="azure">
+                    <div class="charges semy">
+                      <i class="cross-crosslet or"></i>
+                    </div>
                   </div>
-                </div>
-                <div class="per-fess-gules-vert fess-embattled-or">
-                  <div class="charges in-chief">
-                    <i class="mullet argent"></i>
-                    <i class="mullet argent"></i>
-                    <i class="mullet argent"></i>
+                  <div class="per-fess-gules-vert fess-embattled-or">
+                    <div class="charges in-chief">
+                      <i class="mullet argent"></i>
+                      <i class="mullet argent"></i>
+                      <i class="mullet argent"></i>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2201,13 +2637,14 @@
             alternative, ideally its blazon:
           </p>
           <pre data-lang="html">
-&lt;div class="escutcheon azure fess-or" role="img"
-     aria-label="Azure, a fess Or"&gt;&lt;/div&gt;</pre>
+&lt;div class="heater" role="img" aria-label="Azure, a fess Or"&gt;
+  &lt;div class="azure fess-or"&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
           <p class="mt-4">
             Grailwind uses <code>:has()</code>, CSS masks and CSS nesting, so it
-            needs a current browser. Engrailed, invected and wavy edges use
-            <code>clip-path: shape()</code>. Where that isn't supported, the
-            ordinary is drawn with straight edges instead.
+            needs a current browser. The shield's outline and engrailed,
+            invected and wavy edges use <code>clip-path: shape()</code>. Where
+            that isn't supported, they're drawn with straight edges instead.
           </p>
         </section>
 
@@ -2227,6 +2664,10 @@
               ordinary, and furs.
             </li>
             <li>A charge outside a <code>charges</code> container.</li>
+            <li>
+              The blazon on a <code>heater</code> rather than on its field, or
+              the old <code>escutcheon</code>.
+            </li>
             <li>
               <code>between</code> or <code>on</code> with no ordinary to place
               the charges.
@@ -2365,7 +2806,7 @@ export default [
       const wide = matchMedia("(width >= 40rem)");
       const markups = [];
       for (const fig of document.querySelectorAll("figure[data-blazon]")) {
-        const shield = fig.querySelector(".escutcheon");
+        const shield = fig.querySelector(".heater");
         const html = shield.outerHTML;
         const indent = html.split("\n").at(-1).match(/^ */)[0];
 

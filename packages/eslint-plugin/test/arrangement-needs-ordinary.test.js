@@ -5,25 +5,25 @@ const missing = (arrangement) => ({ messageId: "missing", data: { arrangement } 
 
 run("arrangement-needs-ordinary", rule, {
   valid: [
-    `<div class="escutcheon azure chevron-or"><div class="charges between"><i class="mullet or"></i></div></div>`,
-    `<div class="escutcheon azure bend-or chief-argent"><div class="charges on"></div></div>`,
-    `<div class="escutcheon azure"><div class="charges in-pale"></div></div>`,
+    `<div class="heater"><div class="azure chevron-or"><div class="charges between"><i class="mullet or"></i></div></div></div>`,
+    `<div class="heater"><div class="azure bend-or chief-argent"><div class="charges on"></div></div></div>`,
+    `<div class="heater"><div class="azure"><div class="charges in-pale"></div></div></div>`,
     `<div class="charges between"></div>`,
-    `<div class="escutcheon azure fess-engrailed-or"><div class="charges between"></div></div>`,
-    `<div class="escutcheon gules chevron-ermine"><div class="charges on"></div></div>`,
-    `<div class="escutcheon gules bend-invected-erminois"><div class="charges on"></div></div>`,
+    `<div class="heater"><div class="azure fess-engrailed-or"><div class="charges between"></div></div></div>`,
+    `<div class="heater"><div class="gules chevron-ermine"><div class="charges on"></div></div></div>`,
+    `<div class="heater"><div class="gules bend-invected-erminois"><div class="charges on"></div></div></div>`,
   ],
   invalid: [
     {
-      code: `<div class="escutcheon azure"><div class="charges between"></div></div>`,
+      code: `<div class="heater"><div class="azure"><div class="charges between"></div></div></div>`,
       errors: [missing("between")],
     },
     {
-      code: `<div class="escutcheon azure chief-or"><div class="charges between"></div></div>`,
+      code: `<div class="heater"><div class="azure chief-or"><div class="charges between"></div></div></div>`,
       errors: [missing("between")],
     },
     {
-      code: `<div class="escutcheon azure bordure-or"><div class="charges on"></div></div>`,
+      code: `<div class="heater"><div class="azure bordure-or"><div class="charges on"></div></div></div>`,
       errors: [missing("on")],
     },
   ],

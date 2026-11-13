@@ -13,9 +13,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **Breaking:** the shield is a frame round its field. `escutcheon` is now
+  `heater`, with the blazon on its one child:
+
+  ```html
+  <!-- before -->
+  <div class="escutcheon azure fess-or"></div>
+  <!-- after -->
+  <div class="heater"><div class="azure fess-or"></div></div>
+  ```
+
+  The heater is pointed, after Fox-Davies, and its outline is drawn just
+  inside its edge. An inescutcheon is a frame too, round its own field, and
+  pointed. A bordure on a shield's field follows its outline and scales with
+  it; on a part of a divided field or a canton, it's still a border.
+
 - `@grailwind/eslint-plugin` 0.1.0-beta.5 needs `grailwind` 0.9.x. The vair
   family isn't checked by the rule of tincture unless the `furs` option names
-  it.
+  it. The new `field-in-shield` rule flags a blazon on the frame, and
+  `escutcheon`.
 
 ## [0.8.1] - 2026-11-13
 

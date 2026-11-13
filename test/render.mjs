@@ -2,7 +2,8 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { chromium, firefox } from "playwright";
-import { BETWEEN, DIVISIONS, lineOrdinaries, ON } from "../data.js";
+import { BETWEEN, DIVISIONS, lineOrdinaries, ON, POINTS } from "../data.js";
+import { PATHS } from "../paths.js";
 import { build, root } from "./build.mjs";
 
 const out = join(root, "test", ".render");
@@ -61,6 +62,25 @@ const ring = ([x, y], size) => {
   ];
 };
 
+// A shield's field inside its 18.75px bordure, at 300 × 360px: a point as % of that field, as % of
+// the shield, and how much smaller its charges are.
+const inBordure = ([x, y]) => [(18.75 + x * 2.625) / 3, (18.75 + y * 3.225) / 3.6];
+const BORDURED = 262.5 / 300;
+
+/**
+ * A charge's rim, so a charge the heater's outline clips leaves a point on the outline or the page.
+ * @param {number[]} centre The charge's centre, as [x%, y%] of the shield.
+ * @param {number} size The charge's width, as % of the shield's.
+ * @param {number} fraction How far out, as a fraction of a roundel's radius.
+ * @returns {number[][]} Eight points round it.
+ */
+const rim = ([x, y], size, fraction = 0.9) =>
+  Array.from({ length: 8 }, (_, i) => {
+    const angle = (i * Math.PI) / 4;
+    const r = fraction * 0.46 * size;
+    return [x + r * Math.cos(angle), y + ((r * 5) / 6) * Math.sin(angle)];
+  });
+
 // One probe per charge; `charges` is the container's classes besides `charges`, and `size` the
 // charge width as % of the shield's.
 const charged = (shield, charges, size, points, why) =>
@@ -83,10 +103,34 @@ const ermineAt = (across) => {
 };
 const { spot: furSpot, ground: furGround } = ermineAt(6);
 const ermine4 = ermineAt(4);
-// A point is kept off the shield's rounded base, which is tighter near the flanks.
-const onShield = (x, y) => y >= 4 && y <= (x < 20 || x > 80 ? 75 : 96);
-// Bendy's n equal pieces cover the visible part of the shield, the last running to the edge.
-const BENDY_VISIBLE = (30 - 15 + 16.5 + Math.sqrt(15 ** 2 + 13.5 ** 2)) / 60;
+// The heater's curved base, as [x%, y%] points along drawings/heater.svg's cubics.
+const HEATER_BASE = (() => {
+  const points = [];
+  let from = [0, 0];
+  for (const [command, ...n] of PATHS.heater) {
+    if (command === "C") {
+      for (let i = 0; i <= 200; i++) {
+        const t = i / 200;
+        const [a, b, c, d] = [(1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3];
+        const x = a * from[0] + b * n[0] + c * n[2] + d * n[4];
+        const y = a * from[1] + b * n[1] + c * n[3] + d * n[5];
+        points.push([x, (y * 100) / 120]);
+      }
+      from = [n[4], n[5]];
+    } else if (command !== "Z") {
+      from = n;
+    }
+  }
+  return points;
+})();
+// How far down the heater's edge is at x, in %.
+const baseAt = (x) =>
+  HEATER_BASE.reduce((best, p) => (Math.abs(p[0] - x) < Math.abs(best[0] - x) ? p : best))[1];
+// A point is kept clear of the heater's top and its curved base, which is higher near the flanks.
+const onShield = (x, y) => y >= 4 && y <= Math.min(96, baseAt(x) - 3);
+// Bendy's n equal pieces cover the visible part of the shield, the last running to the edge: up to
+// where a band's line is tangent to the base, (x + y) / 2 along the corner-to-corner extent.
+const BENDY_VISIBLE = Math.max(...HEATER_BASE.map(([x, y]) => (x + y) / 200));
 // How far across the corner-to-corner extent a point `lean` of the way through a piece is.
 const bendyFraction = (pieces, piece, lean) => {
   const last = piece === pieces - 1;
@@ -102,6 +146,12 @@ const bendyPoint = (pieces, piece, lean, x, sinister) => {
     return null;
   }
   return [sinister ? 100 - x : x, y];
+};
+// A point at x, `offset` along the extent past where the last piece starts: on the line that
+// depends on where the heater's base cuts the extent.
+const bendyLastLine = (pieces, offset, x) => {
+  const fraction = ((pieces - 1) * BENDY_VISIBLE) / pieces + offset;
+  return [x, 100 * (2 * fraction - (100 - x) / 100)];
 };
 const bendyPiece = (pieces, piece, sinister) => {
   for (const x of [92, 8, 75, 25, 97]) {
@@ -204,7 +254,8 @@ const VOIDED = [
   ["pile", [50, 40], [[37.15, 40], [62.85, 40]], [20, 40]],
   // Mirrored, with a point on each arm so a wrong closing vertex in the bridge shows.
   ["chevron-reversed", [25, 40], [[25, 50], [75, 50]], [25, 60]],
-  ["pall-reversed", [50, 20], [[41, 20], [59, 20], [25, 90.4], [25, 69.6], [75, 90.4], [75, 69.6]], [20, 20]],
+  // The arms' outer outline moved up along them, clear of the heater's point.
+  ["pall-reversed", [50, 20], [[41, 20], [59, 20], [28, 88], [25, 69.6], [72, 88], [75, 69.6]], [20, 20]],
   ["pile-reversed", [50, 60], [[37.15, 60], [62.85, 60]], [20, 60]],
 ];
 
@@ -311,7 +362,7 @@ const PROBES = [
   { shield: "azure bar-or", at: [[50, 35], [50, 55]], expect: "azure", why: "the field above and below the bar" },
   { shield: "azure two-bars-or", at: [[50, 33], [50, 57], [2, 33], [2, 57]], expect: "or", why: "both bars are drawn" },
   { shield: "azure two-bars-or", at: [[50, 45], [2, 45], [50, 22], [50, 68]], expect: "azure", why: "the field between, by the seam and around the bars" },
-  { shield: "azure three-bars-or", at: [[50, 25], [50, 45], [50, 65], [2, 25], [2, 45], [2, 65]], expect: "or", why: "all three bars are drawn" },
+  { shield: "azure three-bars-or", at: [[50, 25], [50, 45], [50, 65], [2, 25], [2, 45], [4, 65]], expect: "or", why: "all three bars are drawn" },
   { shield: "azure three-bars-or", at: [[50, 35], [50, 55], [2, 35], [2, 55], [50, 15], [50, 75]], expect: "azure", why: "the field between, by the seam and around the bars" },
   // Seven scallops across, so x = 50 is the middle of one and x = 300/7 a cusp, where no bite reaches.
   { shield: "azure three-bars-engrailed-or", at: [[50, 22.1], [50, 27.9], [50, 42.1], [50, 47.9], [50, 62.1], [50, 67.9]], expect: "azure", why: "bites in each bar's edges" },
@@ -363,7 +414,7 @@ const PROBES = [
   { shield: "azure chevron-reversed-or", at: [50, 40], expect: "azure", why: "the field above the chevron reversed" },
   { shield: "azure pall-reversed-or", at: [[50, 30], [20, 80], [80, 80]], expect: "or", why: "the pall reversed's stem and arms are drawn" },
   { shield: "azure pall-reversed-or", at: [50, 80], expect: "azure", why: "the field between the pall reversed's arms" },
-  { shield: "azure pall-reversed-or", at: [[25, 91.86], [25, 68.14], [75, 91.86], [75, 68.14], [39, 20], [61, 20]], expect: "or", why: "the pall reversed's arms and stem, just inside each edge" },
+  { shield: "azure pall-reversed-or", at: [[28, 89.46], [25, 68.14], [72, 89.46], [75, 68.14], [39, 20], [61, 20]], expect: "or", why: "the pall reversed's arms and stem, just inside each edge" },
   { shield: "azure pall-reversed-or", at: [[25, 64.14], [75, 64.14], [40, 83.86], [60, 83.86], [37, 20], [63, 20]], expect: "azure", why: "the field beside the pall reversed, just outside each edge" },
   { shield: "azure chevron-reversed-engrailed-or", at: [20.56, 24.79], expect: "azure", why: "a bite in the chevron reversed" },
   { shield: "gules chevron-reversed-engrailed-or", at: [50, 76], expect: "gules", why: "no sliver below the chevron reversed's point" },
@@ -445,7 +496,6 @@ const PROBES = [
   { shield: "azure cross-embattled-or", at: [[26, 33.75], [26, 56.25], [74, 33.75], [74, 56.25]], expect: "or", why: "a merlon on each edge of the cross's arms, opposite" },
   { shield: "azure cross-embattled-or", at: [[38, 35], [62, 35], [38, 55], [62, 55]], expect: "azure", why: "a crenel in each of the cross embattled's inner corners" },
   { shield: "azure cross-embattled-or", at: [[5, 33.75], [95, 33.75]], expect: "or", why: "the cross embattled's arms end on a merlon" },
-  { shield: "azure cross-embattled-or", at: [[39, 96.83], [61, 96.83]], expect: "or", why: "a third merlon just showing in base" },
   // Drawn (drawings/pall-embattled.svg), after the saltire embattled: merlons 10.4 along and 7 out,
   // centred, counted out from a crenel in each inner corner, the foot's corners included.
   { shield: "azure pall-embattled-or", at: [[41.17, 19.08], [58.83, 19.08]], expect: "or", why: "a merlon on the inner edge of each arm of the pall, opposite" },
@@ -770,6 +820,9 @@ const PROBES = [
   { shield: "bendy-sinister-of-eight-or-gules", at: [0, 4, 6].map((piece) => bendyPiece(8, piece, true)), expect: "or", why: "bendy sinister of eight: or in pieces 1, 5 and 7" },
   { shield: "bendy-sinister-of-eight-or-gules", at: [1, 5].map((piece) => bendyPiece(8, piece, true)), expect: "gules", why: "bendy sinister of eight: gules in pieces 2 and 6" },
   { shield: "bendy-or-gules", at: bendyPiece(6, 5, false), expect: "gules", why: "bendy of six: gules in the last piece, on the curved base" },
+  // 3.6px either side of the last line at 300px; the old round base's value moves it 7.3px down.
+  { shield: "bendy-or-gules", at: bendyLastLine(6, 0.005, 25), expect: "gules", why: "bendy of six: the last piece starts where the heater's base cuts the extent" },
+  { shield: "bendy-or-gules", at: bendyLastLine(6, -0.005, 25), expect: "or", why: "bendy of six: the piece before it ends there" },
   { shield: "bendy-of-eight-or-gules", at: bendyPiece(8, 7, false), expect: "gules", why: "bendy of eight: gules in the last piece, on the curved base" },
   { shield: "bendy-sinister-or-gules", at: bendyPiece(6, 5, true), expect: "gules", why: "bendy sinister of six: gules in the last piece, on the curved base" },
   { shield: "bendy-sinister-of-eight-or-gules", at: bendyPiece(8, 7, true), expect: "gules", why: "bendy sinister of eight: gules in the last piece, on the curved base" },
@@ -892,10 +945,15 @@ const PROBES = [
   { shield: "azure", inner: { shield: "per-pale-argent-gules", charges: "counterchanged", items: ["roundel"] }, at: onInner([60, 45]), expect: "argent", why: "a counterchanged charge on an inescutcheon, sinister half" },
   { shield: "azure", inner: { shield: "gules cross-azure fimbriated-argent" }, at: onInner([36.5, 15]), expect: "argent", why: "a fimbriated cross on an inescutcheon" },
   // A bordure is a border, so on the shield it moves the inescutcheon inside it, like the charges.
-  { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([2, 45]), expect: "or", why: "an inescutcheon's bordure" },
+  // A ring paints it, 6.25% of its frame's width: 18.75px on the shield and 6.2px on the 99px
+  // inescutcheon, whose 2px outline is inside its edge.
+  { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([4.5, 45]), expect: "or", why: "an inescutcheon's bordure" },
   { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([8, 45]), expect: "gules", why: "an inescutcheon's bordure is a third as wide" },
   { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [2, 45], expect: "argent", why: "the shield's own bordure, with an inescutcheon" },
-  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [6, 45], expect: "azure", why: "the shield's own bordure keeps its width" },
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [8, 45], expect: "azure", why: "the shield's own bordure keeps its width" },
+  // Inside the bordure, the inescutcheon's left edge is at 18.75 + 0.335 × 262.5 ≈ 106.7px.
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: px(104, 170), expect: "azure", why: "the shield's bordure moves the inescutcheon inside it" },
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: px(110, 170), expect: "gules", why: "the inescutcheon inside the shield's bordure" },
 
   // Canton: `at` is on the outer shield; onCanton maps the canton's own points.
   { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: [[16, 16], [2, 2], [31, 31]], expect: "gules", why: "a canton in dexter chief" },
@@ -920,20 +978,22 @@ const PROBES = [
   ...nested("azure", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton"),
   ...nested("azure chief-or", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton, on a shield with a chief"),
   ...nested("azure fess-or", { kind: "canton", shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on a canton, on a shield with a fess"),
-  // The canton and the chief surmount a bordure, which is 12px. The canton is still 100 × 120px.
+  // The canton and the chief surmount a bordure, which is 18.75px. The canton is 100 × 120px.
   { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: [px(4, 4), px(4, 60), px(60, 4), px(95, 115), px(98, 118)], expect: "gules", why: "a canton over the bordure" },
   { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: [px(102, 60), px(110, 60), px(60, 122)], expect: "azure", why: "a canton over the bordure is a third of the whole shield" },
   { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: px(4, 200), expect: "or", why: "the bordure below a canton" },
   { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: px(98, 118), expect: "gules", why: "a canton without a bordure" },
   { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: [px(102, 60), px(60, 122)], expect: "azure", why: "a canton without a bordure is a third of the shield" },
-  // The canton's own bordure is 4px, and its chief reaches 4 + 0.3 × 112 ≈ 37.6px down.
+  // The canton's own bordure is a border 6.25px wide, and its chief reaches 6.25 + 0.3 × 113.75 ≈
+  // 40.4px down.
   { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: [px(2, 60), px(98, 60), px(50, 118)], expect: "or", why: "a canton's own bordure, over the shield's" },
   { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: px(50, 20), expect: "gules", why: "a chief on a canton with a bordure" },
   { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: [px(2, 2), px(50, 2), px(98, 20)], expect: "gules", why: "a chief on a canton surmounts the canton's bordure" },
   { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: px(50, 60), expect: "vert", why: "a canton's field below its chief" },
-  // An inescutcheon is at (104.5, 107.8)px and 91 × 109px in a bordured shield; its canton is 30 × 36px.
-  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [px(106.5, 109.8), px(132.5, 125.8), px(119.5, 141.8)], expect: "or", why: "a canton on an inescutcheon doesn't move by the shield's bordure" },
-  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [px(137.5, 125.8), px(119.5, 146.8)], expect: "gules", why: "an inescutcheon beside and below its canton" },
+  // An inescutcheon is at (106.7, 110.7)px and 86.6 × 103.9px in a shield with an 18.75px bordure;
+  // its canton is 28.9 × 34.6px.
+  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [px(109, 113), px(133, 128), px(121, 143)], expect: "or", why: "a canton on an inescutcheon doesn't move by the shield's bordure" },
+  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [px(139, 128), px(121, 149)], expect: "gules", why: "an inescutcheon beside and below its canton" },
   // A quarter isn't positioned, so its canton is placed on the shield's field, inside the bordure.
   { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: [px(6, 60), px(60, 6)], expect: "argent", why: "a canton in a quarter doesn't move over the bordure" },
   { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: px(20, 20), expect: "or", why: "a canton in a quarter" },
@@ -953,12 +1013,14 @@ const PROBES = [
   { shield: "quarterly", quarters: ["or", "azure", "azure", "or"], at: [25, 47], expect: "azure", why: "a quartered shield is split per-fess at 45%" },
   { shield: "per-fess", quarters: ["or", "azure"], at: [25, 47], expect: "azure", why: "a per-fess shield is split 45% of the way down the shield" },
   { shield: "azure bordure-or chief-gules", at: [px(4, 4), px(150, 4), px(296, 40), px(150, 110)], expect: "gules", why: "a chief over the bordure" },
-  { shield: "azure bordure-or chief-gules", at: px(150, 116), expect: "azure", why: "a chief's lower edge stays at 30% of the field" },
+  // 18.75 + 0.3 × 322.5 ≈ 115.5px down.
+  { shield: "azure bordure-or chief-gules", at: px(150, 119), expect: "azure", why: "a chief's lower edge stays at 30% of the field" },
   { shield: "azure bordure-or chief-gules", at: [px(4, 116), px(4, 200)], expect: "or", why: "the bordure below a chief" },
   { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: px(146, 50), expect: "gules", why: "a counterchanged chief with a bordure, dexter of the pale line" },
   { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: px(154, 50), expect: "or", why: "a counterchanged chief with a bordure, sinister of the pale line" },
   { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: [px(4, 4), px(296, 4), px(4, 100), px(296, 100)], expect: "argent", why: "a counterchanged chief leaves the bordure's strips unpainted" },
-  // Seven scallops across the 276px field: bites at its middle and its first and last, 105.9px down.
+  // Seven scallops across the 262.5px field, its chief's foot 115.5px down: bites at its middle and
+  // near its first and last, 105.9px down.
   { shield: "azure bordure-argent chief-engrailed-or", at: [px(150, 105.9), px(31.7, 105.9), px(268.3, 105.9)], expect: "azure", why: "an engrailed chief's bites stay on the field" },
   { shield: "azure bordure-argent chief-engrailed-or", at: [px(4, 4), px(296, 4), px(4, 108), px(296, 108), px(150, 60)], expect: "or", why: "an engrailed chief's corners over the bordure" },
   { shield: "azure bordure-argent chief-engrailed-or", at: px(4, 200), expect: "argent", why: "the bordure below an engrailed chief" },
@@ -974,6 +1036,68 @@ const PROBES = [
   // Each quarter starts its own count: a pale of the first in quarter 2 is gules, over its argent half.
   { shield: "quarterly", quarters: ["or", "per-pale-gules-argent pale-of-the-first", "azure", "vert"], at: [80, 25], expect: "gules", why: "a quarter's own first" },
   { shield: "quarterly", quarters: ["or", "per-pale-gules-argent pale-of-the-first", "azure", "vert"], at: [92, 25], expect: "argent", why: "beside a pale of the first in a quarter" },
+
+  // The heater (drawings/heater.svg): straight to 55% down, then a curve to the point. The outline
+  // is 2px inside its edge, and a bordure a ring 18.75px wide inside that, which follows the point:
+  // its inner tip is at 360 − 18.75 = 341.25px.
+  { shield: "azure bordure-gules", at: [px(150, 349), px(150, 344)], expect: "gules", why: "the bordure follows the point" },
+  { shield: "azure bordure-gules", at: [px(150, 336), px(150, 200)], expect: "azure", why: "the field just above the bordure's point" },
+  { shield: "azure", at: [px(1, 150), px(299, 150), px(150, 1)], expect: "sable", why: "the outline, just inside the edge" },
+  { shield: "azure chief-or", inner: { kind: "canton", shield: "gules" }, at: [px(1, 20), px(150, 1)], expect: "sable", why: "the outline over a canton and a chief" },
+  // White, as the argent swatch: where today's round base was drawn, but outside the point.
+  { shield: "azure", at: [[30, 95], [70, 95], [38, 98], [62, 98]], expect: "argent", why: "the page beside the point" },
+  // A bordure twice as wide on a shield twice the size: 6.25% of the width, as px(18.75) is at 300px.
+  { shield: "azure bordure-gules w-[150px]!", at: [[3, 45], [5.5, 45]], expect: "gules", why: "the bordure at 150px is 6.25% wide" },
+  { shield: "azure bordure-gules w-[150px]!", at: [[7.5, 45], [50, 45]], expect: "azure", why: "and no wider at 150px" },
+  { shield: "azure bordure-gules", at: [[3, 45], [5.5, 45]], expect: "gules", why: "the bordure at 300px is 6.25% wide" },
+  { shield: "azure bordure-gules", at: [[7.5, 45], [50, 45]], expect: "azure", why: "and no wider at 300px" },
+  // The field lays out inside the bordure's border, 18.75px each side, and the ring paints over it.
+  // Where the ring curves to the point, it goes over the field's ordinaries; the chief, its
+  // charges, a canton and an inescutcheon go over the ring.
+  { shield: "argent cross-azure bordure-gules", at: [px(125, 338), px(175, 338)], expect: "gules", why: "the bordure over a cross" },
+  { shield: "argent cross-azure bordure-gules", at: px(150, 330), expect: "azure", why: "the cross above the bordure's point" },
+  { shield: "argent bend-azure bordure-gules", at: px(260, 277), expect: "gules", why: "the bordure over a bend" },
+  { shield: "argent bordure-gules chief-azure", charges: "in-chief", items: bezants(3), at: [[25, 15], [50, 15], [75, 15]].flatMap((p) => ring(inBordure(p), 18 * BORDURED)), expect: "or", why: "charges in chief over the chief over the bordure" },
+  { shield: "argent bordure-gules chief-azure", charges: "", items: ["bezant in-dexter-chief"], at: ring(inBordure([25, 15]), 18 * BORDURED), expect: "or", why: "a charge at a chief point over the chief" },
+  { shield: "argent bordure-gules", inner: { kind: "canton", shield: "azure" }, at: [3, 3], expect: "azure", why: "a canton over the bordure" },
+  // 017: the shield's cross over the quarters' saltires, and the bordure over both.
+  { shield: "quarterly cross-or bordure-gules", quarters: ["azure saltire-argent", "azure saltire-argent", "azure saltire-argent", "azure saltire-argent"], at: [[50, 20], [25, 45], [44, 44]], expect: "or", why: "the shield's cross over the quarters' saltires" },
+  { shield: "quarterly cross-or bordure-gules", quarters: ["azure saltire-argent", "azure saltire-argent", "azure saltire-argent", "azure saltire-argent"], at: [[3, 3], [3, 45], [50, 97]], expect: "gules", why: "the bordure over the quarters and the cross" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(3, 150), px(140, 150), px(75, 10)], expect: "or", why: "a bordure on a part is a border" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(160, 150), px(290, 150)], expect: "gules", why: "and only on its own part" },
+  // A counterchanged charge's swapped field lines up with the field inside a bordure. Ermine tiles
+  // across the 262.5 × 322.5px field are 43.75 × 52.5px, so spots sit a tenth of a tile below
+  // (18.75 + 43.75(k + 0.25), 18.75 + 52.5(j + 0.25)). Swapped, the gules half is ermine.
+  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(160.9, 142.1), expect: "sable", why: "a counterchanged charge's spot on the per pale field's grid, inside a bordure" },
+  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(182.8, 136.9), expect: "argent", why: "a counterchanged charge's ground, per pale inside a bordure" },
+  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(140, 163.9), expect: "gules", why: "a counterchanged charge's dexter half, per pale inside a bordure" },
+  { shield: "per-fess-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(117.2, 194.6), expect: "sable", why: "a counterchanged charge's spot on the per fess field's grid, inside a bordure" },
+  { shield: "per-fess-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(139.1, 189.4), expect: "argent", why: "a counterchanged charge's ground, per fess inside a bordure" },
+  // The field's fess line is 18.75 + 0.45 × 322.5 ≈ 163.9px down; the whole shield's would be 162px.
+  { shield: "per-fess-or-azure bordure-argent", charges: "", items: ["roundel counterchanged"], at: [px(150, 160), px(150, 163)], expect: "azure", why: "a counterchanged charge swaps at the field's fess line, inside a bordure" },
+  { shield: "per-fess-or-azure bordure-argent", charges: "", items: ["roundel counterchanged"], at: px(150, 165), expect: "or", why: "and below it" },
+  // Of the first is the shield's, on an inescutcheon too.
+  { shield: "or", inner: { shield: "azure bordure-of-the-first" }, at: onInner([4.5, 45]), expect: "or", why: "an inescutcheon's bordure of the first is the shield's first" },
+  { shield: "or", inner: { shield: "azure bordure-of-the-first" }, at: onInner([50, 45]), expect: "azure", why: "inside an inescutcheon's bordure of the first" },
+
+  // No default placement overflows the heater's outline, on the shield or on an inescutcheon.
+  ...[
+    ["", 3, 28, [[28, 25], [72, 25], [50, 64]]],
+    ["", 4, 24, [[30, 24], [70, 24], [32, 60], [68, 60]]],
+    ["", 6, 20, [[20, 18], [50, 18], [80, 18], [35, 42], [65, 42], [50, 66]]],
+    ["in-bend", 2, 28, [[30, 26], [70, 64]]],
+    ["in-bend", 3, 22, [[22, 16], [50, 45], [78, 74]]],
+    ["in-base", 3, 22, [[30, 72], [50, 84], [70, 72]]],
+  ].flatMap(([charges, count, size, points]) => [
+    { shield: "azure", charges, items: bezants(count), at: points.flatMap((p) => rim(p, size)), expect: "or", why: `${count} ${charges || "charges"} stay inside the outline` },
+    { shield: "azure", inner: { shield: "gules", charges, items: bezants(count) }, at: points.flatMap((p) => rim(onInner(p), size * INNER, 0.75)), expect: "or", why: `${count} ${charges || "charges"} stay inside an inescutcheon's outline` },
+  ]),
+  ...["dexter-base", "base-point", "sinister-base"].map((name) => (
+    { shield: "azure", charges: "", items: [`bezant in-${name}`], at: rim(POINTS[name], 22), expect: "or", why: `in ${name} stays inside the outline` }
+  )),
+  { shield: "azure chevron-gules", charges: "between", items: bezants(3), at: [[24, 22], [76, 22], [50, 70]].flatMap((p) => rim(p, 22)), expect: "or", why: "between a chevron stays inside the outline" },
+  { shield: "azure chevron-gules", charges: "between", items: bezants(6), at: [[18, 14], [50, 11], [82, 14], [40, 72], [60, 72], [50, 84]].flatMap((p) => rim(p, 12, 0.8)), expect: "or", why: "six between a chevron stay inside the outline" },
+  { shield: "azure", inner: { shield: "gules chevron-argent", charges: "between", items: bezants(3) }, at: [[24, 22], [76, 22], [50, 70]].flatMap((p) => rim(onInner(p), 22 * INNER, 0.75)), expect: "or", why: "between a chevron stays inside an inescutcheon's outline" },
 ];
 
 const LINES = ["", "-engrailed", "-invected", "-wavy", "-indented", "-embattled"];
@@ -1052,11 +1176,16 @@ const chargesOf = ({ charges, items }) =>
     ? `<div class="charges ${charges ?? ""}">${items.map((c) => `<i class="${c}"></i>`).join("")}</div>`
     : "";
 // `inner` is an inescutcheon, or a canton by `kind`, after the charges unless `first`. It can
-// hold an `inner` of its own.
-const nestedOf = (inner) =>
-  inner
-    ? `<div class="${inner.kind ?? "inescutcheon"} ${inner.shield}">${chargesOf(inner)}${nestedOf(inner.inner)}</div>`
-    : "";
+// hold an `inner` of its own. An inescutcheon is a frame round its field; a canton is the field.
+const nestedOf = (inner) => {
+  if (!inner) {
+    return "";
+  }
+  const content = chargesOf(inner) + nestedOf(inner.inner);
+  return inner.kind === "canton"
+    ? `<div class="canton ${inner.shield}">${content}</div>`
+    : `<div class="inescutcheon"><div class="${inner.shield}">${content}</div></div>`;
+};
 // `quarters` is each quarter's classes, for a `quarterly` shield, or { shield, charges, items, inner }.
 const quarterOf = (q) =>
   typeof q === "string"
@@ -1066,7 +1195,11 @@ const markup = ({ shield, charges, items, inner, first, more, quarters }, attrs 
   const nested = nestedOf(inner);
   const own = chargesOf({ charges, items }) + (more ? chargesOf(more) : "");
   const content = (quarters ?? []).map(quarterOf).join("") + (first ? nested + own : own + nested);
-  return `<div class="escutcheon ${shield}"${attrs}>${content}</div>`;
+  // A width, e.g. `w-[305px]!`, goes on the frame; the rest on its field.
+  const classes = shield.split(" ");
+  const size = classes.filter((cls) => cls.startsWith("w-"));
+  const field = classes.filter((cls) => !cls.startsWith("w-"));
+  return `<div class="${["heater", ...size].join(" ")}"${attrs}><div class="${field.join(" ")}">${content}</div></div>`;
 };
 const describeShield = ({ shield, charges, items, more }) =>
   (items ? `${shield} · ${charges || "plain"} · ${items.join(", ")}` : shield) +
@@ -1088,7 +1221,7 @@ const grid = (css, width, cells) => `<!doctype html>
 <style>${css}</style>
 <style>
   body { margin: 0; display: grid; grid-template-columns: repeat(6, ${width}px); gap: 20px; }
-  .escutcheon { width: ${width}px; box-shadow: none; }
+  .heater { width: ${width}px; }
   .swatch { width: ${width}px; height: 40px; }
   figure { margin: 0; font: 14px sans-serif; text-align: center; }
 </style>

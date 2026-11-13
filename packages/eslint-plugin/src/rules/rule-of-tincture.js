@@ -4,6 +4,7 @@ import {
   chargeName,
   chargeTincture,
   describe,
+  fieldOf,
   fieldTincture,
   fimbriationOf,
   firstOf,
@@ -118,11 +119,19 @@ export default {
           const { ordinaries, chiefs, bordures } = ordinariesOf(el.classes);
           const fimbriation = fimbriationOf(el.classes);
 
-          // A plain sub-shield lies on its parent's field. A charged or divided one is arms.
+          // A plain sub-shield lies on its parent's field. A charged or divided one is arms. An
+          // inescutcheon is a frame, so its field is its one child.
           const sub = ["canton", "inescutcheon"].find((c) => el.classes.has(c));
-          if (sub && isPlain(el) && el.parent !== UNKNOWN && el.parent.classes) {
+          const subField = sub && (sub === "inescutcheon" ? fieldOf(el) : el);
+          if (
+            subField?.classes &&
+            isPlain(subField) &&
+            el.parent !== UNKNOWN &&
+            el.parent.classes
+          ) {
             const ground = fieldTincture(el.parent.classes);
-            check(el, el.reportNode, field, `plain ${sub}`, field, ground, "plain");
+            const tincture = fieldTincture(subField.classes);
+            check(el, subField.reportNode, tincture, `plain ${sub}`, tincture, ground, "plain");
           }
           const isFimbriated = fimbriation && ordinaries.some(isFimbriable);
 

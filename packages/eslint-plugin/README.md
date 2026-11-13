@@ -57,7 +57,7 @@ export default [
 No metal (`or`, `argent`) on metal, and no colour on colour.
 
 - An ordinary, chief or bordure is checked against the field on the same element:
-  `escutcheon or fess-argent` is metal on metal. So are engrailed, invected, wavy, indented, embattled and voided ones
+  `or fess-argent` is metal on metal. So are engrailed, invected, wavy, indented, embattled and voided ones
   (`fess-engrailed-argent`, `cross-voided-argent`).
 - A fimbriated ordinary is checked against its fimbriation, and the fimbriation against the
   field: `or chevron-sable fimbriated-argent` is metal on metal (Argent on Or).
@@ -66,13 +66,15 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
 - Charges at `in-dexter-chief`, `in-chief-point` or `in-sinister-chief`, or in a
   `charges in-chief` container, are checked against the chief, if there is one.
 - A plain canton or inescutcheon, one with nothing on it, is checked against the field it lies
-  on. One with charges, an ordinary or a division counts as arms of its own and is exempt.
+  on. An inescutcheon's field is its one child. One with charges, an ordinary or a division
+  counts as arms of its own and is exempt.
 
 A divided field (`per-pale-or-gules`) has no single tincture, so nothing is checked against it.
 Neither are `<img>` charges, charges with no tincture, or `bordure-*` with a non-heraldic colour.
 Counterchanged ordinaries and charges take the field's tinctures swapped, so they're skipped too.
 
-`of-the-first` is checked as the shield's first tincture, and reported if it can't be seen.
+`of-the-first` is checked as the shield's first tincture (a quarter's own, but not a canton's or
+an inescutcheon's), and reported if it can't be seen.
 
 Furs count by their ground: `ermine` and `erminois` as metals, `ermines` and `pean` as colours.
 `ermine fess-argent` is metal on metal. The vair family (`vair`, `potent`, `vairy-or-gules` and
@@ -95,6 +97,17 @@ Charges (`mullet`, `bezant`, `charge-[…]` and so on) must be direct children o
 container.
 
 An arrangement (`in-chief`, `in-pale`, `between` and so on) goes on the container, not a charge.
+
+### `field-in-shield`
+
+A `heater` or `inescutcheon` is a frame round one child, the field, which carries the blazon.
+This flags a tincture, division, ordinary, chief, bordure or `fimbriated-*` on the frame, as in
+`<div class="heater azure">`, and a `charges` container directly in it, which would be taken for
+the field. It also flags `escutcheon`, which is now `heater`:
+
+```html
+<div class="heater"><div class="azure fess-or"></div></div>
+```
 
 ### `arrangement-needs-ordinary`
 

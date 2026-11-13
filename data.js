@@ -31,6 +31,9 @@ export const DIVISIONS = [
   "chequy",
 ];
 
+// The classes that frame a field: a shape round one child, which carries the blazon.
+export const FRAMES = ["heater", "inescutcheon"];
+
 // Ordinaries that can be reversed, e.g. `pile-reversed-or`: the same shape upside down.
 export const REVERSIBLE = ["chevron", "pall", "pile"];
 const reversed = (ordinary) => `${ordinary}-reversed`;
