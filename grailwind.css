@@ -42,6 +42,42 @@
   syntax: "*";
   inherits: false;
 }
+@property --field-image {
+  syntax: "*";
+  inherits: false;
+}
+@property --field-size {
+  syntax: "*";
+  inherits: false;
+}
+@property --field-position {
+  syntax: "*";
+  inherits: false;
+}
+@property --field-repeat {
+  syntax: "*";
+  inherits: false;
+}
+@property --on-counterchange-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --on-counterchange-image {
+  syntax: "*";
+  inherits: false;
+}
+@property --on-counterchange-size {
+  syntax: "*";
+  inherits: false;
+}
+@property --on-counterchange-position {
+  syntax: "*";
+  inherits: false;
+}
+@property --on-counterchange-repeat {
+  syntax: "*";
+  inherits: false;
+}
 /* A field's first tincture. The escutcheon copies it to --the-first, which inherits,
  * so a canton's own field can't change it. */
 @property --field-first {

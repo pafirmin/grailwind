@@ -6,6 +6,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Counterchanged charges `on` a counterchanged ordinary showed the ordinary's
+  swapped field and vanished. They now show the field's own tinctures.
+
 ## [0.8.0] - 2026-11-12
 
 ### Added

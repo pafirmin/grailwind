@@ -767,6 +767,29 @@ const PROBES = [
 
   { shield: "per-pale-ermine-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: [30, 45], expect: "gules", why: "a counterchanged charge on the ermine half" },
   { shield: "per-pale-ermine-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: furSpot(4, 2), expect: "sable", why: "a counterchanged charge on the gules half, on the field's spot grid" },
+  ...[
+    ["per-pale-argent-gules", ring(ON.chevron.counts[3][0], ON.chevron.size), "argent", "gules", "a plain field"],
+    ["per-pale-ermine-gules", [ON.chevron.counts[3][0]], "argent", "gules", "a fur field"],
+    ["gyronny-argent-gules", ring(ON.chevron.counts[3][0], ON.chevron.size), "argent", "gules", "gyronny keeps its tinctures' order"],
+  ].flatMap(([division, dexter, dexterTincture, sinisterTincture, what]) => {
+    const shield = `${division} chevron-counterchanged`;
+    const on = { shield, charges: "on counterchanged", items: Array(3).fill("roundel") };
+    return [
+      { ...on, at: dexter, expect: dexterTincture, why: `a counterchanged charge on a counterchanged chevron, dexter: ${what}` },
+      { ...on, at: ring(ON.chevron.counts[3][2], ON.chevron.size), expect: sinisterTincture, why: `a counterchanged charge on a counterchanged chevron, sinister: ${what}` },
+    ];
+  }),
+  { shield: "per-pale-argent-gules chevron-counterchanged", charges: "on counterchanged", items: Array(3).fill("roundel"), more: { charges: "between counterchanged", items: Array(3).fill("roundel") }, at: ring(BETWEEN.chevron.points[0], BETWEEN.chevron.size), expect: "gules", why: "a counterchanged charge between stays swapped, beside one on a counterchanged chevron" },
+  ...["inescutcheon", "canton"].flatMap((kind) => {
+    const onSub = SUB[kind][1];
+    const inner = { kind, shield: "per-pale-or-azure chevron-vert", charges: "on counterchanged", items: Array(3).fill("roundel") };
+    const shield = "per-pale-argent-gules chevron-counterchanged";
+    const on = { shield, charges: "on counterchanged", items: Array(3).fill("roundel"), inner };
+    return [
+      { ...on, at: [onSub(ON.chevron.counts[3][0])], expect: "azure", why: `the ${kind}'s own counterchanged charge, dexter, doesn't take the shield's field` },
+      { ...on, at: [onSub(ON.chevron.counts[3][2])], expect: "or", why: `the ${kind}'s own counterchanged charge, sinister, doesn't take the shield's field` },
+    ];
+  }),
   { shield: "per-pale-ermine-gules fess-counterchanged", at: [25, 45], expect: "gules", why: "a counterchanged fess on the ermine half" },
   { shield: "per-pale-ermine-gules fess-counterchanged", at: furSpot(4, 2), expect: "sable", why: "a counterchanged fess on the gules half, on the field's spot grid" },
   { shield: "azure fess-ermine", at: furSpot(1, 2), expect: "sable", why: "a spot on a fur fess, on the field's grid" },

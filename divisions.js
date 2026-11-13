@@ -225,21 +225,70 @@ const toLayers = (rules) => {
     });
 };
 
-// A division with one fur: the fur's part is left transparent, over the fur's own layers.
-const withFur = (division, first, second, theme) => {
+/**
+ * A division with one fur: the fur's part is left transparent, over the fur's own layers.
+ * @param {string} division The division's name.
+ * @param {string} first The first tincture or fur.
+ * @param {string} second The second tincture or fur; one of the two is a fur.
+ * @param {Function} theme Tailwind's theme function, for the spots' colour.
+ * @returns {{image: string, size: string, position: string, repeat: string}[]} The layers, top first.
+ */
+const furredLayers = (division, first, second, theme) => {
   const fur = FURS[first] ? first : second;
   const paint = (t) => (t === fur ? "transparent" : `var(--color-${t})`);
-  const all = [
+  return [
     ...toLayers(DIVISIONS[division](paint(first), paint(second), true)),
     ...furLayers(fur, theme),
   ];
-  return Object.fromEntries(
+};
+
+/**
+ * Layers joined into one comma-separated value per property.
+ * @param {{image: string, size: string, position: string, repeat: string}[]} layers
+ * @param {string} prefix The property prefix, such as "background" or "--field".
+ * @returns {Object<string, string>} `<prefix>-image`, `-size`, `-position` and `-repeat`.
+ */
+const joinLayers = (layers, prefix) =>
+  Object.fromEntries(
     ["image", "size", "position", "repeat"].map((p) => [
-      `background-${p}`,
-      all.map((layer) => layer[p]).join(", "),
+      `${prefix}-${p}`,
+      layers.map((layer) => layer[p]).join(", "),
     ]),
   );
-};
+
+/**
+ * A division with one fur, as background rules.
+ * @param {string} division The division's name.
+ * @param {string} first The first tincture or fur.
+ * @param {string} second The second tincture or fur; one of the two is a fur.
+ * @param {Function} theme Tailwind's theme function, for the spots' colour.
+ * @returns {Object<string, string>} The four background-* properties.
+ */
+const withFur = (division, first, second, theme) =>
+  joinLayers(furredLayers(division, first, second, theme), "background");
+
+/**
+ * The field's own layers as --field-* variables, for charges on a counterchanged ordinary.
+ * A background colour becomes a last opaque layer, as the variables carry no colour.
+ * @param {{image: string, size: string, position: string, repeat: string}[]} layers
+ * @param {string} [color] The division's background-color, if it has one.
+ * @returns {Object<string, string>} The four --field-* variables.
+ */
+const field = (layers, color) =>
+  joinLayers(
+    color
+      ? [
+          ...layers,
+          {
+            image: `linear-gradient(${color}, ${color})`,
+            size: "100% 100%",
+            position: "0 0",
+            repeat: "no-repeat",
+          },
+        ]
+      : layers,
+    "--field",
+  );
 
 // The field with its tinctures swapped, for counterchanged ordinaries to paint.
 const counterchange = (rules) =>
@@ -262,8 +311,10 @@ export default plugin(({ addUtilities, theme }) => {
 
         const a = `var(--color-${first})`;
         const b = `var(--color-${second})`;
+        const unswapped = background(a, b);
         utilities[`.${division}-${first}-${second}`] = {
-          ...background(a, b),
+          ...unswapped,
+          ...field(toLayers(unswapped), unswapped["background-color"]),
           ...counterchange(background(b, a)),
           "--field-first": a,
         };
@@ -279,9 +330,11 @@ export default plugin(({ addUtilities, theme }) => {
           [fur, tincture],
           [tincture, fur],
         ]) {
+          const layers = furredLayers(division, first, second, theme);
           // Only a tincture can be "of the first"; a fur first leaves it unset.
           utilities[`.${division}-${first}-${second}`] = {
-            ...withFur(division, first, second, theme),
+            ...joinLayers(layers, "background"),
+            ...field(layers),
             ...counterchange(withFur(division, second, first, theme)),
             ...(!FURS[first] && { "--field-first": `var(--color-${first})` }),
           };

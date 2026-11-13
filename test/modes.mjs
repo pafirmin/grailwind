@@ -144,7 +144,7 @@ const PATTERNS = {
     /\.charges \{[^]*?& > \* \{(?:(?!translate)[^}])*margin: calc\(var\(--charge-width\) \/ -2\) 0 0 calc\(var\(--charge-width\) \/ -2\);/,
   "charges pass the swap down": /\.charges \{[^}]*--counterchange-image: inherit;/,
   "a counterchanged charge has a fixed layer":
-    /\.charges > \.counterchanged \{[^]*?&::before \{[^}]*position: fixed;[^}]*background-image: var\(--counterchange-image\);/,
+    /\.charges > \.counterchanged \{[^]*?&::before \{[^}]*position: fixed;[^}]*background-image: var\(--on-counterchange-image, var\(--counterchange-image\)\);/,
   "counterchanged on the container applies to each charge":
     /\.counterchanged\.charges > \* \{[^]*?&::before \{[^}]*position: fixed;/,
   "the chief isn't fimbriated": /\.chief-or \{[^]*?&::after \{(?:(?!fimbriat)[^}])*\}/,

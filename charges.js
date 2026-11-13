@@ -149,17 +149,28 @@ const inheritCounterchange = Object.fromEntries(
   COUNTERCHANGE.map((n) => [`--counterchange-${n}`, "inherit"]),
 );
 
+// What a charge on a counterchanged ordinary is counterchanged against: the field's own
+// tinctures, handed down by the ordinary to `on` containers only.
+const inheritOnCounterchange = Object.fromEntries(
+  COUNTERCHANGE.map((n) => [`--on-counterchange-${n}`, "inherit"]),
+);
+
 // A layer the size of the shield, as the escutcheon is the containing block
 // for fixed positioning. The charge's mask cuts it to shape.
 const counterchanged = {
   ...inheritCounterchange,
+  ...inheritOnCounterchange,
   "&::before": {
     content: '""',
     position: "fixed",
     inset: "0",
     ...inheritCounterchange,
+    ...inheritOnCounterchange,
     ...Object.fromEntries(
-      COUNTERCHANGE.map((n) => [`background-${n}`, `var(--counterchange-${n})`]),
+      COUNTERCHANGE.map((n) => [
+        `background-${n}`,
+        `var(--on-counterchange-${n}, var(--counterchange-${n}))`,
+      ]),
     ),
   },
 };
@@ -279,7 +290,8 @@ export default plugin(({ addUtilities, matchUtilities }) => {
       };
     }
   }
-  utilities[".on"] = on;
+  // Nested, so Tailwind keeps these apart from the per-count rules above.
+  utilities[".on"] = { "&": inheritOnCounterchange, ...on };
 
   for (const name of Object.keys(POINTS)) {
     utilities[`.in-${name}`] = { ".charges > &": atPoint(name) };

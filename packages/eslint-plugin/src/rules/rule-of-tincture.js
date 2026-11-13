@@ -154,7 +154,8 @@ export default {
               if (!charge.classes || charge.tag === "img") {
                 continue;
               }
-              // Counterchanged charges take the swapped field, not a tincture of their own.
+              // Counterchanged charges take the field's tinctures (swapped, or its own on a counterchanged
+              // ordinary), not one of their own.
               if (charge.classes.has("counterchanged") || container.classes.has("counterchanged")) {
                 continue;
               }

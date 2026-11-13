@@ -780,10 +780,20 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       // The swapped field's tiles would wrap into the bordure's strips, so the bordure shows there.
       ...(chief && { "background-clip": "content-box" }),
     };
-    utilities[`.${ordinary}-counterchanged`] = ordinaryRules(ordinary, {
-      ...counterchanged,
-      "clip-path": chief ? plain : `polygon(${vertices.map(pointBelowChief).join(", ")})`,
-    });
+    // Charges on it are counterchanged against it, so they get the field's own tinctures.
+    utilities[`.${ordinary}-counterchanged`] = {
+      ...ordinaryRules(ordinary, {
+        ...counterchanged,
+        "clip-path": chief ? plain : `polygon(${vertices.map(pointBelowChief).join(", ")})`,
+      }),
+      "--on-counterchange-color": "transparent",
+      ...Object.fromEntries(
+        ["image", "size", "position", "repeat"].map((n) => [
+          `--on-counterchange-${n}`,
+          `var(--field-${n})`,
+        ]),
+      ),
+    };
 
     for (const [tincture, colour] of PAINTS) {
       utilities[`.${ordinary}-${tincture}`] = ordinaryRules(ordinary, {
