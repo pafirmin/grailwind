@@ -15,6 +15,14 @@ import {
   TINCTURES,
   VOIDABLE,
 } from "../data.js";
+import {
+  BORDURE_DEPTH,
+  BORDURE_WIDTH,
+  bordurePath,
+  frameOutline,
+  outlinePoints,
+} from "../ordinaries.js";
+import { PATHS } from "../paths.js";
 import { build, root } from "./build.mjs";
 
 const dir = mkdtempSync(join(root, "test", ".tmp-"));
@@ -56,7 +64,15 @@ const CLASSES = [
   "vair",
   "potent",
   "fur-5",
+  "bordure-engrailed-or",
+  "bordure-invected-or",
+  "bordure-engrailed-of-the-first",
 ];
+
+// The bordure's width and depth as the CSS writes them: an eighth is `calc(100cqw / 8)`.
+const FRAME_BORDER = String.raw`calc\(100cqw \/ ${+(1 / BORDURE_WIDTH).toFixed(3)}\)`;
+const CANTON_BORDER = String.raw`calc\(100cqw \/ ${+(3 / BORDURE_WIDTH).toFixed(3)}\)`;
+const NARROWED = String.raw`0\.${String(+(1 - BORDURE_DEPTH).toFixed(3)).slice(2)}`;
 
 // Rules without a plain `.class {` selector, checked by pattern.
 const PATTERNS = {
@@ -132,10 +148,12 @@ const PATTERNS = {
     /\.heater \{[^]*?& > \* \{[^}]*--the-first: var\(--field-first\);/,
   "an inescutcheon's field doesn't, as of the first is the shield's":
     /\.inescutcheon \{[^{}]*& > \* \{(?:(?!--the-first)[^}])*\}/,
-  "the heater is a container, for its ring's cqw":
-    /\.heater \{[^}]*container-type: inline-size;\s*--bordure-width: 6\.25cqw;/,
-  "so is an inescutcheon, so its ring is a third as wide":
-    /\.inescutcheon \{[^}]*container-type: inline-size;\s*--bordure-width: 6\.25cqw;/,
+  "the heater is a container, for its ring's cqw": new RegExp(
+    String.raw`\.heater \{[^}]*container-type: inline-size;\s*--bordure-width: ${FRAME_BORDER};`,
+  ),
+  "so is an inescutcheon, so its ring is a third as wide": new RegExp(
+    String.raw`\.inescutcheon \{[^}]*container-type: inline-size;\s*--bordure-width: ${FRAME_BORDER};`,
+  ),
   "a frame clips to a polygon, then to its shape()":
     /\.heater \{\s*clip-path: polygon\(0 0, 100% 0, 100% 55%,[^;]*\);\s*clip-path: shape\(from 0 0, line to 100% 0, line to 100% 55%, curve to 50% 100% with[^;]*\);/,
   "an inescutcheon is a frame too":
@@ -152,6 +170,18 @@ const PATTERNS = {
     /\.bordure-or \{[^]*?:is\(\.heater, \.inescutcheon\):has\( ?> &\)::after \{\s*content: "";\s*background-color: var\(--color-or\);/,
   "a frame's ring of the first is the shield's first":
     /\.bordure-of-the-first \{[^]*?:is\(\.heater, \.inescutcheon\):has\( ?> &\)::after \{\s*content: "";\s*background-color: var\(--frame-first, transparent\);/,
+  "a lined bordure's ring is a plain polygon, then a nonzero shape() with scallops in its inner edge":
+    /\.bordure-engrailed-or \{[^]*?:has\( ?> &\)::after \{[^}]*background-color: var\(--color-or\);\s*clip-path: polygon\(evenodd, [^;]*\);\s*clip-path: shape\(nonzero from 0 0, [^;]*, close, move to [^;]*, curve to [^;]*, close\);/,
+  "an engrailed bordure's field grows into the bites: the border and inset are narrower on a frame":
+    new RegExp(
+      String.raw`\.bordure-engrailed-or \{[^}]*border-width: var\(--bordure-width, 0\.75rem\);[^}]*:is\(\.heater, \.inescutcheon\) > & \{\s*border-color: transparent;\s*border-width: calc\(var\(--bordure-width\) \* ${NARROWED}\);\s*--bordure-inset: calc\(var\(--bordure-width\) \* ${NARROWED}\);`,
+    ),
+  "an invected bordure's isn't":
+    /\.bordure-invected-or \{[^}]*:is\(\.heater, \.inescutcheon\) > & \{\s*border-color: transparent;\s*\}/,
+  "off a frame the border keeps the full width":
+    /\.bordure-engrailed-or \{\s*border-style: solid;\s*border-width: var\(--bordure-width, 0\.75rem\);\s*border-color: var\(--color-or\);\s*--bordure-inset: var\(--bordure-width, 0\.75rem\);/,
+  "a lined ring of the first is the shield's first":
+    /\.bordure-engrailed-of-the-first \{[^]*?:has\( ?> &\)::after \{[^}]*background-color: var\(--frame-first, transparent\);/,
   "a frame's first inherits, to reach its ::after":
     /@property --frame-first \{\s*syntax: "\*";\s*inherits: true;/,
   "a tincture sets its frame's first":
@@ -160,8 +190,9 @@ const PATTERNS = {
     /^(?![^]*\.inescutcheon[^{,]*:has\( ?> &\) \{\s*--frame-first)/,
   "a division sets its frame's first":
     /\.per-pale-or-gules \{[^}]*\.heater:has\( ?> &\) \{\s*--frame-first: var\(--color-or\);/,
-  "a canton's bordure is a third of the shield's":
-    /\.canton \{[^}]*--bordure-width: calc\(6\.25cqw \/ 3\);/,
+  "a canton's bordure is a third of the shield's": new RegExp(
+    String.raw`\.canton \{[^}]*--bordure-width: ${CANTON_BORDER};`,
+  ),
   "no .escutcheon selector is left": /^(?![^]*\.escutcheon\b)/,
   "each quarter starts its own":
     /\.quarterly \{[^}]*& > \* \{\s*--the-first: var\(--field-first\);/,
@@ -327,6 +358,113 @@ try {
     if (!ok) {
       failures++;
       console.error(`✗ furs: ${name}`);
+    }
+  }
+  // A lined bordure's inner edge, in real units, at its one geometry: BORDURE_WIDTH of a 5:6
+  // frame. Its scallop counts are pinned so a placement bug can't move the render probes along
+  // with it: update them when tuning BORDURE_WIDTH, BORDURE_SCALLOP or CORNER_LOBE.
+  const PINS = {
+    engrailed: { sweep: 1, top: 5, side: 8, lobes: 2 },
+    invected: { sweep: -1, top: 6, side: 9, lobes: 0 },
+  };
+  const inset = BORDURE_WIDTH * 100;
+  const innerEdge = outlinePoints(PATHS.heater, 256).map(([x, y]) => [
+    inset + (x * (100 - 2 * inset)) / 100,
+    inset + (y * (120 - 2 * inset)) / 120,
+  ]);
+  const near = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-6;
+  /**
+   * How far a point is outside a polygon.
+   * @param {number[][]} polygon Its points.
+   * @param {number[]} point [x, y].
+   * @returns {number} 0 inside it, else the distance to its nearest edge.
+   */
+  const outside = (polygon, [x, y]) => {
+    let inside = false;
+    let nearest = Infinity;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const [a, b] = [polygon[j], polygon[i]];
+      if (a[1] > y !== b[1] > y && x < ((b[0] - a[0]) * (y - a[1])) / (b[1] - a[1]) + a[0]) {
+        inside = !inside;
+      }
+      const length = (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2;
+      const t = Math.max(
+        0,
+        Math.min(1, ((x - a[0]) * (b[0] - a[0]) + (y - a[1]) * (b[1] - a[1])) / length),
+      );
+      nearest = Math.min(
+        nearest,
+        Math.hypot(x - a[0] - t * (b[0] - a[0]), y - a[1] - t * (b[1] - a[1])),
+      );
+    }
+    return inside ? 0 : nearest;
+  };
+  /**
+   * @param {{ from: number[], c1: number[], c2: number[], to: number[] }} piece A cubic.
+   * @param {number} t From 0 to 1.
+   * @returns {number[]} Its point at t.
+   */
+  const bezier = ({ from, c1, c2, to }, t) => {
+    const weights = [(1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3];
+    return [0, 1].map((axis) =>
+      [from, c1, c2, to].reduce((sum, point, i) => sum + weights[i] * point[axis], 0),
+    );
+  };
+  for (const [line, { sweep, top, side, lobes }] of Object.entries(PINS)) {
+    const pieces = bordurePath(PATHS.heater, sweep);
+    const scallops = pieces.filter(({ kind }) => kind === "scallop");
+    const onTopEdge = ([, y]) => Math.abs(y - inset) < 1e-6;
+    const onTop = scallops.filter(({ from, to }) => onTopEdge(from) && onTopEdge(to));
+    const points = pieces.flatMap(({ from, c1, c2 }) => [from, c1, c2]);
+    // An engrailed field reaches the scallops' depth past the chord line and no further; an
+    // invected one only to the chord line. Give or take 0.05 (0.15px at 300px), for sampling.
+    const reach = Math.max(
+      ...pieces.flatMap((piece) =>
+        Array.from({ length: 41 }, (_, i) => outside(innerEdge, bezier(piece, i / 40))),
+      ),
+    );
+    // Neighbouring chords: each turns less than a right angle from the last, and they're within
+    // 15% of each other's length.
+    const chord = ({ from, to }) => [to[0] - from[0], to[1] - from[1]];
+    const even = scallops.every((piece, i) => {
+      const previous = scallops[i - 1];
+      if (!previous || !near(previous.to, piece.from)) {
+        return true;
+      }
+      const [a, b] = [chord(previous), chord(piece)];
+      const [lengthA, lengthB] = [Math.hypot(...a), Math.hypot(...b)];
+      return (
+        a[0] * b[0] + a[1] * b[1] >= -1e-9 &&
+        Math.abs(lengthA - lengthB) / Math.max(lengthA, lengthB) <= 0.15
+      );
+    });
+    const [, shape] = frameOutline(PATHS.heater).lined("10px", sweep);
+    const inner = shape.slice(shape.indexOf("move to ") + "move to ".length).split(", ");
+    const results = {
+      [`${top} scallops along the top`]: onTop.length === top,
+      [`${side} down each side`]: scallops.length - onTop.length === 2 * side,
+      [`${lobes} lobes`]: pieces.length - scallops.length === 2 * lobes,
+      closed: pieces.every((piece, i) => near(piece.from, pieces.at(i - 1).to)),
+      "mirror-symmetric": points.every(([x, y]) =>
+        points.some((other) => near([100 - x, y], other)),
+      ),
+      "reaches no further out than its field":
+        reach <= (sweep > 0 ? BORDURE_DEPTH * inset : 0) + 0.05,
+      "chords run forward and are even": even,
+      "top scallops bulge the right way": onTop.every(
+        ({ from, c1 }) => Math.sign(from[1] - c1[1]) === sweep,
+      ),
+      "its shape() starts where it moves to, with a curve per piece":
+        inner[0] === inner.at(-2).split(" with ")[0].replace("curve to ", "") &&
+        inner.length - 2 === pieces.length &&
+        !shape.includes("NaN"),
+    };
+    checks += Object.keys(results).length;
+    for (const [name, ok] of Object.entries(results)) {
+      if (!ok) {
+        failures++;
+        console.error(`✗ ${line} bordure: ${name}`);
+      }
     }
   }
 } catch (error) {

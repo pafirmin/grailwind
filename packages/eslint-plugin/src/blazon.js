@@ -4,6 +4,7 @@
 import { UNKNOWN } from "./tree.js";
 import {
   ARRANGEMENTS,
+  BORDURE_LINES,
   CHARGES,
   COLOURS,
   DIVISIONS,
@@ -73,6 +74,9 @@ for (const ordinary of VOIDABLE) {
 }
 for (const tincture of [...TINCTURES, OF_THE_FIRST]) {
   ORDINARY_CLASSES.set(`bordure-${tincture}`, { ordinary: "bordure", tincture });
+  for (const line of BORDURE_LINES) {
+    ORDINARY_CLASSES.set(`bordure-${line}-${tincture}`, { ordinary: "bordure", tincture, line });
+  }
 }
 
 // Each division class, mapped to its first tincture. Two furs in one division aren't generated.

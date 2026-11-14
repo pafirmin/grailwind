@@ -15,6 +15,8 @@ run("rule-of-tincture", rule, {
     `<div class="heater"><div class="quarterly bend-sable"><div class="or"></div><div class="gules"></div></div></div>`,
     // Not a tincture, e.g. a Tailwind colour without strict mode.
     `<div class="heater"><div class="or bordure-red-500"></div></div>`,
+    `<div class="heater"><div class="azure bordure-engrailed-or"></div></div>`,
+    `<div class="heater"><div class="gules bordure-invected-argent"></div></div>`,
     `<div class="heater"><div class="azure"><div class="charges"><i class="mullet or"></i></div></div></div>`,
     `<div class="heater"><div class="azure"><div class="charges"><i class="bezant"></i></div></div></div>`,
     `<div class="heater"><div class="or"><div class="charges"><img class="charge" src="lion.svg" /></div></div></div>`,
@@ -126,6 +128,18 @@ run("rule-of-tincture", rule, {
     {
       code: `<div class="heater"><div class="gules bordure-azure"></div></div>`,
       errors: [error("`bordure-azure` puts a bordure Azure on Gules: colour on colour")],
+    },
+    {
+      code: `<div class="heater"><div class="or bordure-engrailed-argent"></div></div>`,
+      errors: [
+        error("`bordure-engrailed-argent` puts a bordure engrailed Argent on Or: metal on metal"),
+      ],
+    },
+    {
+      code: `<div class="heater"><div class="gules bordure-invected-azure"></div></div>`,
+      errors: [
+        error("`bordure-invected-azure` puts a bordure invected Azure on Gules: colour on colour"),
+      ],
     },
     {
       code: `<div class="heater"><div class="argent chief-or"></div></div>`,

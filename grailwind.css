@@ -293,8 +293,8 @@
   overflow: clip;
   contain: layout;
   container-type: inline-size;
-  /* A third of the shield's, as cqw is the inescutcheon's own width. */
-  --bordure-width: 6.25cqw;
+  /* An eighth of its own width, like the shield's. */
+  --bordure-width: calc(100cqw / 8);
 
   /* See heater. */
   & > * {
@@ -319,8 +319,8 @@
   overflow-clip-margin: border-box;
   contain: layout;
   --layer-inset: 0px;
-  /* A third of the shield's, as cqw is the shield's width. */
-  --bordure-width: calc(6.25cqw / 3);
+  /* A third of the shield's, as cqw is the shield's width: an eighth of the canton's own. */
+  --bordure-width: calc(100cqw / 24);
 }
 
 /* ---------------------------------------------------------------------------
@@ -337,8 +337,8 @@
   /* The containing block for counterchanged charges' fixed layers. */
   contain: layout;
   container-type: inline-size;
-  /* 0.75rem at w-48. */
-  --bordure-width: 6.25cqw;
+  /* An eighth of the shield's width (BORDURE_WIDTH in ordinaries.js). */
+  --bordure-width: calc(100cqw / 8);
 
   /* The field. A canton steps out over its bordure, and a counterchanged charge's fixed layer
    * in by it, to the field's padding box. */

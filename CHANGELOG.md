@@ -8,11 +8,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Engrailed and invected bordures, e.g. `bordure-engrailed-or`. On a frame the field grows into the
+  bites of an engrailed one; off a frame they are plain.
 - Vair and potent, e.g. `vair`, `counter-vair`, `potent` and `vairy-or-gules`.
 - `fur-<n>` sets how many tiles of a fur go across, e.g. `fur-3` for beffroi.
 
 ### Changed
 
+- The bordure is an eighth of the shield's width, so the field inside it is smaller.
 - **Breaking:** the shield is a frame round its field. `escutcheon` is now
   `heater`, with the blazon on its one child:
 

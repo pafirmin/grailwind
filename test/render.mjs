@@ -1,8 +1,10 @@
 // Renders shields in Chromium and Firefox and checks the tincture at chosen points.
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { chromium, firefox } from "playwright";
 import { BETWEEN, DIVISIONS, lineOrdinaries, ON, POINTS } from "../data.js";
+import { BORDURE_WIDTH, bordurePath, CORNER_LOBE, SCALLOP_DEPTH } from "../ordinaries.js";
 import { PATHS } from "../paths.js";
 import { build, root } from "./build.mjs";
 
@@ -62,10 +64,76 @@ const ring = ([x, y], size) => {
   ];
 };
 
-// A shield's field inside its 18.75px bordure, at 300 × 360px: a point as % of that field, as % of
-// the shield, and how much smaller its charges are.
-const inBordure = ([x, y]) => [(18.75 + x * 2.625) / 3, (18.75 + y * 3.225) / 3.6];
-const BORDURED = 262.5 / 300;
+// A bordure is BORDURE_WIDTH of the shield's width, e.g. 37.5px at 300px for an eighth. A
+// shield's field inside it is FIELD px: a point as % of that field, as % of the shield, and how
+// much smaller its charges are.
+const BORDER = BORDURE_WIDTH * WIDTH;
+const FIELD = [WIDTH - 2 * BORDER, WIDTH * 1.2 - 2 * BORDER];
+const inBordure = ([x, y]) => [
+  (BORDER + (x * FIELD[0]) / 100) / 3,
+  (BORDER + (y * FIELD[1]) / 100) / 3.6,
+];
+const BORDURED = FIELD[0] / WIDTH;
+
+// A bordure's width as % of its frame's width, and where to probe: halfway across a ring, and
+// 15% of it past the ring, in the field.
+const RING = BORDURE_WIDTH * 100;
+const IN_RING = RING / 2;
+const IN_FIELD = RING * 1.15;
+// Where the field's top is, and its fess line, in px down the shield; the 30% foot of a chief.
+const FIELD_TOP = BORDER;
+const CHIEF_FOOT = FIELD_TOP + 0.3 * FIELD[1];
+const FESS_LINE = FIELD_TOP + 0.45 * FIELD[1];
+// The inner tip of the ring round the point, and a point at a fraction of the bordure below or
+// above it.
+const TIP = WIDTH * 1.2 - BORDER;
+// A quarter's width, in px.
+const QUARTER = FIELD[0] / 2;
+// The spots in an engrailed chief's bites on a bordured shield, as % of it: see the probe.
+const CHIEF_BITE_SPOTS = (() => {
+  const chord = 100 / 7;
+  const sagitta = 0.35 * chord;
+  const radius = (chord * chord) / (8 * sagitta) + sagitta / 2;
+  const depthPx = (sagitta / 120) * FIELD[1];
+  const heightAt = (units) =>
+    ((Math.sqrt(radius ** 2 - units ** 2) - (radius - sagitta)) / 120) * FIELD[1];
+  const chordPx = FIELD[0] / 7;
+  const offset = 0.155 * chordPx;
+  const spots = [
+    [WIDTH / 2, 0],
+    [BORDER + chordPx / 2 - offset, offset],
+    [BORDER + FIELD[0] - chordPx / 2 + offset, offset],
+  ];
+  const y = CHIEF_FOOT - 0.7 * depthPx;
+  for (const [, off] of spots) {
+    if (heightAt((off / FIELD[0]) * 100) < 0.7 * depthPx) {
+      throw new Error("probe setup: a chief bite spot is outside its bite");
+    }
+  }
+  return spots.map(([x]) => px(x, y));
+})();
+// The bend's lower end, inside the ring: 90% across and 93% down the field, (240, 302.6)px, where
+// the ring's inner edge is 265px down.
+const BEND_END = px(BORDER + 0.9 * FIELD[0], BORDER + 0.93 * FIELD[1]);
+const onCantonOf = ([left, top, width, height], x, y) =>
+  px(left + (width / 3) * x, top + (height / 3) * y);
+// The inescutcheon on a bordured shield: its left, top, width and height in px.
+const ESCUTCHEON = [
+  BORDER + 0.335 * FIELD[0],
+  FIELD_TOP + 0.285 * FIELD[1],
+  0.33 * FIELD[0],
+  0.33 * FIELD[0] * 1.2,
+];
+// A point on a bordured field's ermine, as the spot in column `column` and row `row` (from 0)
+// plus `across` and `down` tiles from its centre. A tile is a sixth of the field wide and 1.2 times
+// as tall; the grid starts a quarter of the space left over (box - tile) / 20 up and left, which
+// is a quarter tile across but a little more down, as the field is not six tiles tall.
+const onSpot = (column, row, across = 0, down = 0) => {
+  const tile = [FIELD[0] / 6, (FIELD[0] / 6) * 1.2];
+  const spot = (index, axis, offset) =>
+    BORDER + tile[axis] * (index + 0.5 + offset) - (FIELD[axis] - tile[axis]) / 20;
+  return px(spot(column, 0, across), spot(row, 1, down));
+};
 
 /**
  * A charge's rim, so a charge the heater's outline clips leaves a point on the outline or the page.
@@ -215,6 +283,82 @@ const onInner = ([x, y]) => [33.5 + INNER * x, 28.5 + INNER * y];
 // A canton is a third of the shield each way, at its top left.
 const CANTON = 1 / 3;
 const onCanton = ([x, y]) => [CANTON * x, CANTON * y];
+/**
+ * A lined bordure's scallops down the sides of a frame, from bordurePath(). test/modes.mjs pins
+ * their count, so a placement bug can't move these probes along with it.
+ * @param {number[]} frame The frame's [left, top, width] in px.
+ * @param {"engrailed" | "invected"} line Which bordure.
+ * @returns {{ right: object[], left: object[] }} Each side's scallops, as their two `cusps`, the
+ *   `middle` of their chord, the `deepest` point of an engrailed bite, all in px, and `out`, the
+ *   chord's unit normal toward the frame's edge.
+ */
+const scallops = ([left, top, width], line = "engrailed") => {
+  const toPx = ([x, y]) => [left + (x * width) / 100, top + (y * width) / 100];
+  const all = bordurePath(PATHS.heater, line === "engrailed" ? 1 : -1)
+    .filter(({ kind, from, to }) => kind === "scallop" && from[1] !== to[1])
+    .map(({ from, to }) => {
+      const [a, b] = [toPx(from), toPx(to)];
+      const chord = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const out = [(b[1] - a[1]) / chord, (a[0] - b[0]) / chord];
+      const middle = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      const depth = SCALLOP_DEPTH * width;
+      const deepest = [middle[0] + out[0] * depth, middle[1] + out[1] * depth];
+      return { cusps: [a, b], middle, deepest, out, sinister: from[0] + to[0] > 100 };
+    });
+  return {
+    right: all.filter((bite) => bite.sinister),
+    left: all.filter((bite) => !bite.sinister),
+  };
+};
+
+/**
+ * The scallop whose deepest point is nearest a height.
+ * @param {object[]} side One side of scallops() output.
+ * @param {number} y Height in px.
+ * @returns {object} That scallop.
+ */
+const biteAt = (side, y) =>
+  side.reduce((best, bite) =>
+    Math.abs(bite.deepest[1] - y) < Math.abs(best.deepest[1] - y) ? bite : best,
+  );
+
+/**
+ * A point moved along a scallop's outward normal.
+ * @param {number[]} point [x, y] in px.
+ * @param {object} bite A scallop from scallops().
+ * @param {number} distance In px, positive toward the shield's edge, negative into the field.
+ * @returns {number[]} The point as [x%, y%] of the 300 x 360px shield.
+ */
+const outFrom = ([x, y], { out }, distance) => px(x + out[0] * distance, y + out[1] * distance);
+
+/**
+ * A point near a top corner of the shield's field, in the corner's own axes.
+ * @param {number} side -1 for the dexter corner, 1 for the sinister.
+ * @param {number} along px along the top edge, positive into the shield; so negative is outside.
+ * @param {number} down px down the side edge, positive into the shield.
+ * @returns {number[]} The point as [x%, y%] of the shield: `along` runs leftward in the sinister
+ *   corner.
+ */
+const nearCorner = (side, along, down) =>
+  px(side < 0 ? BORDER + along : WIDTH - BORDER - along, BORDER + down);
+
+// A lined bordure's scallops are BITE_DEPTH px deep, and a cusp's ring is probed 0.8 of that up
+// it. An engrailed top corner's lobe is centred LOBE_CENTRE px inside the corner each way, so it
+// reaches BITE_DEPTH past each edge, as the bites do.
+const BITE_DEPTH = SCALLOP_DEPTH * WIDTH;
+const SPIKE = 0.8 * BITE_DEPTH;
+const LOBE_CENTRE = (CORNER_LOBE - 1) * BITE_DEPTH;
+// An engrailed bordure's bites on the shield and on an inescutcheon, and an invected one's.
+const INNER_WIDTH = WIDTH * INNER;
+const BITES = scallops([0, 0, WIDTH]);
+const INVECTED_BITES = scallops([0, 0, WIDTH], "invected");
+const INNER_BITES = scallops([WIDTH * 0.335, WIDTH * 1.2 * 0.285, INNER_WIDTH]);
+// A shield twice the probes' width, where the invected base's lens is big enough to probe. It
+// takes two cells each way on the probe page. The lens is on the axis, widest a quarter of the
+// scallops' depth above the base cusp: LENS, as % of the shield.
+const LARGE = 2 * WIDTH;
+const LENS = [50, 100 - ((BORDURE_WIDTH + 0.25 * SCALLOP_DEPTH) * 100) / 1.2];
+
 const SUB = { inescutcheon: [INNER, onInner], canton: [CANTON, onCanton] };
 // Like `charged`, for bezants on an inescutcheon or canton `inner`; points and size are its own.
 const nested = (shield, inner, size, points, why) => {
@@ -945,15 +1089,15 @@ const PROBES = [
   { shield: "azure", inner: { shield: "per-pale-argent-gules", charges: "counterchanged", items: ["roundel"] }, at: onInner([60, 45]), expect: "argent", why: "a counterchanged charge on an inescutcheon, sinister half" },
   { shield: "azure", inner: { shield: "gules cross-azure fimbriated-argent" }, at: onInner([36.5, 15]), expect: "argent", why: "a fimbriated cross on an inescutcheon" },
   // A bordure is a border, so on the shield it moves the inescutcheon inside it, like the charges.
-  // A ring paints it, 6.25% of its frame's width: 18.75px on the shield and 6.2px on the 99px
-  // inescutcheon, whose 2px outline is inside its edge.
-  { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([4.5, 45]), expect: "or", why: "an inescutcheon's bordure" },
-  { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([8, 45]), expect: "gules", why: "an inescutcheon's bordure is a third as wide" },
-  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [2, 45], expect: "argent", why: "the shield's own bordure, with an inescutcheon" },
-  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [8, 45], expect: "azure", why: "the shield's own bordure keeps its width" },
-  // Inside the bordure, the inescutcheon's left edge is at 18.75 + 0.335 × 262.5 ≈ 106.7px.
-  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: px(104, 170), expect: "azure", why: "the shield's bordure moves the inescutcheon inside it" },
-  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: px(110, 170), expect: "gules", why: "the inescutcheon inside the shield's bordure" },
+  // A ring paints it, BORDURE_WIDTH of its frame's width: on the 99px inescutcheon a third as wide
+  // as the shield's.
+  { shield: "azure", inner: { shield: "gules bordure-or" }, at: [onInner([RING * 0.25, 45]), onInner([IN_RING, 45])], expect: "or", why: "an inescutcheon's bordure" },
+  { shield: "azure", inner: { shield: "gules bordure-or" }, at: onInner([IN_FIELD, 45]), expect: "gules", why: "an inescutcheon's bordure is a third as wide" },
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [[RING * 0.15, 45], [IN_RING, 45]], expect: "argent", why: "the shield's own bordure, with an inescutcheon" },
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: [IN_FIELD, 45], expect: "azure", why: "the shield's own bordure keeps its width" },
+  // Inside the bordure, the inescutcheon's left edge is at the bordure plus 0.335 of the field.
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: px(ESCUTCHEON[0] - 3, ESCUTCHEON[1] + ESCUTCHEON[3] / 2), expect: "azure", why: "the shield's bordure moves the inescutcheon inside it" },
+  { shield: "azure bordure-argent", inner: { shield: "gules" }, at: px(ESCUTCHEON[0] + 4, ESCUTCHEON[1] + ESCUTCHEON[3] / 2), expect: "gules", why: "the inescutcheon inside the shield's bordure" },
 
   // Canton: `at` is on the outer shield; onCanton maps the canton's own points.
   { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: [[16, 16], [2, 2], [31, 31]], expect: "gules", why: "a canton in dexter chief" },
@@ -978,26 +1122,27 @@ const PROBES = [
   ...nested("azure", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton"),
   ...nested("azure chief-or", { kind: "canton", shield: "gules" }, 50, [[50, 45]], "a charge on a canton, on a shield with a chief"),
   ...nested("azure fess-or", { kind: "canton", shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on a canton, on a shield with a fess"),
-  // The canton and the chief surmount a bordure, which is 18.75px. The canton is 100 × 120px.
+  // The canton and the chief surmount a bordure, which is 50px. The canton is 100 × 120px.
   { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: [px(4, 4), px(4, 60), px(60, 4), px(95, 115), px(98, 118)], expect: "gules", why: "a canton over the bordure" },
   { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: [px(102, 60), px(110, 60), px(60, 122)], expect: "azure", why: "a canton over the bordure is a third of the whole shield" },
   { shield: "azure bordure-or", inner: { kind: "canton", shield: "gules" }, at: px(4, 200), expect: "or", why: "the bordure below a canton" },
   { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: px(98, 118), expect: "gules", why: "a canton without a bordure" },
   { shield: "azure", inner: { kind: "canton", shield: "gules" }, at: [px(102, 60), px(60, 122)], expect: "azure", why: "a canton without a bordure is a third of the shield" },
-  // The canton's own bordure is a border 6.25px wide, and its chief reaches 6.25 + 0.3 × 113.75 ≈
-  // 40.4px down.
+  // The canton's own bordure is a border 16.7px wide, and its chief reaches 16.7 + 0.3 × 86.7 ≈
+  // 42.7px down.
   { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: [px(2, 60), px(98, 60), px(50, 118)], expect: "or", why: "a canton's own bordure, over the shield's" },
   { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: px(50, 20), expect: "gules", why: "a chief on a canton with a bordure" },
   { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: [px(2, 2), px(50, 2), px(98, 20)], expect: "gules", why: "a chief on a canton surmounts the canton's bordure" },
   { shield: "azure bordure-argent", inner: { kind: "canton", shield: "vert bordure-or chief-gules" }, at: px(50, 60), expect: "vert", why: "a canton's field below its chief" },
-  // An inescutcheon is at (106.7, 110.7)px and 86.6 × 103.9px in a shield with an 18.75px bordure;
-  // its canton is 28.9 × 34.6px.
-  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [px(109, 113), px(133, 128), px(121, 143)], expect: "or", why: "a canton on an inescutcheon doesn't move by the shield's bordure" },
-  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [px(139, 128), px(121, 149)], expect: "gules", why: "an inescutcheon beside and below its canton" },
-  // A quarter isn't positioned, so its canton is placed on the shield's field, inside the bordure.
-  { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: [px(6, 60), px(60, 6)], expect: "argent", why: "a canton in a quarter doesn't move over the bordure" },
-  { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: px(20, 20), expect: "or", why: "a canton in a quarter" },
-  { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: px(80, 40), expect: "gules", why: "a canton in a quarter is a third of the quarter" },
+  // The inescutcheon is ESCUTCHEON in a shield with a bordure, and its canton a third of it each
+  // way, from its corner. Probed 0.17 of the canton in from its edges, and 0.15 beyond them.
+  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [onCantonOf(ESCUTCHEON, 0.17, 0.12), onCantonOf(ESCUTCHEON, 0.83, 0.5), onCantonOf(ESCUTCHEON, 0.5, 0.88)], expect: "or", why: "a canton on an inescutcheon doesn't move by the shield's bordure" },
+  { shield: "azure bordure-argent", inner: { shield: "gules", inner: { kind: "canton", shield: "or" } }, at: [onCantonOf(ESCUTCHEON, 1.17, 0.5), onCantonOf(ESCUTCHEON, 0.5, 1.15)], expect: "gules", why: "an inescutcheon beside and below its canton" },
+  // A quarter isn't positioned, so its canton is placed on the shield's field, inside the bordure:
+  // quarter 1 is half the field wide, and its canton a third of that, from the field's corner.
+  { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: [px(BORDER / 2, 60), px(60, BORDER / 2)], expect: "argent", why: "a canton in a quarter doesn't move over the bordure" },
+  { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: px(BORDER + QUARTER / 6, BORDER + (QUARTER * 1.2) / 6), expect: "or", why: "a canton in a quarter" },
+  { shield: "quarterly bordure-argent", quarters: [{ shield: "gules", inner: { kind: "canton", shield: "or" } }, "azure", "azure", "gules"], at: px(BORDER + QUARTER * 0.7, BORDER + QUARTER * 0.2), expect: "gules", why: "a canton in a quarter is a third of the quarter" },
   // Each part of a divided shield is a coat of its own: a quarter's charges place within it,
   // so quarter 1's fess point is 45% of 45% down.
   { shield: "quarterly", quarters: [{ shield: "or", charges: "", items: ["roundel gules"] }, "azure", "azure", "or"], at: ring([25, 20.25], 25), expect: "gules", why: "a charge in a plain quarter" },
@@ -1013,17 +1158,77 @@ const PROBES = [
   { shield: "quarterly", quarters: ["or", "azure", "azure", "or"], at: [25, 47], expect: "azure", why: "a quartered shield is split per-fess at 45%" },
   { shield: "per-fess", quarters: ["or", "azure"], at: [25, 47], expect: "azure", why: "a per-fess shield is split 45% of the way down the shield" },
   { shield: "azure bordure-or chief-gules", at: [px(4, 4), px(150, 4), px(296, 40), px(150, 110)], expect: "gules", why: "a chief over the bordure" },
-  // 18.75 + 0.3 × 322.5 ≈ 115.5px down.
-  { shield: "azure bordure-or chief-gules", at: px(150, 119), expect: "azure", why: "a chief's lower edge stays at 30% of the field" },
-  { shield: "azure bordure-or chief-gules", at: [px(4, 116), px(4, 200)], expect: "or", why: "the bordure below a chief" },
+  // The chief's foot is 30% of the field down.
+  { shield: "azure bordure-or chief-gules", at: px(150, CHIEF_FOOT + 3), expect: "azure", why: "a chief's lower edge stays at 30% of the field" },
+  { shield: "azure bordure-or chief-gules", at: [px(4, CHIEF_FOOT + 4), px(4, 200)], expect: "or", why: "the bordure below a chief" },
   { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: px(146, 50), expect: "gules", why: "a counterchanged chief with a bordure, dexter of the pale line" },
   { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: px(154, 50), expect: "or", why: "a counterchanged chief with a bordure, sinister of the pale line" },
   { shield: "per-pale-or-gules bordure-argent chief-counterchanged", at: [px(4, 4), px(296, 4), px(4, 100), px(296, 100)], expect: "argent", why: "a counterchanged chief leaves the bordure's strips unpainted" },
-  // Seven scallops across the 262.5px field, its chief's foot 115.5px down: bites at its middle and
-  // near its first and last, 105.9px down.
-  { shield: "azure bordure-argent chief-engrailed-or", at: [px(150, 105.9), px(31.7, 105.9), px(268.3, 105.9)], expect: "azure", why: "an engrailed chief's bites stay on the field" },
-  { shield: "azure bordure-argent chief-engrailed-or", at: [px(4, 4), px(296, 4), px(4, 108), px(296, 108), px(150, 60)], expect: "or", why: "an engrailed chief's corners over the bordure" },
+  // Seven scallops across the field, each a chord of 100 / 7 real units and 0.35 of that deep
+  // (ordinaries.js's DEPTH). At 0.7 of that depth above the foot there is field at the middle of
+  // the shield and either side of the first and last scallop's centre.
+  { shield: "azure bordure-argent chief-engrailed-or", at: CHIEF_BITE_SPOTS, expect: "azure", why: "an engrailed chief's bites stay on the field" },
+  { shield: "azure bordure-argent chief-engrailed-or", at: [px(4, 4), px(296, 4), px(4, CHIEF_FOOT - 20), px(296, CHIEF_FOOT - 20), px(150, 60)], expect: "or", why: "an engrailed chief's corners over the bordure" },
   { shield: "azure bordure-argent chief-engrailed-or", at: px(4, 200), expect: "argent", why: "the bordure below an engrailed chief" },
+  // 010: an engrailed bordure's field grows into its bites. Each probe takes a scallop at the
+  // shield's side near a given height: 1.5px inside its deepest point is the field there, and 3px
+  // outside it is the ring. A cusp's sides are vertical, so the ring there is a spike: a point
+  // 0.8 d along it, about a fifth of a chord wide, is the ring.
+  ...[BITES.left, BITES.right].map((side) => biteAt(side, 150)).flatMap((bite) => [
+    { shield: "azure fess-or bordure-engrailed-gules", at: outFrom(bite.deepest, bite, -1.5), expect: "or", why: "the fess fills a bite at its end" },
+    { shield: "azure fess-or bordure-engrailed-gules", at: bite.cusps.map((cusp) => outFrom(cusp, bite, SPIKE)), expect: "gules", why: "a cusp of an engrailed bordure" },
+    { shield: "azure fess-or bordure-engrailed-gules", at: outFrom(bite.deepest, bite, 3), expect: "gules", why: "the outer half of the bordure at a bite" },
+  ]),
+  { shield: "per-pale-or-azure bordure-engrailed-gules", at: outFrom(biteAt(BITES.left, 150).deepest, biteAt(BITES.left, 150), -1.5), expect: "or", why: "a bite on the dexter side of per pale" },
+  { shield: "per-pale-or-azure bordure-engrailed-gules", at: outFrom(biteAt(BITES.right, 150).deepest, biteAt(BITES.right, 150), -1.5), expect: "azure", why: "a bite on the sinister side of per pale" },
+  ...[[120, "or", "gules"], [207, "gules", "or"]].flatMap(([y, dexter, sinister]) => [
+    { shield: "quarterly-or-gules bordure-engrailed-azure", at: outFrom(biteAt(BITES.left, y).deepest, biteAt(BITES.left, y), -1.5), expect: dexter, why: `a bite in a dexter quarter, ${y}px down` },
+    { shield: "quarterly-or-gules bordure-engrailed-azure", at: outFrom(biteAt(BITES.right, y).deepest, biteAt(BITES.right, y), -1.5), expect: sinister, why: `a bite in a sinister quarter, ${y}px down` },
+  ]),
+  // Invected leaves the layout alone: the bulge is d inside the plain bordure's inner line, so d/2
+  // inside it is the bordure, and the field's own points are where the plain bordure puts them.
+  ...[INVECTED_BITES.left, INVECTED_BITES.right].map((side) => biteAt(side, 150)).map((bite) => (
+    { shield: "azure bordure-invected-or", at: outFrom(bite.middle, bite, -BITE_DEPTH / 2), expect: "or", why: "d/2 inside an invected bordure's chord, between two cusps" }
+  )),
+  { shield: "azure fess-or bordure-invected-gules", at: inBordure([50, 40]), expect: "or", why: "an invected bordure keeps the plain layout: the fess" },
+  { shield: "azure fess-or bordure-invected-gules", at: inBordure([50, 20]), expect: "azure", why: "an invected bordure keeps the plain layout: above the fess" },
+  { shield: "azure bordure-engrailed-gules chief-argent", at: [px(4, 4), px(296, 4), px(4, 80), px(296, 80), px(150, 60)], expect: "argent", why: "a chief reaches the edge over an engrailed bordure" },
+  { shield: "azure bordure-engrailed-gules chief-argent", at: [px(4, 150), px(296, 150)], expect: "gules", why: "the engrailed bordure below a chief" },
+  { shield: "azure bordure-engrailed-gules", inner: { kind: "canton", shield: "or" }, at: [px(4, 4), px(4, 60), px(60, 4), px(95, 115), px(98, 118)], expect: "or", why: "a canton reaches the edge over an engrailed bordure" },
+  { shield: "azure bordure-engrailed-gules", inner: { kind: "canton", shield: "or" }, at: [px(102, 60), px(110, 60), px(60, 122)], expect: "azure", why: "a canton over an engrailed bordure is a third of the whole shield" },
+  { shield: "azure", inner: { shield: "gules bordure-engrailed-or" }, at: [INNER_BITES.left, INNER_BITES.right].map((side) => biteAt(side, 150)).flatMap((bite) => bite.cusps.map((cusp) => outFrom(cusp, bite, SPIKE * INNER))), expect: "or", why: "a cusp of an inescutcheon's engrailed bordure" },
+  { shield: "azure", inner: { shield: "gules bordure-engrailed-or" }, at: [INNER_BITES.left, INNER_BITES.right].map((side) => biteAt(side, 150)).map((bite) => outFrom(bite.deepest, bite, -1)), expect: "gules", why: "a bite of an inescutcheon's engrailed bordure shows its field" },
+  { shield: "azure", inner: { kind: "canton", shield: "vert bordure-engrailed-or" }, at: px(4, 60), expect: "or", why: "a canton's engrailed bordure is plain" },
+  // Invected arcs overlap where two meet at a cusp, so the inner path crosses itself. Nonzero fills
+  // the overlap, as ring; evenodd leaves a hole of the field there. At each top corner the overlap
+  // is a blob about 9px across, holding the point 0.3 d in from the corner each way. At the base
+  // point it is a lens under a pixel wide at 300px, so it's probed on a LARGE shield.
+  ...[-1, 1].map((side) => (
+    { shield: "azure bordure-invected-or", at: nearCorner(side, 0.3 * BITE_DEPTH, 0.3 * BITE_DEPTH), expect: "or", why: `invected arcs' overlap at the ${side < 0 ? "dexter" : "sinister"} top corner` }
+  )),
+  { shield: `azure bordure-invected-or w-[${LARGE}px]!`, at: LENS, expect: "or", why: "invected arcs' overlap at the base point" },
+  // On a quarterly field the overlap is ring, and just inside the corner is the quarter's own.
+  ...[-1, 1].flatMap((side) => {
+    const which = side < 0 ? "dexter" : "sinister";
+    return [
+      { shield: "quarterly-or-gules bordure-invected-azure", at: nearCorner(side, 0.3 * BITE_DEPTH, 0.3 * BITE_DEPTH), expect: "azure", why: `the overlap at the ${which} top corner is ring over the quarter` },
+      { shield: "quarterly-or-gules bordure-invected-azure", at: nearCorner(side, 1.3 * BITE_DEPTH, 1.3 * BITE_DEPTH), expect: side < 0 ? "or" : "gules", why: `just inside the ${which} top corner is the quarter's tincture` },
+    ];
+  }),
+  // The top corners. An engrailed lobe reaches d beyond the corner along each edge, no further than
+  // the bites, so it stays in the narrowed field's padding box: field inside it, in its own
+  // tincture, and the ring beyond d, the strip where a division would paint wrongly.
+  ...[-1, 1].flatMap((side) => {
+    const which = side < 0 ? "dexter" : "sinister";
+    const inLobe = [nearCorner(side, -0.4 * BITE_DEPTH, LOBE_CENTRE), nearCorner(side, LOBE_CENTRE, -0.4 * BITE_DEPTH)];
+    const beyond = nearCorner(side, -1.6 * BITE_DEPTH, 0.3 * BITE_DEPTH);
+    return [
+      { shield: "azure bordure-engrailed-gules", at: inLobe, expect: "azure", why: `inside an engrailed bordure's lobe at the ${which} top corner` },
+      { shield: "azure bordure-engrailed-gules", at: beyond, expect: "gules", why: `the ring beyond the lobe's reach at the ${which} top corner` },
+      { shield: "quarterly-or-gules bordure-engrailed-azure", at: inLobe[0], expect: side < 0 ? "or" : "gules", why: `the lobe at the ${which} top corner shows its quarter's tincture` },
+      { shield: "quarterly-or-gules bordure-engrailed-azure", at: beyond, expect: "azure", why: `the strip beyond the lobe at the ${which} top corner is ring, not a quarter repeated` },
+    ];
+  }),
   // Of the first: the shield's first tincture, wherever it's painted.
   { shield: "per-pale-or-azure bend-of-the-first", at: [70, 70], expect: "or", why: "a bend of the first over the second tincture" },
   { shield: "per-pale-or-azure bend-of-the-first", at: [85, 40], expect: "azure", why: "the field beside a bend of the first" },
@@ -1038,25 +1243,30 @@ const PROBES = [
   { shield: "quarterly", quarters: ["or", "per-pale-gules-argent pale-of-the-first", "azure", "vert"], at: [92, 25], expect: "argent", why: "beside a pale of the first in a quarter" },
 
   // The heater (drawings/heater.svg): straight to 55% down, then a curve to the point. The outline
-  // is 2px inside its edge, and a bordure a ring 18.75px wide inside that, which follows the point:
-  // its inner tip is at 360 − 18.75 = 341.25px.
-  { shield: "azure bordure-gules", at: [px(150, 349), px(150, 344)], expect: "gules", why: "the bordure follows the point" },
-  { shield: "azure bordure-gules", at: [px(150, 336), px(150, 200)], expect: "azure", why: "the field just above the bordure's point" },
+  // is 2px inside its edge, and a bordure a ring inside that, which follows the point: its inner
+  // tip is at the shield's height less the bordure, and the ring there is probed at 0.15 and 0.45
+  // of the bordure below it.
+  { shield: "azure bordure-gules", at: [px(150, TIP + 0.15 * BORDER), px(150, TIP + 0.45 * BORDER)], expect: "gules", why: "the bordure follows the point" },
+  { shield: "azure bordure-gules", at: [px(150, TIP - 0.12 * BORDER), px(150, 200)], expect: "azure", why: "the field just above the bordure's point" },
   { shield: "azure", at: [px(1, 150), px(299, 150), px(150, 1)], expect: "sable", why: "the outline, just inside the edge" },
   { shield: "azure chief-or", inner: { kind: "canton", shield: "gules" }, at: [px(1, 20), px(150, 1)], expect: "sable", why: "the outline over a canton and a chief" },
   // White, as the argent swatch: where today's round base was drawn, but outside the point.
   { shield: "azure", at: [[30, 95], [70, 95], [38, 98], [62, 98]], expect: "argent", why: "the page beside the point" },
-  // A bordure twice as wide on a shield twice the size: 6.25% of the width, as px(18.75) is at 300px.
-  { shield: "azure bordure-gules w-[150px]!", at: [[3, 45], [5.5, 45]], expect: "gules", why: "the bordure at 150px is 6.25% wide" },
-  { shield: "azure bordure-gules w-[150px]!", at: [[7.5, 45], [50, 45]], expect: "azure", why: "and no wider at 150px" },
-  { shield: "azure bordure-gules", at: [[3, 45], [5.5, 45]], expect: "gules", why: "the bordure at 300px is 6.25% wide" },
-  { shield: "azure bordure-gules", at: [[7.5, 45], [50, 45]], expect: "azure", why: "and no wider at 300px" },
-  // The field lays out inside the bordure's border, 18.75px each side, and the ring paints over it.
+  // A bordure on a shield half the size is the same share of its width.
+  { shield: "azure bordure-gules w-[150px]!", at: [[RING * 0.25, 45], [IN_RING, 45]], expect: "gules", why: "the bordure at 150px is BORDURE_WIDTH wide" },
+  { shield: "azure bordure-gules w-[150px]!", at: [[IN_FIELD, 45], [50, 45]], expect: "azure", why: "and no wider at 150px" },
+  { shield: "azure bordure-gules", at: [[RING * 0.25, 45], [IN_RING, 45]], expect: "gules", why: "the bordure at 300px is BORDURE_WIDTH wide" },
+  { shield: "azure bordure-gules", at: [[IN_FIELD, 45], [50, 45]], expect: "azure", why: "and no wider at 300px" },
+  // The field lays out inside the bordure's border, and the ring paints over it.
   // Where the ring curves to the point, it goes over the field's ordinaries; the chief, its
   // charges, a canton and an inescutcheon go over the ring.
-  { shield: "argent cross-azure bordure-gules", at: [px(125, 338), px(175, 338)], expect: "gules", why: "the bordure over a cross" },
-  { shield: "argent cross-azure bordure-gules", at: px(150, 330), expect: "azure", why: "the cross above the bordure's point" },
-  { shield: "argent bend-azure bordure-gules", at: px(260, 277), expect: "gules", why: "the bordure over a bend" },
+  // The cross's arm is 38–62% of the field across and ends at the field's foot, where the point is.
+  // A quarter of the arm in from its sides, at 136.5 and 163.5px, the ring's inner edge is 318.5px
+  // down and the foot TIP, 322.5px: midway between is the ring over the cross.
+  { shield: "argent cross-azure bordure-gules", at: [px(136.5, 320.5), px(163.5, 320.5)], expect: "gules", why: "the bordure over a cross" },
+  { shield: "argent cross-azure bordure-gules", at: px(150, TIP - 0.2 * BORDER), expect: "azure", why: "the cross above the bordure's point" },
+  // The bend's lower end, at 90% across and 93% down the field, below the ring's inner edge there.
+  { shield: "argent bend-azure bordure-gules", at: BEND_END, expect: "gules", why: "the bordure over a bend" },
   { shield: "argent bordure-gules chief-azure", charges: "in-chief", items: bezants(3), at: [[25, 15], [50, 15], [75, 15]].flatMap((p) => ring(inBordure(p), 18 * BORDURED)), expect: "or", why: "charges in chief over the chief over the bordure" },
   { shield: "argent bordure-gules chief-azure", charges: "", items: ["bezant in-dexter-chief"], at: ring(inBordure([25, 15]), 18 * BORDURED), expect: "or", why: "a charge at a chief point over the chief" },
   { shield: "argent bordure-gules", inner: { kind: "canton", shield: "azure" }, at: [3, 3], expect: "azure", why: "a canton over the bordure" },
@@ -1065,17 +1275,19 @@ const PROBES = [
   { shield: "quarterly cross-or bordure-gules", quarters: ["azure saltire-argent", "azure saltire-argent", "azure saltire-argent", "azure saltire-argent"], at: [[3, 3], [3, 45], [50, 97]], expect: "gules", why: "the bordure over the quarters and the cross" },
   { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(3, 150), px(140, 150), px(75, 10)], expect: "or", why: "a bordure on a part is a border" },
   { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(160, 150), px(290, 150)], expect: "gules", why: "and only on its own part" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: px(WIDTH / 4, 150), expect: "azure", why: "a part's own field, inside its border, which is the full width on each side" },
   // A counterchanged charge's swapped field lines up with the field inside a bordure. Ermine tiles
-  // across the 262.5 × 322.5px field are 43.75 × 52.5px, so spots sit a tenth of a tile below
-  // (18.75 + 43.75(k + 0.25), 18.75 + 52.5(j + 0.25)). Swapped, the gules half is ermine.
-  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(160.9, 142.1), expect: "sable", why: "a counterchanged charge's spot on the per pale field's grid, inside a bordure" },
-  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(182.8, 136.9), expect: "argent", why: "a counterchanged charge's ground, per pale inside a bordure" },
-  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(140, 163.9), expect: "gules", why: "a counterchanged charge's dexter half, per pale inside a bordure" },
-  { shield: "per-fess-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(117.2, 194.6), expect: "sable", why: "a counterchanged charge's spot on the per fess field's grid, inside a bordure" },
-  { shield: "per-fess-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(139.1, 189.4), expect: "argent", why: "a counterchanged charge's ground, per fess inside a bordure" },
-  // The field's fess line is 18.75 + 0.45 × 322.5 ≈ 163.9px down; the whole shield's would be 162px.
-  { shield: "per-fess-or-azure bordure-argent", charges: "", items: ["roundel counterchanged"], at: [px(150, 160), px(150, 163)], expect: "azure", why: "a counterchanged charge swaps at the field's fess line, inside a bordure" },
-  { shield: "per-fess-or-azure bordure-argent", charges: "", items: ["roundel counterchanged"], at: px(150, 165), expect: "or", why: "and below it" },
+  // across the 200 × 260px field are 33.3 × 40px, so a spot's stem is probed a tenth of a tile
+  // below its centre, on the grid onSpot() describes. Swapped, the gules half is ermine.
+  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: onSpot(3, 2, 0, 0.1), expect: "sable", why: "a counterchanged charge's spot on the per pale field's grid, inside a bordure" },
+  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: onSpot(3, 2, 0.5), expect: "argent", why: "a counterchanged charge's ground, per pale inside a bordure" },
+  { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: px(140, FESS_LINE), expect: "gules", why: "a counterchanged charge's dexter half, per pale inside a bordure" },
+  { shield: "per-fess-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: onSpot(2, 3, 0, 0.1), expect: "sable", why: "a counterchanged charge's spot on the per fess field's grid, inside a bordure" },
+  { shield: "per-fess-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"], at: onSpot(2, 3, 0.5), expect: "argent", why: "a counterchanged charge's ground, per fess inside a bordure" },
+  // The field's fess line is 45% of the field down; the whole shield's would be 45% of the shield,
+  // higher. Probed between the two, and 1.5px below the field's.
+  { shield: "per-fess-or-azure bordure-argent", charges: "", items: ["roundel counterchanged"], at: [px(150, (FESS_LINE + WIDTH * 0.54) / 2), px(150, FESS_LINE - 1)], expect: "azure", why: "a counterchanged charge swaps at the field's fess line, inside a bordure" },
+  { shield: "per-fess-or-azure bordure-argent", charges: "", items: ["roundel counterchanged"], at: px(150, FESS_LINE + 1.5), expect: "or", why: "and below it" },
   // Of the first is the shield's, on an inescutcheon too.
   { shield: "or", inner: { shield: "azure bordure-of-the-first" }, at: onInner([4.5, 45]), expect: "or", why: "an inescutcheon's bordure of the first is the shield's first" },
   { shield: "or", inner: { shield: "azure bordure-of-the-first" }, at: onInner([50, 45]), expect: "azure", why: "inside an inescutcheon's bordure of the first" },
@@ -1146,6 +1358,35 @@ const FURRED = [
   { shield: "per-bend-vair-or" },
   { shield: "gules", charges: "", items: ["mullet vair"] },
 ];
+// 010: engrailed and invected bordures, for tuning SCALLOP_DEPTH and BORDURE_SCALLOP by eye
+// against Fig. 211 and 212: each on a plain field, a division, a fur and an ordinary, with a plain
+// bordure beside them.
+const BORDURES = [
+  { shield: "azure bordure-gules" },
+  ...["engrailed", "invected"].flatMap((line) => [
+    { shield: `azure bordure-${line}-gules` },
+    { shield: `azure fess-or bordure-${line}-gules` },
+    { shield: `per-pale-or-azure bordure-${line}-gules` },
+    { shield: `quarterly-or-gules bordure-${line}-azure` },
+    { shield: `ermine bordure-${line}-gules` },
+    { shield: `azure bend-or bordure-${line}-gules` },
+    { shield: `azure chevron-argent bordure-${line}-gules` },
+    { shield: `azure bordure-${line}-gules chief-argent` },
+    { shield: `per-pale-or-azure bordure-${line}-of-the-first` },
+  ]),
+  { shield: "azure bordure-engrailed-gules", inner: { kind: "canton", shield: "or" } },
+  { shield: "azure bordure-invected-gules", inner: { kind: "canton", shield: "or" } },
+  { shield: "azure", inner: { shield: "gules bordure-engrailed-or" } },
+  { shield: "azure", inner: { shield: "gules bordure-invected-or" } },
+  { shield: "azure", inner: { kind: "canton", shield: "vert bordure-engrailed-or" } },
+  { shield: "azure bordure-engrailed-gules w-[150px]!" },
+];
+// Corner crops of the bordure, for finessing its corners by eye: ours at three times Fox-Davies'
+// figures' width, beside crops of Fig. 211 (engrailed) and Fig. 212 (invected) at that scale.
+const CORNER_WIDTH = 465;
+const CORNER_SHIELDS = ["engrailed", "invected"].map((line) => ({
+  shield: `azure bordure-${line}-gules w-[${CORNER_WIDTH}px]!`,
+}));
 // Tile edges at % positions fall mid-pixel at this width, where seams show.
 const ODD_WIDTH = 155;
 // `more` is a second charges container, as { charges, items }.
@@ -1154,7 +1395,8 @@ const key = ({ kind, shield, charges, items, inner, first, more, quarters }) =>
 const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
 const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
 const NESTED = SHIELDS.filter((s) => s.inner);
-const PLAIN = SHIELDS.filter((s) => !s.items && !s.inner);
+// The LARGE shield would cover its neighbours on a contact sheet.
+const PLAIN = SHIELDS.filter((s) => !s.items && !s.inner && !s.shield.includes(`w-[${LARGE}px]`));
 const TINCTURE_MATCH_THRESHOLD = 12;
 
 const isWithinThreshold = (threshold, gotRgb, wantRgb) => {
@@ -1211,7 +1453,15 @@ const caption = (spec) =>
 
 // The CSS for every shield the probes and contact sheets draw.
 const buildShields = (dir) => {
-  const specs = [...SHIELDS, ...CONTACT, ...LINED_CHARGES, ...DIVIDED, ...FURRED];
+  const specs = [
+    ...SHIELDS,
+    ...CONTACT,
+    ...LINED_CHARGES,
+    ...DIVIDED,
+    ...FURRED,
+    ...BORDURES,
+    ...CORNER_SHIELDS,
+  ];
   const classes = [...specs.map((s) => markup(s)), ...TINCTURES.map((t) => `<i class="${t}"></i>`)];
   writeFileSync(join(dir, "index.html"), classes.join("\n"));
   return build({ dir });
@@ -1256,11 +1506,12 @@ const probe = async (page, css) => {
   ].join("\n");
   // Whole-pixel rows, at least the tallest probe shield (306px wide, 367.2px tall), so each
   // shield starts on a whole y and a seam probe doesn't depend on the rows above it. The replace
-  // must match grid()'s gap text.
+  // must match grid()'s gap text. A LARGE shield takes two cells each way.
   await page.setContent(
     grid(css, WIDTH, cells).replace(
       "gap: 20px;",
-      "gap: 20px; grid-auto-rows: 368px; align-items: start;",
+      `gap: 20px; grid-auto-rows: 368px; align-items: start; }
+  [class~="w-[${LARGE}px]!"] { grid-area: span 2 / span 2;`,
     ),
   );
 
@@ -1301,6 +1552,53 @@ const contactSheet = async (page, css, specs, columns, file, width = 150) => {
   await page.screenshot({ path: join(out, file), fullPage: true });
 };
 
+/**
+ * One labelled image: for each line, Fox-Davies' figure and ours, each cropped at the top-left
+ * corner and at the base point.
+ * @param {import("playwright").Page} page The page to draw it on.
+ * @param {string} css The built CSS.
+ * @param {string} dir The directory for its HTML.
+ * @param {string} file Its file name in test/.render.
+ * @returns {Promise<void>} When it's written.
+ */
+const cornerSheet = async (page, css, dir, file) => {
+  const crop = 190;
+  const heightOf = CORNER_WIDTH * 1.2;
+  const corners = [
+    ["top-left corner", 0, 0],
+    ["base point", CORNER_WIDTH / 2 - crop / 2, heightOf - crop],
+  ];
+  const rows = CORNER_SHIELDS.flatMap((spec, i) => {
+    const [line, figure] = [
+      ["engrailed", "211"],
+      ["invected", "212"],
+    ][i];
+    const figureUrl = pathToFileURL(join(root, "reference/fox-davies/images", `fig${figure}.png`));
+    const crops = (inner) => corners.map(([, x, y]) => `<div class="crop">${inner(x, y)}</div>`);
+    return [
+      `<h2>${line}: Fox-Davies Fig. ${figure}, at ${CORNER_WIDTH}px wide</h2>`,
+      ...crops(
+        (x, y) =>
+          `<div style="position:absolute;inset:0;background: url(${figureUrl}) -${x}px -${y}px / ${CORNER_WIDTH}px auto no-repeat"></div>`,
+      ),
+      `<h2>${line}</h2>`,
+      ...crops(
+        (x, y) =>
+          `<div style="position:absolute;left:-${x}px;top:-${y}px;width:${CORNER_WIDTH}px">${markup(spec)}</div>`,
+      ),
+    ];
+  });
+  const html = `<!doctype html><style>${css}</style><style>
+    body { margin: 8px; font: 14px sans-serif; display: grid; grid-template-columns: repeat(2, ${crop}px); gap: 8px 20px; }
+    h2 { grid-column: 1 / 3; font-size: 14px; margin: 12px 0 0; }
+    .crop { position: relative; width: ${crop}px; height: ${crop}px; overflow: hidden; outline: 1px solid #888; }
+  </style><div style="grid-column: 1 / 3">crops: left column the top-left corner, right column the base point</div>${rows.join("")}`;
+  writeFileSync(join(dir, "corners.html"), html);
+  await page.goto(pathToFileURL(join(dir, "corners.html")).href);
+  mkdirSync(out, { recursive: true });
+  await page.screenshot({ path: join(out, file), fullPage: true });
+};
+
 const dir = mkdtempSync(join(root, "test", ".tmp-"));
 const failed = {};
 let buildFailed = false;
@@ -1333,6 +1631,8 @@ try {
         await contactSheet(page, css, PLAIN, 8, `probes-${name}.png`);
         await contactSheet(page, css, DIVIDED, 8, `divisions-${name}.png`);
         await contactSheet(page, css, FURRED, 6, `furs-${name}.png`);
+        await contactSheet(page, css, BORDURES, 6, `bordures-${name}.png`, 200);
+        await cornerSheet(page, css, dir, `bordure-corners-${name}.png`);
         await contactSheet(page, css, DIVIDED, 8, `divisions-odd-${name}.png`, ODD_WIDTH);
       } catch (error) {
         console.error(`  (no contact sheet for ${name}: ${error.message})`);

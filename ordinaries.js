@@ -5,6 +5,7 @@ import plugin from "tailwindcss/plugin";
 import {
   BETWEEN,
   BETWEEN_LINED,
+  BORDURE_LINES,
   CHARGES,
   FRAMES,
   FURS,
@@ -720,17 +721,18 @@ const arcPoints = (from, [rx, ry, rotation, large, sweep, x, y]) => {
 /**
  * A drawn outline as polygon points, its curves and arcs sampled.
  * @param {Array[]} segments The drawing's segments, as in paths.js.
+ * @param {number} [samples] Points per curve.
  * @returns {number[][]} Points in real units, starting at the move.
  */
-const outlinePoints = (segments) => {
+const outlinePoints = (segments, samples = SAMPLES) => {
   const points = [[segments[0][1], segments[0][2]]];
   for (const [command, ...n] of segments.slice(1)) {
     const from = points.at(-1);
     if (command === "L") {
       points.push([n[0], n[1]]);
     } else if (command === "C") {
-      for (let i = 1; i <= SAMPLES; i++) {
-        const t = i / SAMPLES;
+      for (let i = 1; i <= samples; i++) {
+        const t = i / samples;
         const [a, b, c, d] = [(1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3];
         points.push([
           a * from[0] + b * n[0] + c * n[2] + d * n[4],
@@ -744,26 +746,160 @@ const outlinePoints = (segments) => {
   return points;
 };
 
+// A bordure's width, as a fraction of its frame's. grailwind.css has it as `calc(100cqw / 8)` on a
+// frame and a third of that on a canton, which test/modes.mjs checks. A lined bordure is drawn for
+// this width.
+const BORDURE_WIDTH = 1 / 8;
+// How deep a lined bordure's scallops are, as a fraction of its frame's width.
+const SCALLOP_DEPTH = 0.037;
+// The same as a fraction of the bordure's width: an engrailed field's border narrows by it.
+const BORDURE_DEPTH = SCALLOP_DEPTH / BORDURE_WIDTH;
+// A lined bordure's scallop length in real units, as SCALLOP is an ordinary's: a run between
+// corners gets one scallop per this much of its length inside the bordure.
+const BORDURE_SCALLOP = 12;
+// An engrailed bordure's top corners are round lobes, their radius this many times the scallops'
+// depth (at least 1), centred inside the corner so they reach the depth past each edge, as the
+// bites do. Every other corner is a cusp.
+const CORNER_LOBE = 1.8;
+// Points per curve when a run is cut into scallops by arc length.
+const RUN_SAMPLES = 256;
+
+/**
+ * @param {number[]} vector A vector.
+ * @returns {number[]} The unit vector the same way.
+ */
+const unit = ([x, y]) => [x / Math.hypot(x, y), y / Math.hypot(x, y)];
+
+/**
+ * Points evenly spaced along a polyline, one scallop apart.
+ * @param {number[][]} polyline Points of a drawing, in real units.
+ * @param {number} start How far along it to start.
+ * @param {number} [end] How far along it to end, by default its end.
+ * @returns {number[][]} The chords' ends, from `start` to `end`.
+ */
+const chordEnds = (polyline, start, end) => {
+  const lengths = [0];
+  for (let i = 1; i < polyline.length; i++) {
+    const [from, to] = [polyline[i - 1], polyline[i]];
+    lengths.push(lengths[i - 1] + Math.hypot(to[0] - from[0], to[1] - from[1]));
+  }
+  const last = end ?? lengths.at(-1);
+  const count = Math.max(
+    1,
+    Math.round(((last - start) * (1 - 2 * BORDURE_WIDTH)) / BORDURE_SCALLOP),
+  );
+  return Array.from({ length: count + 1 }, (_, part) => {
+    const distance = start + ((last - start) * part) / count;
+    const i = Math.max(
+      1,
+      lengths.findIndex((length) => length >= distance),
+    );
+    const fraction = (distance - lengths[i - 1]) / (lengths[i] - lengths[i - 1]);
+    return polyline[i - 1].map((v, axis) => v + (polyline[i][axis] - v) * fraction);
+  });
+};
+
+/**
+ * A lined bordure's inner edge, clockwise, in real units. Its frame's outline, inside the bordure,
+ * is cut at the top corners and the base point into runs, and each run into equal chords by its
+ * length in the drawing. Each chord is a scallop, a cubic whose controls are its ends moved 4/3 of
+ * the depth along the chord's normal, so it peaks at the depth and leaves its cusps square to the
+ * chord. The left side is the right's mirror.
+ * @param {Array[]} segments A heater's drawing, as in paths.js: two lines, then two curves.
+ * @param {number} sweep 1 for engrailed, bulging toward the frame's edge; -1 for invected.
+ * @returns {{ from: number[], c1: number[], c2: number[], to: number[], kind: string }[]} Its
+ *   cubics from the top edge's first cusp, each from where the last ends, and the last back to the
+ *   first. `kind` is "scallop" or "lobe".
+ */
+const bordurePath = (segments, sweep) => {
+  const inset = BORDURE_WIDTH * W;
+  const depth = SCALLOP_DEPTH * W;
+  const scale = [(W - 2 * inset) / W, (H - 2 * inset) / H];
+  const inside = (point) => point.map((v, axis) => inset + v * scale[axis]);
+  const scallops = (ends) =>
+    ends.slice(1).map((end, i) => {
+      const start = ends[i];
+      const normal = unit([end[1] - start[1], start[0] - end[0]]);
+      const push = (point) => point.map((v, axis) => v + (normal[axis] * sweep * 4 * depth) / 3);
+      const [from, to] = [inside(start), inside(end)];
+      return { from, c1: push(from), c2: push(to), to, kind: "scallop" };
+    });
+  // The top-right lobe: its circle's centre is `centre` inside the corner each way, and its cusps
+  // are `reach` from the corner along each edge. It runs clockwise from the top cusp through the
+  // apex to the side cusp. Without a lobe, the corner is the cusp.
+  const radius = CORNER_LOBE * depth;
+  const centre = radius - depth;
+  const reach = sweep > 0 ? centre + Math.sqrt(radius ** 2 - centre ** 2) : 0;
+  const corner = inside([W, 0]);
+  const middle = [corner[0] - centre, corner[1] + centre];
+  const onCircle = (angle) => [
+    middle[0] + radius * Math.cos(angle),
+    middle[1] + radius * Math.sin(angle),
+  ];
+  const [first, last] = [Math.atan2(-centre, centre - reach), Math.atan2(reach - centre, centre)];
+  const apex = (first + last) / 2;
+  const handle = (4 / 3) * Math.tan((last - first) / 8) * radius;
+  const toward = (angle, along) =>
+    onCircle(angle).map(
+      (v, axis) => v + [-Math.sin(angle), Math.cos(angle)][axis] * handle * along,
+    );
+  const lobe = [
+    { from: onCircle(first), c1: toward(first, 1), c2: toward(apex, -1), to: onCircle(apex) },
+    { from: onCircle(apex), c1: toward(apex, 1), c2: toward(last, -1), to: onCircle(last) },
+  ].map((piece) => ({ ...piece, kind: "lobe" }));
+  const outline = outlinePoints(segments, RUN_SAMPLES);
+  const top = chordEnds(outline.slice(0, 2), reach / scale[0], W - reach / scale[0]);
+  const side = outline.slice(1, 3 + RUN_SAMPLES);
+  const right = [...(sweep > 0 ? lobe : []), ...scallops(chordEnds(side, reach / scale[1]))];
+  const flip = ([x, y]) => [W - x, y];
+  const left = right
+    .map(({ from, c1, c2, to, kind }) => ({
+      from: flip(to),
+      c1: flip(c2),
+      c2: flip(c1),
+      to: flip(from),
+      kind,
+    }))
+    .reverse();
+  return [...scallops(top), ...right, ...left];
+};
+
 /**
  * A frame's clip-paths from its drawing: the outline, and rings just inside it. Each is a polygon
  * fallback, then the shape().
  * @param {Array[]} segments The drawing's segments, as in paths.js.
- * @returns {{ outer: string[], ring: (inset: string) => string[] }} The outline, and a ring
- *   `inset` wide: the outline minus the outline mapped into a box inset by `inset`.
+ * @returns {{ outer: string[], ring: (inset: string) => string[], lined: (inset: string, sweep: number) => string[] }}
+ *   The outline, and a ring `inset` wide: the outline minus the outline mapped into a box inset by
+ *   `inset`. A lined ring has its inner edge scalloped as bordurePath() draws it, bulging outward
+ *   for a `sweep` of 1 and inward for -1. Its shape() is drawn for an `inset` of BORDURE_WIDTH,
+ *   and its polygon is the plain ring. The outline must be a heater's.
  */
 const frameOutline = (segments) => {
   const points = outlinePoints(segments);
   const start = [segments[0][1], segments[0][2]];
   const loop = (inset) => [...points, points[0]].map((p) => insetPoint(p, inset)).join(", ");
+  const ring = (inset) => [
+    `polygon(evenodd, ${loop(null)}, ${loop(inset)})`,
+    `shape(evenodd from ${insetPoint(start, null)}, ${insetCommands(segments, null).join(", ")}, move to ${insetPoint(start, inset)}, ${insetCommands(segments, inset).join(", ")})`,
+  ];
   return {
     outer: [
       `polygon(${points.map((p) => insetPoint(p, null)).join(", ")})`,
       `shape(from ${insetPoint(start, null)}, ${insetCommands(segments, null).join(", ")})`,
     ],
-    ring: (inset) => [
-      `polygon(evenodd, ${loop(null)}, ${loop(inset)})`,
-      `shape(evenodd from ${insetPoint(start, null)}, ${insetCommands(segments, null).join(", ")}, move to ${insetPoint(start, inset)}, ${insetCommands(segments, inset).join(", ")})`,
-    ],
+    ring,
+    lined: (inset, sweep) => {
+      // The inner subpath runs counter-clockwise, against the outer, so a nonzero fill leaves the
+      // field unpainted and still paints where invected scallops overlap.
+      const pieces = bordurePath(segments, sweep);
+      const inner = pieces
+        .toReversed()
+        .map(({ from, c1, c2 }) => `curve to ${at(from)} with ${at(c2)} / ${at(c1)}`);
+      return [
+        ring(inset)[0],
+        `shape(nonzero from ${insetPoint(start, null)}, ${insetCommands(segments, null).join(", ")}, move to ${at(pieces[0].from)}, ${inner.join(", ")}, close)`,
+      ];
+    },
   };
 };
 
@@ -876,6 +1012,12 @@ const FRAME = `:is(${FRAMES.map((frame) => `.${frame}`).join(", ")})`;
 const OUTLINE_WIDTH = "2px";
 
 export {
+  BORDURE_DEPTH,
+  BORDURE_WIDTH,
+  bordurePath,
+  CORNER_LOBE,
+  outlinePoints,
+  SCALLOP_DEPTH,
   draftOutline,
   DRAWN,
   flipPath,
@@ -918,6 +1060,34 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         "clip-path": heater.ring("var(--bordure-width)"),
       },
     };
+  }
+
+  // On a frame's field the border is transparent and the ring paints the bordure. An engrailed
+  // ring bites into the field, so the field's border is narrower by the scallops' depth and the
+  // field grows into the bites. Anywhere else the border is the bordure, plain.
+  const BORDER = "var(--bordure-width, 0.75rem)";
+  const narrowed = `calc(var(--bordure-width) * ${num(1 - BORDURE_DEPTH)})`;
+  for (const line of BORDURE_LINES) {
+    const sweep = line === "engrailed" ? 1 : -1;
+    const clip = heater.lined("var(--bordure-width)", sweep);
+    for (const [tincture, colour] of PAINTS) {
+      const first = tincture === OF_THE_FIRST;
+      utilities[`.bordure-${line}-${tincture}`] = {
+        "border-style": "solid",
+        "border-width": BORDER,
+        "border-color": colour,
+        "--bordure-inset": BORDER,
+        ":is(.heater, .inescutcheon) > &": {
+          "border-color": "transparent",
+          ...(sweep === 1 && { "border-width": narrowed, "--bordure-inset": narrowed }),
+        },
+        ":is(.heater, .inescutcheon):has(> &)::after": {
+          content: '""',
+          "background-color": first ? "var(--frame-first, transparent)" : colour,
+          "clip-path": clip,
+        },
+      };
+    }
   }
 
   for (const [tincture, colour] of PAINTS) {

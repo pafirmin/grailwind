@@ -34,6 +34,9 @@ export const DIVISIONS = [
 // The classes that frame a field: a shape round one child, which carries the blazon.
 export const FRAMES = ["heater", "inescutcheon"];
 
+// The lines a bordure can have besides plain, e.g. `bordure-engrailed-or`.
+export const BORDURE_LINES = ["engrailed", "invected"];
+
 // Ordinaries that can be reversed, e.g. `pile-reversed-or`: the same shape upside down.
 export const REVERSIBLE = ["chevron", "pall", "pile"];
 const reversed = (ordinary) => `${ordinary}-reversed`;
