@@ -18,7 +18,7 @@ import {
   TINCTURES,
   VOIDABLE,
 } from "./data.js";
-import { furBackground } from "./furs.js";
+import { furBackground, ringBackground } from "./furs.js";
 import { PATHS } from "./paths.js";
 
 // prettier-ignore
@@ -66,15 +66,20 @@ const PSEUDO = { chief: "&::after" };
 
 // The chief surmounts a bordure.
 const INSET = "var(--bordure-inset)";
+// Each side's step-out. A bordure on a per-pale part sets its palar side's to 0.
+const DEXTER = `var(--bordure-inset-dexter, ${INSET})`;
+const SINISTER = `var(--bordure-inset-sinister, ${INSET})`;
 const OVER_BORDURE = {
   "--bordure-inset": "inherit",
-  inset: `calc(-1 * ${INSET}) calc(-1 * ${INSET}) 0`,
-  padding: `${INSET} ${INSET} 0`,
+  "--bordure-inset-dexter": "inherit",
+  "--bordure-inset-sinister": "inherit",
+  inset: `calc(-1 * ${INSET}) calc(-1 * ${SINISTER}) 0 calc(-1 * ${DEXTER})`,
+  padding: `${INSET} ${SINISTER} 0 ${DEXTER}`,
   "background-origin": "content-box",
 };
 // A vertex on the shield's top or side edges, moved out to the bordure's outer edge.
 const outer = ([x, y]) => {
-  const ox = x === 0 ? `calc(-1 * ${INSET})` : x === 100 ? `calc(100% + ${INSET})` : pct(x);
+  const ox = x === 0 ? `calc(-1 * ${DEXTER})` : x === 100 ? `calc(100% + ${SINISTER})` : pct(x);
   return `${ox} ${y === 0 ? `calc(-1 * ${INSET})` : pct(y)}`;
 };
 
@@ -1058,6 +1063,9 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         inset: "0",
         "z-index": "2",
         "clip-path": heater.ring("var(--bordure-width)"),
+        // A bordure on a per-pale part sets --ring-dexter or --ring-sinister: the ring on that half.
+        "background-image":
+          "linear-gradient(to right, var(--ring-dexter, transparent) 50%, var(--ring-sinister, transparent) 50%)",
       },
     };
   }
@@ -1065,14 +1073,52 @@ export default plugin(({ addBase, addUtilities, theme }) => {
   // On a frame's field the border is transparent and the ring paints the bordure. An engrailed
   // ring bites into the field, so the field's border is narrower by the scallops' depth and the
   // field grows into the bites. Anywhere else the border is the bordure, plain.
+  //
+  // A bordure on a per-pale part is the ring on that half (see the frame's ::after), and the part
+  // has no border on the palar side, so the bordure stops at the line as the rule says. Limits:
+  // a part's bordure is always plain, a fur's ground only, and of-the-first takes the shield's
+  // first. A bordure on both the field and a part isn't handled. A chief on a bordured part goes
+  // under the ring, as the part is a stacking context; it steps out only by the sides that have
+  // a bordure (--bordure-inset-dexter and -sinister).
   const BORDER = "var(--bordure-width, 0.75rem)";
   const narrowed = `calc(var(--bordure-width) * ${num(1 - BORDURE_DEPTH)})`;
-  for (const line of BORDURE_LINES) {
+  // Each part, and the side it has no bordure on: its half of the ring, its palar border and the
+  // step-out that's 0 there.
+  const PARTS = {
+    "first-child": ["dexter", "border-right-width", "--bordure-inset-sinister"],
+    "last-child": ["sinister", "border-left-width", "--bordure-inset-dexter"],
+  };
+  const furPaints = Object.keys(FURS).map((fur) => ({
+    name: fur,
+    colour: `var(--color-${FURS[fur][0]})`,
+    ring: ringBackground(fur, theme),
+  }));
+  const tinctures = PAINTS.map(([tincture, colour]) => ({
+    name: tincture,
+    colour,
+    ring: {
+      "background-color": tincture === OF_THE_FIRST ? "var(--frame-first, transparent)" : colour,
+    },
+  }));
+  for (const line of ["", ...BORDURE_LINES]) {
     const sweep = line === "engrailed" ? 1 : -1;
-    const clip = heater.lined("var(--bordure-width)", sweep);
-    for (const [tincture, colour] of PAINTS) {
-      const first = tincture === OF_THE_FIRST;
-      utilities[`.bordure-${line}-${tincture}`] = {
+    const clip = line && heater.lined("var(--bordure-width)", sweep);
+    // Plain tinctures are in grailwind.css.
+    for (const { name, colour, ring } of line ? [...tinctures, ...furPaints] : furPaints) {
+      const ringColour = ring["background-color"];
+      const part = {};
+      for (const [child, [side, open, inset]] of Object.entries(PARTS)) {
+        part[`${FRAME} > .per-pale > &:${child}`] = {
+          "border-color": "transparent",
+          [open]: "0",
+          [inset]: "0px",
+        };
+        part[`${FRAME}:has(> .per-pale > &:${child})::after`] = {
+          content: '""',
+          [`--ring-${side}`]: ringColour,
+        };
+      }
+      utilities[line ? `.bordure-${line}-${name}` : `.bordure-${name}`] = {
         "border-style": "solid",
         "border-width": BORDER,
         "border-color": colour,
@@ -1083,9 +1129,10 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         },
         ":is(.heater, .inescutcheon):has(> &)::after": {
           content: '""',
-          "background-color": first ? "var(--frame-first, transparent)" : colour,
-          "clip-path": clip,
+          ...ring,
+          ...(clip && { "clip-path": clip }),
         },
+        ...part,
       };
     }
   }

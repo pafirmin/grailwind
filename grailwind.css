@@ -98,6 +98,17 @@
   inherits: false;
   initial-value: 0px;
 }
+/* A part's bordure has none on its palar side: 0 there, and the chief steps out by it. Unset
+ * elsewhere, so the chief falls back to --bordure-inset, and not inherited, so a canton's own
+ * doesn't take its part's. */
+@property --bordure-inset-dexter {
+  syntax: "*";
+  inherits: false;
+}
+@property --bordure-inset-sinister {
+  syntax: "*";
+  inherits: false;
+}
 
 /* ---------------------------------------------------------------------------
  * Tinctures
@@ -248,8 +259,9 @@
 
 /* Bordure, e.g. `bordure-or`: a border, so what's inside it lays out within it. On a frame's
  * field the border is transparent, and a ring on the frame's ::after (see ordinaries.js)
- * paints it, following the frame's outline. Anywhere else, such as on a part of a divided
- * field or a canton, the border is painted. */
+ * paints it, following the frame's outline. On a per-pale part the ring is on that half, and
+ * the part has no border on the palar side. A chief on the part goes under the ring. Anywhere
+ * else, such as on a quarter or a canton, the border is painted. */
 @utility bordure-* {
   border-style: solid;
   border-width: var(--bordure-width, 0.75rem);
@@ -262,6 +274,24 @@
   :is(.heater, .inescutcheon):has(> &)::after {
     content: "";
     background-color: --value(--color-*);
+  }
+  :is(.heater, .inescutcheon) > .per-pale > &:first-child {
+    border-color: transparent;
+    border-right-width: 0;
+    --bordure-inset-sinister: 0px;
+  }
+  :is(.heater, .inescutcheon):has(> .per-pale > &:first-child)::after {
+    content: "";
+    --ring-dexter: --value(--color-*);
+  }
+  :is(.heater, .inescutcheon) > .per-pale > &:last-child {
+    border-color: transparent;
+    border-left-width: 0;
+    --bordure-inset-dexter: 0px;
+  }
+  :is(.heater, .inescutcheon):has(> .per-pale > &:last-child)::after {
+    content: "";
+    --ring-sinister: --value(--color-*);
   }
 }
 @utility bordure-of-the-first {
@@ -276,6 +306,24 @@
   :is(.heater, .inescutcheon):has(> &)::after {
     content: "";
     background-color: var(--frame-first, transparent);
+  }
+  :is(.heater, .inescutcheon) > .per-pale > &:first-child {
+    border-color: transparent;
+    border-right-width: 0;
+    --bordure-inset-sinister: 0px;
+  }
+  :is(.heater, .inescutcheon):has(> .per-pale > &:first-child)::after {
+    content: "";
+    --ring-dexter: var(--frame-first, transparent);
+  }
+  :is(.heater, .inescutcheon) > .per-pale > &:last-child {
+    border-color: transparent;
+    border-left-width: 0;
+    --bordure-inset-dexter: 0px;
+  }
+  :is(.heater, .inescutcheon):has(> .per-pale > &:last-child)::after {
+    content: "";
+    --ring-sinister: var(--frame-first, transparent);
   }
 }
 

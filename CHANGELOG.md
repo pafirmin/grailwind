@@ -10,6 +10,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Engrailed and invected bordures, e.g. `bordure-engrailed-or`. On a frame the field grows into the
   bites of an engrailed one; off a frame they are plain.
+- Bordures in a fur, e.g. `bordure-ermine` and `bordure-engrailed-vair`. Off a shield's field they
+  show the fur's ground.
+- A bordure on a per-pale part follows the shield's outline and stops at the line of
+  impalement. A chief on that part goes under the bordure.
 - Vair and potent, e.g. `vair`, `counter-vair`, `potent` and `vairy-or-gules`.
 - `fur-<n>` sets how many tiles of a fur go across, e.g. `fur-3` for beffroi.
 

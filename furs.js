@@ -151,6 +151,39 @@ const FIELDS = {
  */
 const field = (fur) => FIELDS[family(FUR_PATTERNS[fur])];
 
+// Ermine's spots on a bordure are 1.4 bordure widths across. At the default eighth, the side
+// columns are then on the ring's centre lines (3.5 widths = 5 half-tiles), whatever the width.
+const RING_ERMINE_TILE = 1.4;
+// A bordure's panes are one row across its width, so the tile is as wide as the pane's share of it.
+const RINGS = {
+  ermine: {
+    size: `calc(${RING_ERMINE_TILE} * var(--bordure-width)) auto`,
+    position: `center calc(var(--bordure-width) / 2)`,
+  },
+  vair: { size: `calc(var(--bordure-width) * ${PANE} / ${VAIR_ROW}) auto`, position: "center 0" },
+  potent: {
+    size: `calc(var(--bordure-width) * ${PANE} / ${POTENT_ROW}) auto`,
+    position: "center 0",
+  },
+};
+
+/**
+ * A fur on a frame's bordure ring, sized to the bordure's width, not to `fur-<n>`.
+ * @param {string} fur A key of FURS.
+ * @param {Function} theme Tailwind's theme() lookup.
+ * @returns {Record<string, string>} CSS background declarations for the ring's ::after.
+ */
+export const ringBackground = (fur, theme) => {
+  const ring = RINGS[family(FUR_PATTERNS[fur])];
+  return {
+    "background-color": `var(--color-${FURS[fur][0]})`,
+    "background-image": tile(fur, theme),
+    "background-size": ring.size,
+    "background-position": ring.position,
+    "background-repeat": "repeat",
+  };
+};
+
 /**
  * The layers under a fur in a divided field: the pattern, then the ground.
  * @param {string} fur A key of FURS.

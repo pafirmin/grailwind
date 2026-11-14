@@ -72,10 +72,16 @@ for (const ordinary of VOIDABLE) {
     voided: true,
   });
 }
-for (const tincture of [...TINCTURES, OF_THE_FIRST]) {
-  ORDINARY_CLASSES.set(`bordure-${tincture}`, { ordinary: "bordure", tincture });
+for (const tincture of PAINT) {
+  const fur = FUR.has(tincture);
+  ORDINARY_CLASSES.set(`bordure-${tincture}`, { ordinary: "bordure", tincture, fur });
   for (const line of BORDURE_LINES) {
-    ORDINARY_CLASSES.set(`bordure-${line}-${tincture}`, { ordinary: "bordure", tincture, line });
+    ORDINARY_CLASSES.set(`bordure-${line}-${tincture}`, {
+      ordinary: "bordure",
+      tincture,
+      fur,
+      line,
+    });
   }
 }
 

@@ -162,6 +162,24 @@ const PATTERNS = {
     /\.heater \{\s*clip-path:[^]*?&::before \{[^}]*z-index: 6;\s*background-color: var\(--color-sable\);\s*clip-path: polygon\(evenodd, [^;]*\);\s*clip-path: shape\(evenodd from 0 0, [^;]*, close, move to 2px 2px, line to calc\(100% - 2px\) 2px,/,
   "a frame's bordure ring sits under the chief, its width a var":
     /\.heater \{\s*clip-path:[^]*?&::after \{[^}]*z-index: 2;\s*clip-path: polygon\(evenodd, [^;]*\);\s*clip-path: shape\(evenodd from 0 0, [^;]*move to var\(--bordure-width\) var\(--bordure-width\),/,
+  "a frame's ring is split into a dexter and a sinister half, for a bordure on a part":
+    /\.heater \{\s*clip-path:[^]*?&::after \{[^}]*background-image: linear-gradient\(to right, var\(--ring-dexter, transparent\) 50%, var\(--ring-sinister, transparent\) 50%\);/,
+  "a bordure ermine paints its tile on the ring, sized to the bordure":
+    /\.bordure-ermine \{[^]*?:has\( ?> &\)::after \{\s*content: "";\s*background-color: var\(--color-argent\);\s*background-image: url\("data:image\/svg[^"]*"\);\s*background-size: calc\(1\.4 \* var\(--bordure-width\)\) auto;\s*background-position: center calc\(var\(--bordure-width\) \/ 2\);\s*background-repeat: repeat;/,
+  "a bordure vair has one row of panes across the ring":
+    /\.bordure-vair \{[^]*?:has\( ?> &\)::after \{[^}]*background-size: calc\(var\(--bordure-width\) \* 30 \/ 32\) auto;\s*background-position: center 0;/,
+  "a lined fur bordure is clipped like the tincture ones":
+    /\.bordure-engrailed-ermine \{[^]*?:has\( ?> &\)::after \{[^}]*background-image: url[^}]*clip-path: polygon\(evenodd, [^;]*\);\s*clip-path: shape\(nonzero from 0 0,/,
+  "a bordure on a per-pale part sets its ring's half, and has no border on the palar side":
+    /\.bordure-or \{[^]*?\.per-pale > &:first-child \{\s*border-color: transparent;\s*border-right-width: 0;\s*--bordure-inset-sinister: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:first-child\)::after \{\s*content: "";\s*--ring-dexter: var\(--color-or\);/,
+  "a fur bordure on a part sets its ring's half to the ground":
+    /\.bordure-ermine \{[^]*?\.per-pale > &:first-child \{\s*border-color: transparent;\s*border-right-width: 0;\s*--bordure-inset-sinister: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:first-child\)::after \{\s*content: "";\s*--ring-dexter: var\(--color-argent\);/,
+  "a lined bordure on a part is plain: its ring's half, and no clip":
+    /\.bordure-engrailed-or \{[^]*?\.per-pale > &:last-child \{\s*border-color: transparent;\s*border-left-width: 0;\s*--bordure-inset-dexter: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:last-child\)::after \{\s*content: "";\s*--ring-sinister: var\(--color-or\);\s*\}/,
+  "a chief steps out by each side's own inset, so it stops at a part's palar line":
+    /\.chief-or \{[^]*?inset: calc\(-1 \* var\(--bordure-inset\)\) calc\(-1 \* var\(--bordure-inset-sinister, var\(--bordure-inset\)\)\) 0 calc\(-1 \* var\(--bordure-inset-dexter, var\(--bordure-inset\)\)\);/,
+  "and the sinister part, mirrored":
+    /\.bordure-or \{[^]*?\.per-pale > &:last-child \{\s*border-color: transparent;\s*border-left-width: 0;\s*--bordure-inset-dexter: 0px;\s*\}[^]*?--ring-sinister: var\(--color-or\);/,
   "a bordure is a border, so what's inside it lays out within it":
     /\.bordure-or \{\s*border-style: solid;\s*border-width: var\(--bordure-width, 0\.75rem\);\s*border-color: var\(--color-or\);/,
   "on a frame's field the border is transparent":
@@ -208,7 +226,7 @@ const PATTERNS = {
     /\.canton \{[^}]*--layer-inset: 0px;[^]*\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > \* \{[^}]*--layer-inset: 0px;|\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > \* \{[^}]*--layer-inset: 0px;[^]*\.canton \{[^}]*--layer-inset: 0px;/,
   "a quarter has no bordure to surmount": /\.quarterly \{[^}]*& > \* \{[^}]*--outer-inset: 0px;/,
   "the chief pulls its own element's bordure width":
-    /\.chief-or \{[^]*?&::after \{[^}]*--bordure-inset: inherit;[^}]*clip-path: polygon\(calc\(-1 \* var\(--bordure-inset\)\)[^;]*\) content-box;/,
+    /\.chief-or \{[^]*?&::after \{[^}]*--bordure-inset: inherit;[^}]*clip-path: polygon\(calc\(-1 \* var\(--bordure-inset-dexter, var\(--bordure-inset\)\)\)[^;]*\) content-box;/,
   "a field's first doesn't inherit":
     /@property --field-first \{\s*syntax: "\*";\s*inherits: false;/,
   "a bare tincture is a field's first": /\.gules \{[^}]*--field-first: var\(--color-gules\);/,
@@ -306,7 +324,7 @@ const DATA_CLASSES = [
 
 writeFileSync(
   join(dir, "index.html"),
-  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly per-pale per-fess bordure-or"></div>`,
+  `<div class="${[...CLASSES, ...DATA_CLASSES].join(" ")} bend-or on between counterchanged in-bend-sinister inescutcheon canton quarterly per-pale per-fess bordure-or bordure-ermine bordure-vair bordure-engrailed-ermine"></div>`,
 );
 
 let checks = 0;

@@ -80,6 +80,7 @@ const BORDURED = FIELD[0] / WIDTH;
 const RING = BORDURE_WIDTH * 100;
 const IN_RING = RING / 2;
 const IN_FIELD = RING * 1.15;
+const SPOT_TAIL = BORDER / 2 + 6 * ((1.4 * BORDER) / 50);
 // Where the field's top is, and its fess line, in px down the shield; the 30% foot of a chief.
 const FIELD_TOP = BORDER;
 const CHIEF_FOOT = FIELD_TOP + 0.3 * FIELD[1];
@@ -1199,6 +1200,30 @@ const PROBES = [
   { shield: "azure", inner: { shield: "gules bordure-engrailed-or" }, at: [INNER_BITES.left, INNER_BITES.right].map((side) => biteAt(side, 150)).flatMap((bite) => bite.cusps.map((cusp) => outFrom(cusp, bite, SPIKE * INNER))), expect: "or", why: "a cusp of an inescutcheon's engrailed bordure" },
   { shield: "azure", inner: { shield: "gules bordure-engrailed-or" }, at: [INNER_BITES.left, INNER_BITES.right].map((side) => biteAt(side, 150)).map((bite) => outFrom(bite.deepest, bite, -1)), expect: "gules", why: "a bite of an inescutcheon's engrailed bordure shows its field" },
   { shield: "azure", inner: { kind: "canton", shield: "vert bordure-engrailed-or" }, at: px(4, 60), expect: "or", why: "a canton's engrailed bordure is plain" },
+  // 028: a fur in the ring. Ermine's tile is 1.4 widths across, centred, with its top b/2 down:
+  // whole spots are on the ring's centre line at 150 +- 0.7b + k * 1.4b, and the ground between.
+  // A spot's centre is thin, so SPOT_TAIL is 6 units down its tail, where it is 7 wide, of 50
+  // across the tile.
+  { shield: "gules bordure-ermine", at: [px(150 - 0.7 * BORDER, SPOT_TAIL), px(150 + 0.7 * BORDER, SPOT_TAIL), px(150 + 2.1 * BORDER, SPOT_TAIL)], expect: "sable", why: "a whole ermine spot on the bordure's top strip" },
+  { shield: "gules bordure-ermine", at: [px(150, BORDER / 2), px(150 + 1.4 * BORDER, BORDER / 2)], expect: "argent", why: "the bordure ermine's ground between spots" },
+  { shield: "gules bordure-ermine", at: [px(150, 150), px(BORDER * 1.15, 150)], expect: "gules", why: "the field inside a bordure ermine" },
+  { shield: "gules bordure-ermines", at: px(150 + 0.7 * BORDER, BORDER / 2), expect: "argent", why: "a bordure ermines: argent spots" },
+  { shield: "gules bordure-ermines", at: px(150, BORDER / 2), expect: "sable", why: "a bordure ermines: sable ground" },
+  { shield: "gules bordure-pean", at: px(150, BORDER / 2), expect: "sable", why: "a bordure pean: sable ground" },
+  { shield: "gules bordure-erminois", at: px(150, BORDER / 2), expect: "or", why: "a bordure erminois: or ground" },
+  { shield: "gules bordure-vair", at: [px(150, BORDER * 0.1), px(150, BORDER * 0.9)], expect: "argent", why: "a bordure vair: the pane's top and base are argent" },
+  { shield: "gules bordure-vair", at: px(150 + (BORDER * 30) / 32 / 2, BORDER * 0.1), expect: "azure", why: "a bordure vair: the next pane is azure" },
+  { shield: "gules bordure-engrailed-ermine", at: [px(150 + 0.7 * BORDER, BORDER / 2)], expect: "sable", why: "an engrailed bordure ermine's spot" },
+  { shield: "gules bordure-engrailed-ermine", at: px(150, 150), expect: "gules", why: "the field inside an engrailed bordure ermine" },
+  { shield: "per-pale-or-azure bordure-ermine", at: px(BORDER + 12, 150), expect: "or", why: "the dexter half's field inside a bordure ermine" },
+  { shield: "per-pale-or-azure bordure-ermine", at: px(WIDTH - BORDER - 12, 150), expect: "azure", why: "the sinister half's field inside a bordure ermine" },
+  { shield: "gyronny-gules-or bordure-ermine", at: inBordure([25, 21]), expect: "gules", why: "gyronny inside a bordure ermine: the first gyron" },
+  { shield: "gyronny-gules-or bordure-ermine", at: inBordure([25, 24]), expect: "or", why: "gyronny inside a bordure ermine: the second gyron" },
+  { shield: "ermine bordure-erminois", at: px(150, BORDER / 2), expect: "or", why: "an erminois bordure over an ermine field: or ground" },
+  { shield: "azure", inner: { shield: "gules bordure-ermine" }, at: onInner([IN_FIELD, 45]), expect: "gules", why: "an inescutcheon's field inside a bordure ermine" },
+  { shield: "azure bordure-ermine", inner: { kind: "canton", shield: "or" }, at: px(4, 4), expect: "or", why: "a canton over a bordure ermine" },
+  { shield: "azure bordure-ermine chief-or", at: [px(4, 4), px(150, 4)], expect: "or", why: "a chief over a bordure ermine" },
+  { shield: "azure", inner: { kind: "canton", shield: "vert bordure-ermine" }, at: px(4, 60), expect: "argent", why: "a canton's bordure ermine is its ground" },
   // Invected arcs overlap where two meet at a cusp, so the inner path crosses itself. Nonzero fills
   // the overlap, as ring; evenodd leaves a hole of the field there. At each top corner the overlap
   // is a blob about 9px across, holding the point 0.3 d in from the corner each way. At the base
@@ -1273,9 +1298,36 @@ const PROBES = [
   // 017: the shield's cross over the quarters' saltires, and the bordure over both.
   { shield: "quarterly cross-or bordure-gules", quarters: ["azure saltire-argent", "azure saltire-argent", "azure saltire-argent", "azure saltire-argent"], at: [[50, 20], [25, 45], [44, 44]], expect: "or", why: "the shield's cross over the quarters' saltires" },
   { shield: "quarterly cross-or bordure-gules", quarters: ["azure saltire-argent", "azure saltire-argent", "azure saltire-argent", "azure saltire-argent"], at: [[3, 3], [3, 45], [50, 97]], expect: "gules", why: "the bordure over the quarters and the cross" },
-  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(3, 150), px(140, 150), px(75, 10)], expect: "or", why: "a bordure on a part is a border" },
-  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(160, 150), px(290, 150)], expect: "gules", why: "and only on its own part" },
-  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: px(WIDTH / 4, 150), expect: "azure", why: "a part's own field, inside its border, which is the full width on each side" },
+  // 028: a bordure on a per-pale part is the ring on that half: round its top, outer side and base,
+  // and nothing down the palar line.
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(3, 150), px(75, 10), px(135, 330)], expect: "or", why: "a bordure on a part is the ring round its top, outer side and base" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(160, 150), px(290, 150), px(225, 10)], expect: "gules", why: "and only on its own part" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], at: [px(WIDTH / 4, 150), px(147, 150), px(147, 60), px(147, 250)], expect: "azure", why: "a part's own field, inside its border, which runs to the palar line" },
+  { shield: "per-pale", quarters: ["gules", "azure bordure-or"], at: [px(297, 150), px(225, 10), px(165, 330)], expect: "or", why: "a bordure on the sinister part, mirrored" },
+  { shield: "per-pale", quarters: ["gules", "azure bordure-or"], at: [px(147, 150), px(60, 150), px(75, 10)], expect: "gules", why: "the dexter part is untouched by the sinister's bordure" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "argent bordure-gules"], at: [px(3, 150), px(75, 10)], expect: "or", why: "both parts bordured: the dexter's ring" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "argent bordure-gules"], at: [px(297, 150), px(225, 10)], expect: "gules", why: "both parts bordured: the sinister's ring" },
+  { shield: "per-pale", quarters: ["azure bordure-ermine", "gules"], at: px(75, BORDER / 2), expect: "argent", why: "a fur bordure on a part paints its ground" },
+  { shield: "per-pale", quarters: ["azure bordure-engrailed-or", "gules"], at: [px(3, 150), px(75, 10)], expect: "or", why: "a lined bordure on a part draws plain" },
+  { shield: "per-pale", quarters: ["azure bordure-engrailed-or", "gules"], at: px(WIDTH / 4, 150), expect: "azure", why: "a lined bordure on a part leaves its field" },
+  // A part's chief goes under the ring (the part is a stacking context), and steps out only on the
+  // sides that have a bordure, so it stops at the palar line.
+  { shield: "per-pale", quarters: ["argent", "azure bordure-or chief-gules"], at: [px(147, 60), px(140, 60), px(115, 60)], expect: "argent", why: "a chief on the sinister part's bordure stops at the palar line" },
+  { shield: "per-pale", quarters: ["azure bordure-or chief-gules", "argent"], at: [px(153, 60), px(160, 60), px(185, 60)], expect: "argent", why: "a chief on the dexter part's bordure stops at the palar line" },
+  { shield: "per-pale", quarters: ["azure bordure-or chief-gules", ""], at: [px(160, 60), px(185, 60)], expect: "argent", why: "a chief on the dexter part's bordure doesn't spill over a bare sinister part" },
+  { shield: "per-pale", quarters: ["", "azure bordure-or chief-gules"], at: [px(115, 60), px(140, 60)], expect: "argent", why: "a chief on the sinister part's bordure doesn't spill over a bare dexter part" },
+  // A part's palar-side step-out of 0 isn't inherited by a nested canton, whose own chief steps
+  // out over its own bordure. The canton is a third of the part's content, at its top left: 37.5px
+  // wide, 45 tall, at (37.5, 37.5) in the dexter part and (150, 37.5) in the sinister.
+  { shield: "per-pale", quarters: [{ shield: "azure bordure-or", inner: { kind: "canton", shield: "vert bordure-argent chief-or" } }, "argent"], at: px(37.5 + 0.95 * 37.5, 37.5 + 0.05 * 45), expect: "or", why: "a canton's chief over its own bordure, in the dexter part's bordure" },
+  { shield: "per-pale", quarters: ["argent", { shield: "azure bordure-or", inner: { kind: "canton", shield: "vert bordure-argent chief-or" } }], at: px(150 + 0.05 * 37.5, 37.5 + 0.05 * 45), expect: "or", why: "a canton's chief over its own bordure, in the sinister part's bordure" },
+  { shield: "per-pale", quarters: ["argent", "azure bordure-or chief-gules"], at: [px(200, 60), px(160, 60)], expect: "gules", why: "a chief on the sinister part fills the part" },
+  { shield: "per-pale", quarters: ["azure bordure-or chief-gules", "argent"], at: [px(100, 60), px(140, 60)], expect: "gules", why: "a chief on the dexter part fills the part" },
+  // An inescutcheon's ring is a share of its own width: ground between spots, and a spot's tail,
+  // which needs a LARGE shield to be more than a pixel wide.
+  { shield: "azure", inner: { shield: "gules bordure-ermine" }, at: onInner([50, (RING / 2) * (5 / 6)]), expect: "argent", why: "an inescutcheon's bordure ermine: ground in its ring" },
+  { shield: `azure w-[${LARGE}px]!`, inner: { shield: "gules bordure-ermine" }, at: [onInner([50 + 0.7 * RING, (RING / 2 + 6 * 0.028 * RING) * (5 / 6)])], expect: "sable", why: "an inescutcheon's bordure ermine: a spot in its ring" },
+  { shield: "quarterly", quarters: ["azure bordure-or", "gules", "gules", "azure"], at: [px(3, 60), px(75, 4), px(147, 60), px(75, 150)], expect: "or", why: "a bordure on a quarter still runs all round" },
   // A counterchanged charge's swapped field lines up with the field inside a bordure. Ermine tiles
   // across the 200 × 260px field are 33.3 × 40px, so a spot's stem is probed a tenth of a tile
   // below its centre, on the grid onSpot() describes. Swapped, the gules half is ermine.
@@ -1381,6 +1433,36 @@ const BORDURES = [
   { shield: "azure", inner: { kind: "canton", shield: "vert bordure-engrailed-or" } },
   { shield: "azure bordure-engrailed-gules w-[150px]!" },
 ];
+// 028: fur bordures, for the user to tune the spot phase by eye, with the per-pale part cases.
+const FUR_BORDURES = [
+  ...[
+    "ermine",
+    "ermines",
+    "erminois",
+    "pean",
+    "vair",
+    "counter-vair",
+    "potent",
+    "counter-potent",
+  ].flatMap((fur) =>
+    ["", "engrailed-", "invected-"].map((line) => ({ shield: `gules bordure-${line}${fur}` })),
+  ),
+  { shield: "azure bordure-ermine w-[64px]!" },
+  { shield: "azure bordure-engrailed-ermine w-[64px]!" },
+  { shield: "azure bordure-vair w-[64px]!" },
+  { shield: "ermine bordure-erminois" },
+  { shield: "per-pale-or-azure bordure-ermine" },
+  { shield: "gyronny-gules-or bordure-ermine" },
+  { shield: "azure bordure-ermine chief-or" },
+  { shield: "azure bordure-ermine", inner: { kind: "canton", shield: "or" } },
+  { shield: "azure", inner: { shield: "gules bordure-ermine" } },
+  { shield: "per-pale", quarters: ["azure bordure-or", "argent"] },
+  { shield: "per-pale", quarters: ["argent", "azure bordure-or"] },
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules bordure-argent"] },
+  { shield: "per-pale", quarters: ["azure bordure-ermine", "gules"] },
+  { shield: "per-pale", quarters: ["azure bordure-engrailed-or chief-gules", "argent"] },
+  { shield: "quarterly", quarters: ["azure bordure-or", "argent", "argent", "azure"] },
+];
 // Corner crops of the bordure, for finessing its corners by eye: ours at three times Fox-Davies'
 // figures' width, beside crops of Fig. 211 (engrailed) and Fig. 212 (invected) at that scale.
 const CORNER_WIDTH = 465;
@@ -1460,6 +1542,7 @@ const buildShields = (dir) => {
     ...DIVIDED,
     ...FURRED,
     ...BORDURES,
+    ...FUR_BORDURES,
     ...CORNER_SHIELDS,
   ];
   const classes = [...specs.map((s) => markup(s)), ...TINCTURES.map((t) => `<i class="${t}"></i>`)];
@@ -1632,6 +1715,7 @@ try {
         await contactSheet(page, css, DIVIDED, 8, `divisions-${name}.png`);
         await contactSheet(page, css, FURRED, 6, `furs-${name}.png`);
         await contactSheet(page, css, BORDURES, 6, `bordures-${name}.png`, 200);
+        await contactSheet(page, css, FUR_BORDURES, 6, `bordures-fur-${name}.png`, 200);
         await cornerSheet(page, css, dir, `bordure-corners-${name}.png`);
         await contactSheet(page, css, DIVIDED, 8, `divisions-odd-${name}.png`, ODD_WIDTH);
       } catch (error) {

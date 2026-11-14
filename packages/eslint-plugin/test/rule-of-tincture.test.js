@@ -17,6 +17,11 @@ run("rule-of-tincture", rule, {
     `<div class="heater"><div class="or bordure-red-500"></div></div>`,
     `<div class="heater"><div class="azure bordure-engrailed-or"></div></div>`,
     `<div class="heater"><div class="gules bordure-invected-argent"></div></div>`,
+    // A bordure in a fur is that fur: ermine counts as a metal, the vair family isn't checked.
+    `<div class="heater"><div class="gules bordure-ermine"></div></div>`,
+    `<div class="heater"><div class="azure bordure-engrailed-erminois"></div></div>`,
+    `<div class="heater"><div class="argent bordure-vair"></div></div>`,
+    `<div class="heater"><div class="gules bordure-invected-potent"></div></div>`,
     `<div class="heater"><div class="azure"><div class="charges"><i class="mullet or"></i></div></div></div>`,
     `<div class="heater"><div class="azure"><div class="charges"><i class="bezant"></i></div></div></div>`,
     `<div class="heater"><div class="or"><div class="charges"><img class="charge" src="lion.svg" /></div></div></div>`,
@@ -113,6 +118,23 @@ run("rule-of-tincture", rule, {
     },
   ],
   invalid: [
+    {
+      code: `<div class="heater"><div class="argent bordure-ermine"></div></div>`,
+      errors: [
+        error(
+          "`bordure-ermine` puts a bordure Ermine on Argent: metal on metal (ermine counts as a metal)",
+        ),
+      ],
+    },
+    {
+      code: `<div class="heater"><div class="azure bordure-engrailed-pean"></div></div>`,
+      options: [{ furs: "ground" }],
+      errors: [
+        error(
+          "`bordure-engrailed-pean` puts a bordure engrailed Pean on Azure: colour on colour (pean counts as a colour)",
+        ),
+      ],
+    },
     {
       code: `<div class="heater"><div class="or fess-argent"></div></div>`,
       errors: [error("`fess-argent` puts a fess Argent on Or: metal on metal")],
