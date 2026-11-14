@@ -64,6 +64,9 @@ const polygon = (vertices) => `polygon(${vertices.map(point).join(", ")})`;
 
 const PSEUDO = { chief: "&::after" };
 
+// A split field's parts: its children that aren't over all of it. Written out in grailwind.css.
+const PART = ":not(.charges, .inescutcheon, .canton)";
+
 // The chief surmounts a bordure.
 const INSET = "var(--bordure-inset)";
 // Each side's step-out. A bordure on a per-pale part sets its palar side's to 0.
@@ -1037,7 +1040,7 @@ export default plugin(({ addBase, addUtilities, theme }) => {
   // Unset on an inescutcheon, a canton or a part of a divided shield, so it can't inherit its
   // shield's layout. In the base layer, so an ordinary on it still sets its own.
   addBase({
-    ".inescutcheon, .inescutcheon > *, .canton, :is(.heater, .heater *):is(.quarterly, .per-pale, .per-fess) > *":
+    [`.inescutcheon, .inescutcheon > *, .canton, :is(.heater, .heater *):is(.quarterly, .per-pale, .per-fess) > ${PART}`]:
       Object.fromEntries(layoutVars().map((name) => [name, "initial"])),
   });
 
@@ -1085,8 +1088,8 @@ export default plugin(({ addBase, addUtilities, theme }) => {
   // Each part, and the side it has no bordure on: its half of the ring, its palar border and the
   // step-out that's 0 there.
   const PARTS = {
-    "first-child": ["dexter", "border-right-width", "--bordure-inset-sinister"],
-    "last-child": ["sinister", "border-left-width", "--bordure-inset-dexter"],
+    [`nth-child(1 of ${PART})`]: ["dexter", "border-right-width", "--bordure-inset-sinister"],
+    [`nth-last-child(1 of ${PART})`]: ["sinister", "border-left-width", "--bordure-inset-dexter"],
   };
   const furPaints = Object.keys(FURS).map((fur) => ({
     name: fur,

@@ -84,6 +84,8 @@ const SPOT_TAIL = BORDER / 2 + 6 * ((1.4 * BORDER) / 50);
 // Where the field's top is, and its fess line, in px down the shield; the 30% foot of a chief.
 const FIELD_TOP = BORDER;
 const CHIEF_FOOT = FIELD_TOP + 0.3 * FIELD[1];
+// The shield's fess point, in px down.
+const FESS_POINT_PX = WIDTH * 1.2 * 0.45;
 const FESS_LINE = FIELD_TOP + 0.45 * FIELD[1];
 // The inner tip of the ring round the point, and a point at a fraction of the bordure below or
 // above it.
@@ -358,6 +360,8 @@ const INNER_BITES = scallops([WIDTH * 0.335, WIDTH * 1.2 * 0.285, INNER_WIDTH]);
 // takes two cells each way on the probe page. The lens is on the axis, widest a quarter of the
 // scallops' depth above the base cusp: LENS, as % of the shield.
 const LARGE = 2 * WIDTH;
+// A point of a LARGE shield, in px, as %.
+const onLarge = (x, y) => [(x * 100) / LARGE, (y * 100) / (LARGE * 1.2)];
 const LENS = [50, 100 - ((BORDURE_WIDTH + 0.25 * SCALLOP_DEPTH) * 100) / 1.2];
 
 const SUB = { inescutcheon: [INNER, onInner], canton: [CANTON, onCanton] };
@@ -1340,6 +1344,60 @@ const PROBES = [
   // higher. Probed between the two, and 1.5px below the field's.
   { shield: "per-fess-or-azure bordure-argent", charges: "", items: ["roundel counterchanged"], at: [px(150, (FESS_LINE + WIDTH * 0.54) / 2), px(150, FESS_LINE - 1)], expect: "azure", why: "a counterchanged charge swaps at the field's fess line, inside a bordure" },
   { shield: "per-fess-or-azure bordure-argent", charges: "", items: ["roundel counterchanged"], at: px(150, FESS_LINE + 1.5), expect: "or", why: "and below it" },
+  // 070: where a counterchanged charge's fixed layer sits, inside a bordure on a part, a canton and
+  // an inescutcheon, which each reset or set --layer-inset. Each point is on a roundel's own line
+  // or spot, a few px from where the layer would sit without the rule.
+  { shield: "per-pale bordure-or", quarters: [{ shield: "per-fess-or-azure", charges: "", items: ["roundel counterchanged"] }, "gules"], at: [px(74, 160), px(113, 160)], expect: "azure", why: "a counterchanged charge in a per pale part's own chief, inside the field's bordure" },
+  { shield: "per-pale bordure-or", quarters: [{ shield: "per-fess-or-azure", charges: "", items: ["roundel counterchanged"] }, "gules"], at: [px(74, 171), px(113, 170)], expect: "or", why: "and in the part's own base" },
+  { shield: "per-fess bordure-or", quarters: [{ shield: "per-pale-or-azure", charges: "", items: ["roundel counterchanged"] }, "gules"], at: [px(141, 134), px(141, 131)], expect: "azure", why: "a counterchanged charge in a per fess part's own dexter half, inside the field's bordure" },
+  { shield: "per-fess bordure-or", quarters: [{ shield: "per-pale-or-azure", charges: "", items: ["roundel counterchanged"] }, "gules"], at: [px(185, 74), px(183, 74)], expect: "or", why: "and in the part's own sinister half" },
+  { shield: "quarterly bordure-or", quarters: [{ shield: "per-pale-or-azure", charges: "", items: ["roundel counterchanged"] }, "azure", "azure", "gules"], at: [px(74, 95), px(74, 94)], expect: "azure", why: "a counterchanged charge in a quarter's own dexter half, inside the field's bordure" },
+  { shield: "quarterly bordure-or", quarters: [{ shield: "per-pale-or-azure", charges: "", items: ["roundel counterchanged"] }, "azure", "azure", "gules"], at: [px(113, 95), px(113, 94)], expect: "or", why: "and in the quarter's own sinister half" },
+  { shield: "azure bordure-or", inner: { kind: "canton", shield: "per-pale-or-gules", charges: "", items: ["roundel counterchanged"] }, at: [px(36, 53), px(36, 55)], expect: "gules", why: "a counterchanged charge on a canton swaps at the canton's own pale line, inside the field's bordure" },
+  { shield: "azure bordure-or", inner: { kind: "canton", shield: "per-pale-or-gules", charges: "", items: ["roundel counterchanged"] }, at: [px(62, 54), px(63, 55)], expect: "or", why: "and on its sinister half" },
+  // The inescutcheon's field sets its own inset, its bordure's. Probed on a LARGE shield, where an
+  // ermine spot is wide enough to tell: the grid moves by the whole inset. The spot probe and the
+  // 020 one are within 3px of a colour edge, and may move with 071 (heater inset rounding and
+  // outline helper).
+  { shield: `azure w-[${LARGE}px]!`, inner: { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"] }, at: [onLarge(308, 337), onLarge(307, 337)], expect: "argent", why: "a counterchanged charge on an inescutcheon's ermine, on the inescutcheon's own spot grid" },
+  { shield: `azure w-[${LARGE}px]!`, inner: { shield: "per-pale-ermine-gules bordure-or", charges: "", items: ["roundel counterchanged"] }, at: [onLarge(318, 313), onLarge(318, 314)], expect: "sable", why: "and on its spot" },
+  // 020: counterchanged charges on a counterchanged chevron, inside the field's bordure, take the
+  // field's own spot grid.
+  { shield: "per-pale-ermine-gules bordure-or chevron-counterchanged", charges: "on counterchanged", items: Array(3).fill("roundel"), at: [px(87, 215), px(90, 219)], expect: "argent", why: "a counterchanged charge on a counterchanged chevron, inside a bordure: ground where the field's spot isn't" },
+  // 070: an inescutcheon, charges or a canton over all of a split field aren't a part of it, so
+  // the parts keep their boxes (probed near each part's far edge) and the extra keeps its place.
+  ...[
+    ["an inescutcheon", { inner: { shield: "vert" } }, [50, 45], "vert"],
+    ["charges", { charges: "", items: bezants(1) }, [50, 45], "or"],
+    ["a canton", { inner: { kind: "canton", shield: "vert" } }, onCanton([50, 50]), "vert"],
+  ].flatMap(([kind, extra, where, colour]) => {
+    // Neither of the last two is the colour of what lies over them, as at the fess point they meet.
+    const quarters = ["azure", "gules", "sable", "argent"];
+    return [
+      { shield: "per-pale", quarters: ["azure", "gules"], ...extra, at: [px(30, 235), px(140, 235)], expect: "azure", why: `${kind} over a per pale field: the dexter part keeps its half` },
+      { shield: "per-pale", quarters: ["azure", "gules"], ...extra, at: [px(160, 235), px(270, 235)], expect: "gules", why: `${kind} over a per pale field: the sinister part keeps its half` },
+      { shield: "per-pale", quarters: ["azure", "gules"], ...extra, at: where, expect: colour, why: `${kind} over a per pale field is placed on the shield` },
+      { shield: "per-fess", quarters: ["azure", "gules"], ...extra, at: [px(30, FESS_POINT_PX - 4), px(270, FESS_POINT_PX - 4), px(270, 40)], expect: "azure", why: `${kind} over a per fess field: the chief keeps to the fess point` },
+      { shield: "per-fess", quarters: ["azure", "gules"], ...extra, at: [px(30, FESS_POINT_PX + 4), px(270, FESS_POINT_PX + 4), px(30, 190)], expect: "gules", why: `${kind} over a per fess field: the 45:55 split stays` },
+      { shield: "per-fess", quarters: ["azure", "gules"], ...extra, at: where, expect: colour, why: `${kind} over a per fess field is placed on the shield` },
+      { shield: "quarterly", quarters, ...extra, at: [px(20, FESS_POINT_PX - 4), px(30, FESS_POINT_PX - 4)], expect: "azure", why: `${kind} over a quartered field: the first quarter stays` },
+      { shield: "quarterly", quarters, ...extra, at: [px(270, FESS_POINT_PX - 4), px(280, FESS_POINT_PX - 4)], expect: "gules", why: `${kind} over a quartered field: the second quarter stays` },
+      { shield: "quarterly", quarters, ...extra, at: [px(20, FESS_POINT_PX + 4), px(30, 190)], expect: "sable", why: `${kind} over a quartered field: the third quarter stays` },
+      { shield: "quarterly", quarters, ...extra, at: [px(270, FESS_POINT_PX + 4), px(280, 190)], expect: "argent", why: `${kind} over a quartered field: the fourth quarter stays` },
+      { shield: "quarterly", quarters, ...extra, at: where, expect: colour, why: `${kind} over a quartered field is placed on the shield` },
+    ];
+  }),
+  // A canton over all of a bordured quartered field still steps out over the bordure, and charges
+  // over all of one with a chief keep the chief's layout: the bezant is below it.
+  { shield: "quarterly bordure-or", quarters: ["azure", "gules", "vert", "or"], inner: { kind: "canton", shield: "vert" }, at: [3, 3], expect: "vert", why: "a canton over a bordured quartered field is over the bordure" },
+  { shield: "quarterly bordure-or chief-argent", quarters: ["azure", "gules", "vert", "or"], charges: "", items: bezants(1), at: ring(px(150, 212.9), 37.7), expect: "or", why: "charges over a quartered field with a bordure and a chief keep its layout" },
+  // The part's bordure is still on the part, with an inescutcheon after the parts.
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], inner: { shield: "vert" }, at: [px(3, 150), px(75, 10), px(135, 330)], expect: "or", why: "a bordure on the dexter part, with an inescutcheon after the parts" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], inner: { shield: "vert" }, at: [px(290, 150), px(225, 10), px(165, 330)], expect: "gules", why: "and not on the sinister part" },
+  { shield: "per-pale", quarters: ["gules", "azure bordure-or"], inner: { shield: "vert" }, at: [px(297, 150), px(225, 10), px(165, 330)], expect: "or", why: "a bordure on the sinister part, with an inescutcheon after the parts" },
+  { shield: "per-pale", quarters: ["gules", "azure bordure-or"], inner: { shield: "vert" }, at: [px(145, 235), px(60, 150), px(75, 10)], expect: "gules", why: "and not on the dexter part" },
+  { shield: "per-pale", quarters: ["gules", "azure bordure-or"], inner: { shield: "vert" }, at: [px(153, 60), px(153, 270)], expect: "azure", why: "a bordure on the sinister part has no border on the palar side, with an inescutcheon after the parts" },
+  { shield: "per-pale", quarters: ["azure bordure-or", "gules"], inner: { shield: "vert" }, at: [px(147, 60), px(147, 270)], expect: "azure", why: "a bordure on the dexter part has no border on the palar side, with an inescutcheon after the parts" },
   // Of the first is the shield's, on an inescutcheon too.
   { shield: "or", inner: { shield: "azure bordure-of-the-first" }, at: onInner([4.5, 45]), expect: "or", why: "an inescutcheon's bordure of the first is the shield's first" },
   { shield: "or", inner: { shield: "azure bordure-of-the-first" }, at: onInner([50, 45]), expect: "azure", why: "inside an inescutcheon's bordure of the first" },

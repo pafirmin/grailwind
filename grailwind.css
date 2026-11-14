@@ -190,7 +190,9 @@
  * Field divisions
  * ------------------------------------------------------------------------- */
 
-/* Per pale: split vertically into dexter | sinister. */
+/* Per pale: split vertically into dexter | sinister. A split field's parts are its children that
+ * aren't charges, an inescutcheon or a canton: those lie over all of it. The same selector is
+ * PART in ordinaries.js. */
 @utility per-pale {
   display: grid;
   grid-auto-flow: column;
@@ -198,7 +200,7 @@
 
   /* On a shield, each part is a coat of its own: what's in it is placed, stacked and
    * counterchanged within it. */
-  &:is(.heater, .heater *) > * {
+  &:is(.heater, .heater *) > :not(.charges, .inescutcheon, .canton) {
     position: relative;
     contain: layout;
     --layer-inset: 0px;
@@ -214,12 +216,16 @@
   /* On a shield, two parts split at the fess point, FESS_POINT in divisions.js.
    * More parts stay equal. */
   &:is(.heater, .heater *) {
-    &:has(> :last-child:nth-child(2)) {
+    &:has(
+      > :nth-child(2 of :not(.charges, .inescutcheon, .canton)):nth-last-child(
+          1 of :not(.charges, .inescutcheon, .canton)
+        )
+    ) {
       grid-template-rows: 45fr 55fr;
     }
 
     /* See per-pale. */
-    & > * {
+    & > :not(.charges, .inescutcheon, .canton) {
       position: relative;
       contain: layout;
       --layer-inset: 0px;
@@ -235,7 +241,7 @@
   grid-template-rows: 1fr 1fr;
 
   /* Each quarter is a coat of its own, so it starts its own count. */
-  & > * {
+  & > :not(.charges, .inescutcheon, .canton) {
     --the-first: var(--field-first);
     --outer-inset: 0px;
   }
@@ -245,7 +251,7 @@
     grid-template-rows: 45fr 55fr;
 
     /* See per-pale. */
-    & > * {
+    & > :not(.charges, .inescutcheon, .canton) {
       position: relative;
       contain: layout;
       --layer-inset: 0px;
@@ -275,21 +281,30 @@
     content: "";
     background-color: --value(--color-*);
   }
-  :is(.heater, .inescutcheon) > .per-pale > &:first-child {
+  :is(.heater, .inescutcheon)
+    > .per-pale
+    > &:nth-child(1 of :not(.charges, .inescutcheon, .canton)) {
     border-color: transparent;
     border-right-width: 0;
     --bordure-inset-sinister: 0px;
   }
-  :is(.heater, .inescutcheon):has(> .per-pale > &:first-child)::after {
+  :is(.heater, .inescutcheon):has(
+      > .per-pale > &:nth-child(1 of :not(.charges, .inescutcheon, .canton))
+    )::after {
     content: "";
     --ring-dexter: --value(--color-*);
   }
-  :is(.heater, .inescutcheon) > .per-pale > &:last-child {
+  :is(.heater, .inescutcheon)
+    > .per-pale
+    > &:nth-last-child(1 of :not(.charges, .inescutcheon, .canton)) {
     border-color: transparent;
     border-left-width: 0;
     --bordure-inset-dexter: 0px;
   }
-  :is(.heater, .inescutcheon):has(> .per-pale > &:last-child)::after {
+  :is(.heater, .inescutcheon):has(
+      > .per-pale
+        > &:nth-last-child(1 of :not(.charges, .inescutcheon, .canton))
+    )::after {
     content: "";
     --ring-sinister: --value(--color-*);
   }
@@ -307,21 +322,30 @@
     content: "";
     background-color: var(--frame-first, transparent);
   }
-  :is(.heater, .inescutcheon) > .per-pale > &:first-child {
+  :is(.heater, .inescutcheon)
+    > .per-pale
+    > &:nth-child(1 of :not(.charges, .inescutcheon, .canton)) {
     border-color: transparent;
     border-right-width: 0;
     --bordure-inset-sinister: 0px;
   }
-  :is(.heater, .inescutcheon):has(> .per-pale > &:first-child)::after {
+  :is(.heater, .inescutcheon):has(
+      > .per-pale > &:nth-child(1 of :not(.charges, .inescutcheon, .canton))
+    )::after {
     content: "";
     --ring-dexter: var(--frame-first, transparent);
   }
-  :is(.heater, .inescutcheon) > .per-pale > &:last-child {
+  :is(.heater, .inescutcheon)
+    > .per-pale
+    > &:nth-last-child(1 of :not(.charges, .inescutcheon, .canton)) {
     border-color: transparent;
     border-left-width: 0;
     --bordure-inset-dexter: 0px;
   }
-  :is(.heater, .inescutcheon):has(> .per-pale > &:last-child)::after {
+  :is(.heater, .inescutcheon):has(
+      > .per-pale
+        > &:nth-last-child(1 of :not(.charges, .inescutcheon, .canton))
+    )::after {
     content: "";
     --ring-sinister: var(--frame-first, transparent);
   }

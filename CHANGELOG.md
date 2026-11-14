@@ -40,6 +40,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   it. The new `field-in-shield` rule flags a blazon on the frame, and
   `escutcheon`.
 
+### Fixed
+
+- A canton, inescutcheon or `charges` over all of a divided field with parts no longer takes a
+  part's place.
+
 ## [0.8.1] - 2026-11-13
 
 ### Fixed

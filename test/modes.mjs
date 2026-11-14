@@ -72,6 +72,7 @@ const CLASSES = [
 // The bordure's width and depth as the CSS writes them: an eighth is `calc(100cqw / 8)`.
 const FRAME_BORDER = String.raw`calc\(100cqw \/ ${+(1 / BORDURE_WIDTH).toFixed(3)}\)`;
 const CANTON_BORDER = String.raw`calc\(100cqw \/ ${+(3 / BORDURE_WIDTH).toFixed(3)}\)`;
+const PART = String.raw`:not\(\.charges, \.inescutcheon, \.canton\)`;
 const NARROWED = String.raw`0\.${String(+(1 - BORDURE_DEPTH).toFixed(3)).slice(2)}`;
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -111,8 +112,9 @@ const PATTERNS = {
     /\.quarterly \{\s*display: grid;[^}]*grid-template-rows: 1fr 1fr;/,
   "grid quarterly splits at the fess point on a shield":
     /\.quarterly \{[^]*?&:is\(\.heater, \.heater \*\) \{\s*grid-template-rows: 45fr 55fr;/,
-  "grid per-fess splits at the fess point on a shield, in two parts only":
-    /\.per-fess \{[^]*?&:is\(\.heater, \.heater \*\) \{\s*&:has\(> :last-child:nth-child\(2\)\) \{\s*grid-template-rows: 45fr 55fr;/,
+  "grid per-fess splits at the fess point on a shield, in two parts only": new RegExp(
+    String.raw`\.per-fess \{[^]*?&:is\(\.heater, \.heater \*\) \{\s*&:has\(\s*> :nth-child\(2 of ${PART}\):nth-last-child\(\s*1 of ${PART}\s*\)\s*\) \{\s*grid-template-rows: 45fr 55fr;`,
+  ),
   "counterchange vars don't inherit":
     /@property --counterchange-image \{\s*syntax: "\*";\s*inherits: false;/,
   "a counterchanged ordinary pulls them from its shield":
@@ -135,10 +137,12 @@ const PATTERNS = {
   "a charge elsewhere doesn't": /^(?![^]*\.charges:has\( > \.in-base-point\))/,
   "a canton doesn't inherit its shield's layout":
     /\.inescutcheon, \.inescutcheon > \*, \.canton[,\s][^{]*\{[^}]*--field-top: initial;/,
-  "a part of a divided shield doesn't inherit its shield's layout":
-    /:is\(\.quarterly, \.per-pale, \.per-fess\) > \* \{[^}]*--field-top: initial;/,
-  "a part is contained only on a shield, not in a page layout":
-    /\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > \* \{[^}]*contain: layout;/,
+  "a part of a divided shield doesn't inherit its shield's layout": new RegExp(
+    String.raw`:is\(\.quarterly, \.per-pale, \.per-fess\) > ${PART} \{[^}]*--field-top: initial;`,
+  ),
+  "a part is contained only on a shield, not in a page layout": new RegExp(
+    String.raw`\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > ${PART} \{[^}]*contain: layout;`,
+  ),
   "in-bend-sinister runs from sinister chief":
     /\.in-bend-sinister:has\( > :nth-child\(3\):last-child\) > :nth-child\(1\) \{\s*left: 78%;\s*top: 16%;/,
   "in-chief takes the chief's points":
@@ -171,15 +175,20 @@ const PATTERNS = {
   "a lined fur bordure is clipped like the tincture ones":
     /\.bordure-engrailed-ermine \{[^]*?:has\( ?> &\)::after \{[^}]*background-image: url[^}]*clip-path: polygon\(evenodd, [^;]*\);\s*clip-path: shape\(nonzero from 0 0,/,
   "a bordure on a per-pale part sets its ring's half, and has no border on the palar side":
-    /\.bordure-or \{[^]*?\.per-pale > &:first-child \{\s*border-color: transparent;\s*border-right-width: 0;\s*--bordure-inset-sinister: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:first-child\)::after \{\s*content: "";\s*--ring-dexter: var\(--color-or\);/,
-  "a fur bordure on a part sets its ring's half to the ground":
-    /\.bordure-ermine \{[^]*?\.per-pale > &:first-child \{\s*border-color: transparent;\s*border-right-width: 0;\s*--bordure-inset-sinister: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:first-child\)::after \{\s*content: "";\s*--ring-dexter: var\(--color-argent\);/,
-  "a lined bordure on a part is plain: its ring's half, and no clip":
-    /\.bordure-engrailed-or \{[^]*?\.per-pale > &:last-child \{\s*border-color: transparent;\s*border-left-width: 0;\s*--bordure-inset-dexter: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:last-child\)::after \{\s*content: "";\s*--ring-sinister: var\(--color-or\);\s*\}/,
+    new RegExp(
+      String.raw`\.bordure-or \{[^]*?\.per-pale > &:nth-child\(1 of ${PART}\) \{\s*border-color: transparent;\s*border-right-width: 0;\s*--bordure-inset-sinister: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:nth-child\(1 of ${PART}\s*\)\s*\)::after \{\s*content: "";\s*--ring-dexter: var\(--color-or\);`,
+    ),
+  "a fur bordure on a part sets its ring's half to the ground": new RegExp(
+    String.raw`\.bordure-ermine \{[^]*?\.per-pale > &:nth-child\(1 of ${PART}\) \{\s*border-color: transparent;\s*border-right-width: 0;\s*--bordure-inset-sinister: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:nth-child\(1 of ${PART}\s*\)\s*\)::after \{\s*content: "";\s*--ring-dexter: var\(--color-argent\);`,
+  ),
+  "a lined bordure on a part is plain: its ring's half, and no clip": new RegExp(
+    String.raw`\.bordure-engrailed-or \{[^]*?\.per-pale > &:nth-last-child\(1 of ${PART}\) \{\s*border-color: transparent;\s*border-left-width: 0;\s*--bordure-inset-dexter: 0px;\s*\}[^]*?:has\( ?> \.per-pale > &:nth-last-child\(1 of ${PART}\s*\)\s*\)::after \{\s*content: "";\s*--ring-sinister: var\(--color-or\);\s*\}`,
+  ),
   "a chief steps out by each side's own inset, so it stops at a part's palar line":
     /\.chief-or \{[^]*?inset: calc\(-1 \* var\(--bordure-inset\)\) calc\(-1 \* var\(--bordure-inset-sinister, var\(--bordure-inset\)\)\) 0 calc\(-1 \* var\(--bordure-inset-dexter, var\(--bordure-inset\)\)\);/,
-  "and the sinister part, mirrored":
-    /\.bordure-or \{[^]*?\.per-pale > &:last-child \{\s*border-color: transparent;\s*border-left-width: 0;\s*--bordure-inset-dexter: 0px;\s*\}[^]*?--ring-sinister: var\(--color-or\);/,
+  "and the sinister part, mirrored": new RegExp(
+    String.raw`\.bordure-or \{[^]*?\.per-pale > &:nth-last-child\(1 of ${PART}\) \{\s*border-color: transparent;\s*border-left-width: 0;\s*--bordure-inset-dexter: 0px;\s*\}[^]*?--ring-sinister: var\(--color-or\);`,
+  ),
   "a bordure is a border, so what's inside it lays out within it":
     /\.bordure-or \{\s*border-style: solid;\s*border-width: var\(--bordure-width, 0\.75rem\);\s*border-color: var\(--color-or\);/,
   "on a frame's field the border is transparent":
@@ -212,8 +221,9 @@ const PATTERNS = {
     String.raw`\.canton \{[^}]*--bordure-width: ${CANTON_BORDER};`,
   ),
   "no .escutcheon selector is left": /^(?![^]*\.escutcheon\b)/,
-  "each quarter starts its own":
-    /\.quarterly \{[^}]*& > \* \{\s*--the-first: var\(--field-first\);/,
+  "each quarter starts its own": new RegExp(
+    String.raw`\.quarterly \{[^}]*& > ${PART} \{\s*--the-first: var\(--field-first\);`,
+  ),
   "a field's bordure width doesn't inherit":
     /@property --bordure-inset \{\s*syntax: "<length>";\s*inherits: false;\s*initial-value: 0px;/,
   "a bordure as a border publishes its width":
@@ -222,9 +232,12 @@ const PATTERNS = {
     /\.heater \{[^]*?& > \* \{[^}]*--outer-inset: var\(--bordure-inset\);/,
   "a counterchanged charge's layer steps in by the field's bordure":
     /\.heater \{[^]*?& > \* \{[^}]*--layer-inset: var\(--bordure-inset\);/,
-  "but not in a canton or a part of a divided shield, which hold their own layers":
-    /\.canton \{[^}]*--layer-inset: 0px;[^]*\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > \* \{[^}]*--layer-inset: 0px;|\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > \* \{[^}]*--layer-inset: 0px;[^]*\.canton \{[^}]*--layer-inset: 0px;/,
-  "a quarter has no bordure to surmount": /\.quarterly \{[^}]*& > \* \{[^}]*--outer-inset: 0px;/,
+  "but not in a canton or a part of a divided shield, which hold their own layers": new RegExp(
+    String.raw`\.canton \{[^}]*--layer-inset: 0px;[^]*\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > ${PART} \{[^}]*--layer-inset: 0px;|\.per-pale \{[^}]*&:is\(\.heater, \.heater \*\) > ${PART} \{[^}]*--layer-inset: 0px;[^]*\.canton \{[^}]*--layer-inset: 0px;`,
+  ),
+  "a quarter has no bordure to surmount": new RegExp(
+    String.raw`\.quarterly \{[^}]*& > ${PART} \{[^}]*--outer-inset: 0px;`,
+  ),
   "the chief pulls its own element's bordure width":
     /\.chief-or \{[^]*?&::after \{[^}]*--bordure-inset: inherit;[^}]*clip-path: polygon\(calc\(-1 \* var\(--bordure-inset-dexter, var\(--bordure-inset\)\)\)[^;]*\) content-box;/,
   "a field's first doesn't inherit":
