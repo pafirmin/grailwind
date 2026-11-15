@@ -11,6 +11,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The label, e.g. `label-azure`, and `label-of-five-points-azure`. Its own element in the field,
   drawn throughout over everything but a canton or inescutcheon, and on the chief if there is one.
   `charges on` inside it puts one charge on each point. The lint checks labels.
+- The cross bottony, `cross-bottony`: each arm ends in three round knobs.
 
 ### Changed
 

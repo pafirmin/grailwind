@@ -57,6 +57,11 @@ const SHAPES = {
     "M43 50V21C41 17 37 16 33 20C30 12 37 8 45 13C45 8 47 5 50 2C53 5 55 8 55 13C63 8 70 12 67 20C63 16 59 17 57 21V50Z",
     4,
   ),
+  // A crosslet with rounded ends: the tip and two stubby transepts, all the arm's width.
+  "cross-bottony": rotateX(
+    "M43 50V26H40A7 7 0 0 1 40 12H43V9A7 7 0 0 1 57 9V12H60A7 7 0 0 1 60 26H57V50Z",
+    4,
+  ),
   shakefork: `<polygon points="50,96 39,85 39,43 12.6,20.9 11.3,5.4 26.8,4 50,23.5 73.2,4 88.7,5.4 87.4,20.9 61,43 61,85"/>`,
 };
 

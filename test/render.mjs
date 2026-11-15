@@ -43,6 +43,7 @@ const CROSSES = [
   "cross-crosslet",
   "cross-moline",
   "cross-fleury",
+  "cross-bottony",
   "shakefork",
 ];
 // Box points inside the shape where the centre isn't: the Maltese arms meet at a point.
@@ -770,6 +771,9 @@ const PROBES = [
     { shield: "azure", charges: "", items: [`${name} or`], at: lone(SOLID[name] ?? [50, 50]), expect: "or", why: `${name}: drawn` },
     { shield: "azure", charges: "", items: [`${name} or`], at: lone([12, 88]), expect: "azure", why: `${name}: a corner of its box is empty` },
   ]),
+  // Crossland: quarterly argent and gules, a cross bottony counterchanged. Probes the side knobs.
+  { shield: "quarterly-argent-gules", charges: "", items: ["cross-bottony counterchanged"], at: [lone([40, 19]), lone([60, 81]), lone([88, 12])], expect: "gules", why: "Crossland: the cross gules on the argent quarters, and the gules field" },
+  { shield: "quarterly-argent-gules", charges: "", items: ["cross-bottony counterchanged"], at: [lone([60, 19]), lone([40, 81]), lone([12, 12])], expect: "argent", why: "Crossland: the cross argent on the gules quarters, and the argent field" },
   { shield: "azure fess-gules", charges: "between", items: Array(3).fill("cross-crosslet or"), at: [[30, 15], [70, 15], [50, 78]].flatMap((p) => ring(p, 20)), expect: "or", why: "three crosses crosslet between a fess" },
 
   // Semé: 25% tiles from −6.25%, so charges centre at 6.25 + 25i and, staggered, 18.75 + 25i. A

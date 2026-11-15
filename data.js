@@ -73,6 +73,7 @@ export const CHARGES = [
   "cross-crosslet",
   "cross-moline",
   "cross-fleury",
+  "cross-bottony",
   "shakefork",
 ];
 
