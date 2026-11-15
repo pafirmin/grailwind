@@ -30,6 +30,10 @@ run("field-in-shield", rule, {
       ],
     },
     {
+      code: `<div class="heater bordure-compony-or-sable"><div class="argent bordure-chequy-or-azure"></div></div>`,
+      errors: [onFrame("bordure-compony-or-sable")],
+    },
+    {
       code: `<div class="heater quarterly"><div class="or"></div><div class="gules"></div></div>`,
       errors: [onFrame("quarterly")],
     },

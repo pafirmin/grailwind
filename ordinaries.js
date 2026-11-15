@@ -6,6 +6,7 @@ import {
   BETWEEN,
   BETWEEN_LINED,
   BORDURE_LINES,
+  BORDURE_PATTERNS,
   CHARGES,
   CHEQUY,
   FRAMES,
@@ -354,6 +355,34 @@ const chequyClip = (ordinary) => {
   return `polygon(${band.map((vertex) => vertex.map(coordinate).join(" ")).join(", ")})`;
 };
 
+// Every pattern's pair of tinctures, first and second: two furs aren't generated.
+const PATTERN_PAIRS = [...TINCTURES, ...Object.keys(FURS)].flatMap((first, _, paints) =>
+  paints
+    .filter((second) => first !== second && !(FURS[first] && FURS[second]))
+    .map((second) => [first, second]),
+);
+
+/**
+ * A pattern's two paints. A fur's is transparent, to show the fur's layers under it.
+ * @param {string} first The first tincture or fur.
+ * @param {string} second The second; at most one of the two is a fur.
+ * @returns {{a: string, b: string, fur: string|undefined}} The first's and second's paints, and
+ *   the fur if there is one.
+ */
+const patternPaints = (first, second) => {
+  const fur = [first, second].find((t) => FURS[t]);
+  const paint = (t) => (t === fur ? "transparent" : `var(--color-${t})`);
+  return { a: paint(first), b: paint(second), fur };
+};
+
+/**
+ * One 2 × 2-check tile of a chequer, its top-left check `a`.
+ * @param {string} a The top-left and bottom-right checks' paint.
+ * @param {string} b The other two's.
+ * @returns {string} A conic-gradient.
+ */
+const chequer = (a, b) => `conic-gradient(${b} 0 25%, ${a} 0 50%, ${b} 0 75%, ${a} 0)`;
+
 /**
  * A chequy ordinary's background layers. With a fur, its checks are transparent over the fur.
  * @param {string} ordinary One of CHEQUY.
@@ -363,14 +392,8 @@ const chequyClip = (ordinary) => {
  * @returns {{image: string, size: string, position: string, repeat: string}[]} The layers, top first.
  */
 const chequyLayers = (ordinary, first, second, theme) => {
-  const fur = [first, second].find((t) => FURS[t]);
-  const paint = (t) => (t === fur ? "transparent" : `var(--color-${t})`);
-  const [a, b] = [paint(first), paint(second)];
-  const grid = {
-    image: `conic-gradient(${b} 0 25%, ${a} 0 50%, ${b} 0 75%, ${a} 0)`,
-    ...chequyTile(ordinary),
-    repeat: "repeat",
-  };
+  const { a, b, fur } = patternPaints(first, second);
+  const grid = { image: chequer(a, b), ...chequyTile(ordinary), repeat: "repeat" };
   return fur ? [grid, ...furLayers(fur, theme)] : [grid];
 };
 
@@ -847,6 +870,34 @@ const RUN_SAMPLES = 256;
 const unit = ([x, y]) => [x / Math.hypot(x, y), y / Math.hypot(x, y)];
 
 /**
+ * @param {number[][]} polyline Points, in real units.
+ * @returns {number[]} How far along it each point is.
+ */
+const lengthsAlong = (polyline) => {
+  const lengths = [0];
+  for (let i = 1; i < polyline.length; i++) {
+    const [from, to] = [polyline[i - 1], polyline[i]];
+    lengths.push(lengths[i - 1] + Math.hypot(to[0] - from[0], to[1] - from[1]));
+  }
+  return lengths;
+};
+
+/**
+ * @param {number[][]} polyline Points, in real units.
+ * @param {number[]} lengths lengthsAlong(polyline).
+ * @param {number} distance How far along it.
+ * @returns {number[]} The point that far along.
+ */
+const pointAt = (polyline, lengths, distance) => {
+  const i = Math.max(
+    1,
+    lengths.findIndex((length) => length >= distance),
+  );
+  const fraction = (distance - lengths[i - 1]) / (lengths[i] - lengths[i - 1]);
+  return polyline[i - 1].map((v, axis) => v + (polyline[i][axis] - v) * fraction);
+};
+
+/**
  * Points evenly spaced along a polyline, one scallop apart.
  * @param {number[][]} polyline Points of a drawing, in real units.
  * @param {number} start How far along it to start.
@@ -854,25 +905,15 @@ const unit = ([x, y]) => [x / Math.hypot(x, y), y / Math.hypot(x, y)];
  * @returns {number[][]} The chords' ends, from `start` to `end`.
  */
 const chordEnds = (polyline, start, end) => {
-  const lengths = [0];
-  for (let i = 1; i < polyline.length; i++) {
-    const [from, to] = [polyline[i - 1], polyline[i]];
-    lengths.push(lengths[i - 1] + Math.hypot(to[0] - from[0], to[1] - from[1]));
-  }
+  const lengths = lengthsAlong(polyline);
   const last = end ?? lengths.at(-1);
   const count = Math.max(
     1,
     Math.round(((last - start) * (1 - 2 * BORDURE_WIDTH)) / BORDURE_SCALLOP),
   );
-  return Array.from({ length: count + 1 }, (_, part) => {
-    const distance = start + ((last - start) * part) / count;
-    const i = Math.max(
-      1,
-      lengths.findIndex((length) => length >= distance),
-    );
-    const fraction = (distance - lengths[i - 1]) / (lengths[i] - lengths[i - 1]);
-    return polyline[i - 1].map((v, axis) => v + (polyline[i][axis] - v) * fraction);
-  });
+  return Array.from({ length: count + 1 }, (_, part) =>
+    pointAt(polyline, lengths, start + ((last - start) * part) / count),
+  );
 };
 
 /**
@@ -977,6 +1018,125 @@ const frameOutline = (segments) => {
       ];
     },
   };
+};
+
+// A bordure compony's panes along the ring's midline: across the top, down each side, and round
+// the base. The top's and base's are odd, so a pane is on the pale and the panes mirror about it.
+// By eye.
+const COMPONY_PANES = { top: 5, side: 4, base: 9 };
+
+/**
+ * The points between `from` and `to` that cut it into equal parts.
+ * @param {number} from The start.
+ * @param {number} to The end.
+ * @param {number} count How many parts.
+ * @returns {number[]} The `count - 1` cuts, from `from`.
+ */
+const evenly = (from, to, count) =>
+  Array.from({ length: count - 1 }, (_, i) => from + ((i + 1) * (to - from)) / count);
+
+/**
+ * A bordure compony on a frame's ring, as FD 223: straight panes along the top and sides, radial
+ * panes round the base from a centre on the pale, and a long pane each side of a top corner,
+ * mitred from the outer corner to the inner. Pane edges are at equal lengths along the ring's
+ * midline, the outline mapped into a box inset by half the bordure, as the ring's inner edge is by
+ * all of it. Panes alternate clockwise from the top's first, which is the first tincture.
+ * @param {Array[]} segments A heater's drawing, as in paths.js: down a straight side, then a curve
+ *   to the point and its mirror back.
+ * @returns {(a: string, b: string) => {image: string, size: string, position: string, repeat: string}[]}
+ *   The background layers for two paints, top first: the corners, the top, the sides, the base.
+ *   A `transparent` paint (a fur's) also clears the top and sides under the corners.
+ * @throws {Error} If COMPONY_PANES.top or .base is even.
+ */
+const componyRing = (segments) => {
+  if (COMPONY_PANES.top % 2 === 0 || COMPONY_PANES.base % 2 === 0) {
+    throw new Error(
+      `COMPONY_PANES.top and .base must be odd, not ${JSON.stringify(COMPONY_PANES)}`,
+    );
+  }
+  const width = BORDURE_WIDTH * W;
+  const inset = width / 2;
+  const midline = ([x, y]) => [
+    inset + (x * (W - 2 * inset)) / W,
+    inset + (y * (H - 2 * inset)) / H,
+  ];
+  const curve = segments.findIndex(([command]) => command === "C");
+  const [, sideX, sideEnd] = segments[curve - 1];
+  const topEdges = evenly(inset, W - inset, COMPONY_PANES.top).map((x) => pct((x * 100) / W));
+  const sideEdges = evenly(inset, sideEnd, COMPONY_PANES.side).map((y) => pct((y * 100) / sideEnd));
+  // The base's pane edges meet on the pale, level with the sides' end. Its angles are clockwise
+  // from up, from the sinister side's end round to the dexter's.
+  const centre = [W / 2, sideEnd];
+  const angle = ([x, y]) => 180 - (Math.atan2(x - centre[0], y - centre[1]) * 180) / Math.PI;
+  const base = outlinePoints([["M", sideX, sideEnd], ...segments.slice(curve, curve + 2)]).map(
+    midline,
+  );
+  const lengths = lengthsAlong(base);
+  const baseEdges = evenly(0, lengths.at(-1), COMPONY_PANES.base).map(
+    (distance) => `${num(angle(pointAt(base, lengths, distance)))}deg`,
+  );
+  const strip = (width * 100) / H;
+  const below = ((H - sideEnd) * 100) / H;
+
+  return (a, b) => {
+    const panes = (from, count) =>
+      Array.from({ length: count }, (_, i) => ((from + i) % 2 ? b : a));
+    const top = panes(0, COMPONY_PANES.top);
+    const side = panes(COMPONY_PANES.top, COMPONY_PANES.side);
+    const stripes = (paints, edges) =>
+      paints.map((paint, i) => `${paint} 0${i < edges.length ? ` ${edges[i]}` : ""}`);
+    const layer = (image, size, position) => ({ image, size, position, repeat: "no-repeat" });
+    const corner = `${pct(width)} ${pct(strip)}`;
+    // With a fur, the top and sides are clear under the corner squares, so the corner's fur half
+    // shows the fur. They're clear to a pixel short of the square's inner edge, where a snapped or
+    // anti-aliased corner edge would otherwise show the fur through the pane beside it. Without a
+    // fur they run on under it, as layers cut there would move the panes' edges by a snapped pixel.
+    const clear = [a, b].includes("transparent");
+    const short = (edge) => `calc(${pct(edge)} - 1px)`;
+    const topStripes = clear
+      ? stripes(
+          ["transparent", ...top, "transparent"],
+          [short((width * 100) / W), ...topEdges, `calc(${pct(((W - width) * 100) / W)} + 1px)`],
+        )
+      : stripes(top, topEdges);
+    const sides = (
+      clear
+        ? stripes(["transparent", ...side], [short((width * 100) / sideEnd), ...sideEdges])
+        : stripes(side, sideEdges)
+    ).join(", ");
+    const sideSize = `${pct(width)} ${pct((sideEnd * 100) / H)}`;
+    const baseStripes = stripes(
+      panes(COMPONY_PANES.top + COMPONY_PANES.side, COMPONY_PANES.base),
+      baseEdges,
+    );
+    return [
+      layer(`linear-gradient(to top right, ${side[0]} 50%, ${top[0]} 50%)`, corner, "0 0"),
+      layer(`linear-gradient(to top left, ${side[0]} 50%, ${top.at(-1)} 50%)`, corner, "100% 0"),
+      layer(`linear-gradient(to right, ${topStripes.join(", ")})`, `100% ${pct(strip)}`, "0 0"),
+      layer(`linear-gradient(to bottom, ${sides})`, sideSize, "0 0"),
+      layer(`linear-gradient(to bottom, ${sides})`, sideSize, "100% 0"),
+      layer(`conic-gradient(at 50% 0, ${baseStripes.join(", ")})`, `100% ${pct(below)}`, "0 100%"),
+    ];
+  };
+};
+
+/**
+ * A bordure chequy on a frame's ring: a palar grid from the frame's top-left corner, three checks
+ * across the bordure, whatever its outline.
+ * @param {string} a The first tincture's paint, in the top-left check.
+ * @param {string} b The second's.
+ * @returns {{image: string, size: string, position: string, repeat: string}[]} One layer.
+ */
+const chequyRing = (a, b) => {
+  const check = (BORDURE_WIDTH * W) / 3;
+  return [
+    {
+      image: chequer(a, b),
+      size: `${pct((2 * check * 100) / W)} ${pct((2 * check * 100) / H)}`,
+      position: "0 0",
+      repeat: "repeat",
+    },
+  ];
 };
 
 // The same shape upside down, for an ordinary's reversed form.
@@ -1224,40 +1384,89 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       "background-color": tincture === OF_THE_FIRST ? "var(--frame-first, transparent)" : colour,
     },
   }));
+  /**
+   * A bordure's rules: a border round what's inside it, painted in `colour` off a frame. On a
+   * frame's field the border is transparent and the frame's ring is painted by `ring`.
+   * @param {string} colour The border's colour off a frame.
+   * @param {string} half The ring's half for a bordure on a per-pale part.
+   * @param {Object<string, string>} ring Background declarations for the frame's ring.
+   * @param {string[]|false|""} clip A lined ring's clip-paths, or nothing for the plain ring.
+   * @param {boolean} engrailed Whether the field's border narrows into the ring's bites.
+   * @returns {object} The utility's rules.
+   */
+  const bordureRules = (colour, half, ring, clip, engrailed) => {
+    const part = {};
+    for (const [child, [side, open, inset]] of Object.entries(PARTS)) {
+      part[`${FRAME} > .per-pale > &:${child}`] = {
+        "border-color": "transparent",
+        [open]: "0",
+        [inset]: "0px",
+      };
+      part[`${FRAME}:has(> .per-pale > &:${child})::after`] = {
+        content: '""',
+        [`--ring-${side}`]: half,
+      };
+    }
+    return {
+      "border-style": "solid",
+      "border-width": BORDER,
+      "border-color": colour,
+      "--bordure-inset": BORDER,
+      ":is(.heater, .inescutcheon) > &": {
+        "border-color": "transparent",
+        ...(engrailed && { "border-width": narrowed, "--bordure-inset": narrowed }),
+      },
+      ":is(.heater, .inescutcheon):has(> &)::after": {
+        content: '""',
+        ...ring,
+        ...(clip && { "clip-path": clip }),
+      },
+      ...part,
+    };
+  };
   for (const line of ["", ...BORDURE_LINES]) {
     const sweep = line === "engrailed" ? 1 : -1;
     const clip = line && heater.lined("var(--bordure-width)", sweep);
     // Plain tinctures are in grailwind.css.
     for (const { name, colour, ring } of line ? [...tinctures, ...furPaints] : furPaints) {
-      const ringColour = ring["background-color"];
-      const part = {};
-      for (const [child, [side, open, inset]] of Object.entries(PARTS)) {
-        part[`${FRAME} > .per-pale > &:${child}`] = {
-          "border-color": "transparent",
-          [open]: "0",
-          [inset]: "0px",
-        };
-        part[`${FRAME}:has(> .per-pale > &:${child})::after`] = {
-          content: '""',
-          [`--ring-${side}`]: ringColour,
-        };
+      utilities[line ? `.bordure-${line}-${name}` : `.bordure-${name}`] = bordureRules(
+        colour,
+        ring["background-color"],
+        ring,
+        clip,
+        sweep === 1,
+      );
+    }
+  }
+
+  // Patterned only on a frame's ring. Elsewhere, as on a canton or a part, it's plain in its first
+  // tincture, a fur's ground.
+  const ringPatterns = { compony: componyRing(PATHS.heater), chequy: chequyRing };
+  for (const pattern of BORDURE_PATTERNS) {
+    for (const [first, second] of PATTERN_PAIRS) {
+      const { a, b, fur } = patternPaints(first, second);
+      const layers = ringPatterns[pattern](a, b);
+      const furRing = fur && ringBackground(fur, theme);
+      if (furRing) {
+        layers.push({
+          image: furRing["background-image"],
+          size: furRing["background-size"],
+          position: furRing["background-position"],
+          repeat: furRing["background-repeat"],
+        });
       }
-      utilities[line ? `.bordure-${line}-${name}` : `.bordure-${name}`] = {
-        "border-style": "solid",
-        "border-width": BORDER,
-        "border-color": colour,
-        "--bordure-inset": BORDER,
-        ":is(.heater, .inescutcheon) > &": {
-          "border-color": "transparent",
-          ...(sweep === 1 && { "border-width": narrowed, "--bordure-inset": narrowed }),
-        },
-        ":is(.heater, .inescutcheon):has(> &)::after": {
-          content: '""',
-          ...ring,
-          ...(clip && { "clip-path": clip }),
-        },
-        ...part,
+      const colour = `var(--color-${FURS[first]?.[0] ?? first})`;
+      const ring = {
+        ...(furRing && { "background-color": furRing["background-color"] }),
+        ...joinLayers(layers, "background"),
       };
+      utilities[`.bordure-${pattern}-${first}-${second}`] = bordureRules(
+        colour,
+        colour,
+        ring,
+        false,
+        false,
+      );
     }
   }
 
@@ -1405,18 +1614,12 @@ export default plugin(({ addBase, addUtilities, theme }) => {
 
     // Without the fimbriation vars, as for a fur. Two furs aren't generated.
     if (CHEQUY.includes(ordinary)) {
-      const paints = [...TINCTURES, ...Object.keys(FURS)];
-      for (const first of paints) {
-        for (const second of paints) {
-          if (first === second || (FURS[first] && FURS[second])) {
-            continue;
-          }
-          utilities[`.${ordinary}-chequy-${first}-${second}`] = ordinaryRules(ordinary, {
-            ...placed,
-            ...joinLayers(chequyLayers(ordinary, first, second, theme), "background"),
-            "clip-path": chequyClip(ordinary),
-          });
-        }
+      for (const [first, second] of PATTERN_PAIRS) {
+        utilities[`.${ordinary}-chequy-${first}-${second}`] = ordinaryRules(ordinary, {
+          ...placed,
+          ...joinLayers(chequyLayers(ordinary, first, second, theme), "background"),
+          "clip-path": chequyClip(ordinary),
+        });
       }
     }
 

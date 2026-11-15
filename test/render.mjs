@@ -212,6 +212,47 @@ const HEATER_BASE = (() => {
   }
   return points;
 })();
+/**
+ * 073 (bordure): a point on a bordure's midline round the base, halfway across the ring: the
+ * heater's base curve mapped into a box inset by half the bordure, sampled from HEATER_BASE.
+ * @param {number} along How far from the sinister side's end to the point, as a fraction.
+ * @param {number} [side] 1 for the sinister half, -1 for the dexter.
+ * @returns {number[]} The point, as [x%, y%] of the frame.
+ */
+const ringBase = (along, side = 1) => {
+  const inset = RING / 2;
+  const half = HEATER_BASE.slice(0, 201).map(([x, y]) => [
+    inset + (x * (100 - 2 * inset)) / 100,
+    inset + (y * 1.2 * (120 - 2 * inset)) / 120,
+  ]);
+  const lengths = [0];
+  for (let i = 1; i < half.length; i++) {
+    lengths.push(
+      lengths[i - 1] + Math.hypot(half[i][0] - half[i - 1][0], half[i][1] - half[i - 1][1]),
+    );
+  }
+  const i = Math.max(
+    1,
+    lengths.findIndex((length) => length >= along * lengths.at(-1)),
+  );
+  const [x, y] = half[i];
+  return [50 + side * (x - 50), y / 1.2];
+};
+/**
+ * 073 (bordure): a point on a frame in real units, as %.
+ * @param {number} x Across, of 100.
+ * @param {number} y Down, of 120.
+ * @returns {number[]} The point, as [x%, y%] of the frame.
+ */
+const units = (x, y) => [x, y / 1.2];
+/**
+ * The centre of a bordure chequy's check, a third of the bordure, from the frame's top-left.
+ * @param {number} column The check's column from the dexter edge, from 0.
+ * @param {number} row The check's row from the top, from 0.
+ * @returns {number[]} Its centre, as [x%, y%] of the frame.
+ */
+const ringCheck = (column, row) => units((RING / 3) * (column + 0.5), (RING / 3) * (row + 0.5));
+
 // How far down the heater's edge is at x, in %.
 const baseAt = (x) =>
   HEATER_BASE.reduce((best, p) => (Math.abs(p[0] - x) < Math.abs(best[0] - x) ? p : best))[1];
@@ -1295,6 +1336,34 @@ const PROBES = [
   { shield: "azure bordure-ermine", inner: { kind: "canton", shield: "or" }, at: px(4, 4), expect: "or", why: "a canton over a bordure ermine" },
   { shield: "azure bordure-ermine chief-or", at: [px(4, 4), px(150, 4)], expect: "or", why: "a chief over a bordure ermine" },
   { shield: "azure", inner: { kind: "canton", shield: "vert bordure-ermine" }, at: px(4, 60), expect: "argent", why: "a canton's bordure ermine is its ground" },
+  // 073 (bordure): a bordure compony's panes are equal lengths along the ring's midline, 6.25 units
+  // in: 5 across the top (17.5 units each), 4 down each side to 66 (14.94 each), and 4½ round each
+  // half of the base. Each probe is mid-pane; the mitres 4 units off each top corner's diagonal.
+  { shield: "ermine bordure-compony-or-sable", at: [units(50, IN_RING), units(18, IN_RING), units(82, IN_RING), units(8, 4), units(92, 4), units(IN_RING, 28.7), units(100 - IN_RING, 28.7), units(IN_RING, 58.5), units(100 - IN_RING, 58.5), ringBase(1.5 / 4.5), ringBase(3.5 / 4.5), ringBase(1.5 / 4.5, -1), ringBase(3.5 / 4.5, -1)], expect: "or", why: "Rendell: or in the top's middle and end panes, above each mitre, in the sides' second and fourth panes, and the base's second and fourth" },
+  { shield: "ermine bordure-compony-or-sable", at: [units(32.5, IN_RING), units(67.5, IN_RING), units(4, 8), units(96, 8), units(IN_RING, 17), units(100 - IN_RING, 17), units(IN_RING, 43.6), units(100 - IN_RING, 43.6), ringBase(0.5 / 4.5), ringBase(2.5 / 4.5), ringBase(0.5 / 4.5, -1), ringBase(2.5 / 4.5, -1), ringBase(1)], expect: "sable", why: "Rendell: sable between, below each mitre, in the sides' first and third panes, the base's first and third, and the pane over the point" },
+  { shield: "ermine bordure-compony-or-sable", at: units(50, 20), expect: "argent", why: "Rendell: the field inside a bordure compony" },
+  { shield: "gules bordure-compony-ermine-azure", at: [units(32.5, IN_RING), units(IN_RING, 17), units(100 - IN_RING, 43.6), ringBase(1)], expect: "azure", why: "Beaufort: the azure panes of a bordure compony ermine and azure" },
+  { shield: "gules bordure-compony-ermine-azure", at: [units(50, IN_RING), units(IN_RING, 33)], expect: "argent", why: "Beaufort: the ermine panes' ground, between spots" },
+  { shield: "gules bordure-compony-ermine-azure", at: px(BORDER / 2, SPOT_TAIL + 1.68 * BORDER), expect: "sable", why: "Beaufort: a spot in an ermine pane, on the ring's own fur" },
+  // Each side of the top corners' mitres, on the ermine's ground between its spots: the fur's half
+  // shows the fur, not the top or side pane under the corner.
+  { shield: "gules bordure-compony-ermine-azure", at: [units(10, 2), units(90, 2)], expect: "argent", why: "Beaufort: the ermine half of each top corner" },
+  { shield: "gules bordure-compony-ermine-azure", at: [units(2, 10), units(98, 10)], expect: "azure", why: "Beaufort: the azure half of each top corner" },
+  { shield: "gules bordure-compony-or-ermine", at: [units(10, 2), units(90, 2)], expect: "or", why: "a bordure compony or and ermine: the or half of each top corner" },
+  { shield: "gules bordure-compony-or-ermine", at: [units(2, 10), units(98, 10)], expect: "argent", why: "a bordure compony or and ermine: the ermine half of each top corner" },
+  { shield: "azure", inner: { shield: "gules bordure-compony-or-sable" }, at: [onInner(units(50, IN_RING)), onInner(units(IN_RING, 28.7)), onInner(ringBase(1.5 / 4.5))], expect: "or", why: "an inescutcheon's bordure compony: or panes" },
+  { shield: "azure", inner: { shield: "gules bordure-compony-or-sable" }, at: [onInner(units(32.5, IN_RING)), onInner(units(IN_RING, 17)), onInner(ringBase(1))], expect: "sable", why: "an inescutcheon's bordure compony: sable panes" },
+  // A bordure chequy is a palar grid from the top-left corner, three checks across the bordure.
+  { shield: "vert bordure-chequy-or-gules", at: [ringCheck(0, 0), ringCheck(2, 0), ringCheck(1, 1), ringCheck(0, 2), ringCheck(12, 0), ringCheck(12, 2)], expect: "or", why: "a bordure chequy: or in the top-left check, and alternately, three deep" },
+  { shield: "vert bordure-chequy-or-gules", at: [ringCheck(1, 0), ringCheck(0, 1), ringCheck(12, 1)], expect: "gules", why: "a bordure chequy: gules between the or checks" },
+  { shield: "vert bordure-chequy-or-gules", at: ringCheck(12, 3), expect: "vert", why: "a bordure chequy is three checks deep" },
+  { shield: "azure", inner: { shield: "vert bordure-chequy-or-gules" }, at: [onInner(ringCheck(0, 0)), onInner(ringCheck(2, 0)), onInner(ringCheck(1, 1))], expect: "or", why: "an inescutcheon's bordure chequy: or checks" },
+  { shield: "azure", inner: { shield: "vert bordure-chequy-or-gules" }, at: [onInner(ringCheck(1, 0)), onInner(ringCheck(0, 1))], expect: "gules", why: "an inescutcheon's bordure chequy: gules checks" },
+  // Off a frame, and on a part, a patterned bordure is plain in its first tincture.
+  { shield: "azure", inner: { kind: "canton", shield: "vert bordure-compony-or-sable" }, at: [px(4, 20), px(4, 60), px(50, 4), px(96, 60), px(50, 116)], expect: "or", why: "a canton's bordure compony is plain" },
+  { shield: "azure", inner: { kind: "canton", shield: "vert bordure-chequy-gules-or" }, at: [px(2, 2), px(6, 2), px(2, 6), px(50, 4)], expect: "gules", why: "a canton's bordure chequy is plain" },
+  { shield: "azure", inner: { kind: "canton", shield: "vert bordure-compony-ermine-azure" }, at: [px(4, 60), px(50, 4)], expect: "argent", why: "a canton's bordure compony ermine is its ground" },
+  { shield: "per-pale", quarters: ["azure bordure-compony-or-sable", "gules"], at: [px(3, 150), px(BORDER / 2, 52), px(75, 10), px(98, 10), px(135, 330)], expect: "or", why: "a bordure compony on a part is plain" },
   // Invected arcs overlap where two meet at a cusp, so the inner path crosses itself. Nonzero fills
   // the overlap, as ring; evenodd leaves a hole of the field there. At each top corner the overlap
   // is a blob about 9px across, holding the point 0.3 d in from the corner each way. At the base
@@ -1666,7 +1735,9 @@ const NESTED = SHIELDS.filter((s) => s.inner);
 // The LARGE shield would cover its neighbours on a contact sheet.
 const PLAIN = SHIELDS.filter((s) => !s.items && !s.inner && !s.shield.includes(`w-[${LARGE}px]`));
 // The patterned ordinaries (073), large enough to check by eye.
-const PATTERNED = SHIELDS.filter((s) => /\b(fess|pale)-chequy-/.test(s.shield));
+const PATTERNED = SHIELDS.filter((s) =>
+  /\b((fess|pale)-chequy|bordure-(compony|chequy))-/.test(key(s)),
+);
 const TINCTURE_MATCH_THRESHOLD = 12;
 
 const isWithinThreshold = (threshold, gotRgb, wantRgb) => {

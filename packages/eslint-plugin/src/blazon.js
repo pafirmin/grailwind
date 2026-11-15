@@ -5,6 +5,7 @@ import { UNKNOWN } from "./tree.js";
 import {
   ARRANGEMENTS,
   BORDURE_LINES,
+  BORDURE_PATTERNS,
   CHARGES,
   CHEQUY,
   COLOURS,
@@ -76,15 +77,19 @@ for (const ordinary of VOIDABLE) {
 }
 // A two-tincture ordinary has no tincture of its own, so it may lie on any field, and the charges
 // on it aren't checked (Fox-Davies). Two furs and "of the first" aren't generated.
-for (const ordinary of CHEQUY) {
+const PATTERNED = [
+  ...CHEQUY.map((ordinary) => [ordinary, "chequy"]),
+  ...BORDURE_PATTERNS.map((pattern) => ["bordure", pattern]),
+];
+for (const [ordinary, pattern] of PATTERNED) {
   for (const a of TINCTURE) {
     for (const b of TINCTURE) {
       if (a !== b && !(FUR.has(a) && FUR.has(b))) {
-        ORDINARY_CLASSES.set(`${ordinary}-chequy-${a}-${b}`, {
+        ORDINARY_CLASSES.set(`${ordinary}-${pattern}-${a}-${b}`, {
           ordinary,
           tincture: null,
           tinctures: [a, b],
-          pattern: "chequy",
+          pattern,
         });
       }
     }

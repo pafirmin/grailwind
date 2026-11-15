@@ -75,6 +75,9 @@ run("rule-of-tincture", rule, {
     `<div class="heater"><div class="argent pale-chequy-or-ermine"></div></div>`,
     `<div class="heater"><div class="or fess-chequy-azure-argent"><div class="charges on"><i class="mullet or"></i></div></div></div>`,
     `<div class="heater"><div class="or fess-chequy-azure-argent fimbriated-or"></div></div>`,
+    `<div class="heater"><div class="or bordure-compony-or-sable"></div></div>`,
+    `<div class="heater"><div class="ermine bordure-compony-ermine-azure"></div></div>`,
+    `<div class="heater"><div class="argent bordure-chequy-or-argent"></div></div>`,
     // The vair family has no single ground, so it isn't checked by default.
     `<div class="heater"><div class="vair chief-or"></div></div>`,
     `<div class="heater"><div class="vair chief-gules"></div></div>`,

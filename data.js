@@ -110,6 +110,9 @@ export const VOIDABLE = [
 // Ordinaries that can be chequy of two tinctures, e.g. `fess-chequy-azure-argent`.
 export const CHEQUY = ["fess", "pale"];
 
+// The bordure's patterns of two tinctures, e.g. `bordure-compony-or-sable`.
+export const BORDURE_PATTERNS = ["compony", "chequy"];
+
 // The vair family: plain vair and potent are argent and azure, and the -y forms take a metal and a
 // colour, metal first as blazon writes them.
 const VAIRS = ["vair", "counter-vair", "potent", "counter-potent"];

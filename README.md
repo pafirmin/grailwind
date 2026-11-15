@@ -58,7 +58,8 @@ tinctures replace Tailwind's colours entirely.
   `ermines`, `erminois`, `pean`, `vair` and `potent` (with `vairy-or-gules` and the like), which
   work in divisions too, and `fur-<n>` sets their density.
 - **The shield:** `heater`, a pointed shield round its one child, the field, plus `bordure-*` (a
-  eighth of the shield wide, also `bordure-engrailed-*` and `bordure-invected-*`), `inescutcheon` (a
+  eighth of the shield wide, also `bordure-engrailed-*`, `bordure-invected-*` and
+  `bordure-compony-or-sable` (also chequy) in two tinctures), `inescutcheon` (a
   small shield at the centre) and `canton` (a ninth of the shield in dexter chief), each with its
   own field and charges.
 - **Divided fields:** `per-pale-or-gules`, `quarterly-azure-argent`,

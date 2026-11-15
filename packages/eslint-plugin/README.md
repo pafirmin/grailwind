@@ -59,8 +59,9 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
 - An ordinary, chief or bordure is checked against the field on the same element:
   `or fess-argent` is metal on metal. So are engrailed, invected, wavy, indented, embattled and voided ones
   (`fess-engrailed-argent`, `cross-voided-argent`).
-- A chequy ordinary (`fess-chequy-azure-argent`) is of two tinctures, so it may lie on any field,
-  and the charges on it aren't checked.
+- A chequy ordinary (`fess-chequy-azure-argent`) or a bordure compony or chequy
+  (`bordure-compony-or-sable`) is of two tinctures, so it may lie on any field, and the charges on
+  it aren't checked.
 - A fimbriated ordinary is checked against its fimbriation, and the fimbriation against the
   field: `or chevron-sable fimbriated-argent` is metal on metal (Argent on Or).
 - Charges in a `charges` container are checked against the field.
