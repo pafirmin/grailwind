@@ -107,6 +107,9 @@ export const VOIDABLE = [
   ...REVERSIBLE.map(reversed),
 ];
 
+// Ordinaries that can be chequy of two tinctures, e.g. `fess-chequy-azure-argent`.
+export const CHEQUY = ["fess", "pale"];
+
 // The vair family: plain vair and potent are argent and azure, and the -y forms take a metal and a
 // colour, metal first as blazon writes them.
 const VAIRS = ["vair", "counter-vair", "potent", "counter-potent"];

@@ -7,6 +7,7 @@ import {
   BETWEEN_LINED,
   BORDURE_LINES,
   CHARGES,
+  CHEQUY,
   FRAMES,
   FURS,
   LABELS,
@@ -20,7 +21,7 @@ import {
   VOIDABLE,
 } from "./data.js";
 import { FESS_POINT } from "./divisions.js";
-import { furBackground, ringBackground, vairBelow } from "./furs.js";
+import { furBackground, furLayers, joinLayers, ringBackground, vairBelow } from "./furs.js";
 import { PATHS } from "./paths.js";
 
 // prettier-ignore
@@ -308,6 +309,70 @@ const bands = (layers, colour) => ({
     .join(", "),
   "background-repeat": "no-repeat",
 });
+
+// Whole checks along each band, none cut at the shield's edge. The fess's odd count mirrors about
+// the pale, as in FD 668, its checks 7% narrower than square. The pale's are square.
+const CHEQUY_ALONG = { fess: 9, pale: 12 };
+
+/**
+ * Where a chequy ordinary's grid lies: one 2 × 2-check tile, repeated, three checks across the
+ * ordinary's band, with the tile's top-left check at the band's start.
+ * @param {string} ordinary One of CHEQUY, e.g. "fess".
+ * @returns {{size: string, position: string}} The tile's background-size and
+ *   background-position, as % of the ordinary's box (the field below any chief).
+ */
+const chequyTile = (ordinary) => {
+  const band = ORDINARIES[ordinary];
+  const max = Math.max(...band.map(([x, y]) => (ordinary === "fess" ? y : x)));
+  const min = Math.min(...band.map(([x, y]) => (ordinary === "fess" ? y : x)));
+  const width = max - min;
+  const tileSize = (width / 3) * 2;
+  const tileLength = (100 / CHEQUY_ALONG[ordinary]) * 2;
+  const tileWidth = ordinary === "fess" ? tileLength : tileSize;
+  const tileHeight = ordinary === "fess" ? tileSize : tileLength;
+  const posX = tilePosition(band[0][0], tileWidth);
+  const posY = tilePosition(band[0][1], tileHeight);
+
+  return {
+    size: `${pct(tileWidth)} ${pct(tileHeight)}`,
+    position: `${posX} ${posY}`,
+  };
+};
+
+/**
+ * A chequy ordinary's clip, its far edge 1px in. The band's far edge is mid-tile, and Chromium
+ * snaps a repeated tile to whole pixels, which can show a sliver of the next row there.
+ * @param {string} ordinary One of CHEQUY.
+ * @returns {string} The clip-path polygon.
+ */
+const chequyClip = (ordinary) => {
+  const band = ORDINARIES[ordinary];
+  const axis = ordinary === "fess" ? 1 : 0;
+  const far = Math.max(...band.map((vertex) => vertex[axis]));
+  const coordinate = (value, i) =>
+    i === axis && value === far ? `calc(${pct(value)} - 1px)` : pct(value);
+  return `polygon(${band.map((vertex) => vertex.map(coordinate).join(" ")).join(", ")})`;
+};
+
+/**
+ * A chequy ordinary's background layers. With a fur, its checks are transparent over the fur.
+ * @param {string} ordinary One of CHEQUY.
+ * @param {string} first The tincture or fur in the dexter chief check.
+ * @param {string} second The other tincture or fur; at most one of the two is a fur.
+ * @param {Function} theme Tailwind's theme() lookup, for a fur's spots.
+ * @returns {{image: string, size: string, position: string, repeat: string}[]} The layers, top first.
+ */
+const chequyLayers = (ordinary, first, second, theme) => {
+  const fur = [first, second].find((t) => FURS[t]);
+  const paint = (t) => (t === fur ? "transparent" : `var(--color-${t})`);
+  const [a, b] = [paint(first), paint(second)];
+  const grid = {
+    image: `conic-gradient(${b} 0 25%, ${a} 0 50%, ${b} 0 75%, ${a} 0)`,
+    ...chequyTile(ordinary),
+    repeat: "repeat",
+  };
+  return fur ? [grid, ...furLayers(fur, theme)] : [grid];
+};
 
 // Lines of partition. Scallops are round on the 5:6 shield; below a chief the
 // box is shorter, so they are slightly squashed.
@@ -1335,6 +1400,23 @@ export default plugin(({ addBase, addUtilities, theme }) => {
           },
           name,
         );
+      }
+    }
+
+    // Without the fimbriation vars, as for a fur. Two furs aren't generated.
+    if (CHEQUY.includes(ordinary)) {
+      const paints = [...TINCTURES, ...Object.keys(FURS)];
+      for (const first of paints) {
+        for (const second of paints) {
+          if (first === second || (FURS[first] && FURS[second])) {
+            continue;
+          }
+          utilities[`.${ordinary}-chequy-${first}-${second}`] = ordinaryRules(ordinary, {
+            ...placed,
+            ...joinLayers(chequyLayers(ordinary, first, second, theme), "background"),
+            "clip-path": chequyClip(ordinary),
+          });
+        }
       }
     }
 

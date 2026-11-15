@@ -6,6 +6,7 @@ import {
   ARRANGEMENTS,
   BORDURE_LINES,
   CHARGES,
+  CHEQUY,
   COLOURS,
   DIVISIONS,
   FRAMES,
@@ -73,6 +74,22 @@ for (const ordinary of VOIDABLE) {
     voided: true,
   });
 }
+// A two-tincture ordinary has no tincture of its own, so it may lie on any field, and the charges
+// on it aren't checked (Fox-Davies). Two furs and "of the first" aren't generated.
+for (const ordinary of CHEQUY) {
+  for (const a of TINCTURE) {
+    for (const b of TINCTURE) {
+      if (a !== b && !(FUR.has(a) && FUR.has(b))) {
+        ORDINARY_CLASSES.set(`${ordinary}-chequy-${a}-${b}`, {
+          ordinary,
+          tincture: null,
+          tinctures: [a, b],
+          pattern: "chequy",
+        });
+      }
+    }
+  }
+}
 for (const tincture of PAINT) {
   const fur = FUR.has(tincture);
   ORDINARY_CLASSES.set(`bordure-${tincture}`, { ordinary: "bordure", tincture, fur });
@@ -107,7 +124,8 @@ for (const division of DIVISIONS) {
 }
 
 // Only a plain, tinctured ordinary is fimbriated (see ordinaries.js).
-export const isFimbriable = (o) => !o.counterchanged && !o.line && !o.fur && !o.voided;
+export const isFimbriable = (o) =>
+  !o.counterchanged && !o.line && !o.fur && !o.voided && !o.pattern;
 
 export const isFur = (tincture) => FUR.has(tincture);
 

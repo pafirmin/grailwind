@@ -3,7 +3,7 @@
  */
 import plugin from "tailwindcss/plugin";
 import { FURS, TINCTURES } from "./data.js";
-import { furLayers } from "./furs.js";
+import { furLayers, joinLayers } from "./furs.js";
 import { PATHS } from "./paths.js";
 
 // The fess point, in % down the shield: horizontal lines of partition pass through it, as the
@@ -271,20 +271,6 @@ const furredLayers = (division, first, second, theme) => {
     ...furLayers(fur, theme),
   ];
 };
-
-/**
- * Layers joined into one comma-separated value per property.
- * @param {{image: string, size: string, position: string, repeat: string}[]} layers
- * @param {string} prefix The property prefix, such as "background" or "--field".
- * @returns {Object<string, string>} `<prefix>-image`, `-size`, `-position` and `-repeat`.
- */
-const joinLayers = (layers, prefix) =>
-  Object.fromEntries(
-    ["image", "size", "position", "repeat"].map((p) => [
-      `${prefix}-${p}`,
-      layers.map((layer) => layer[p]).join(", "),
-    ]),
-  );
 
 /**
  * A division with one fur, as background rules.

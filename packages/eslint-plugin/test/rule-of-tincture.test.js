@@ -70,6 +70,11 @@ run("rule-of-tincture", rule, {
     // Engrailed and fur ordinaries aren't fimbriated, so the fimbriation touches nothing.
     `<div class="heater"><div class="gules fess-ermine fimbriated-gules"></div></div>`,
     `<div class="heater"><div class="azure fess-engrailed-or fimbriated-azure"></div></div>`,
+    // A two-tincture ordinary may lie on any field, and the charges on it aren't checked.
+    `<div class="heater"><div class="or fess-chequy-azure-argent"></div></div>`,
+    `<div class="heater"><div class="argent pale-chequy-or-ermine"></div></div>`,
+    `<div class="heater"><div class="or fess-chequy-azure-argent"><div class="charges on"><i class="mullet or"></i></div></div></div>`,
+    `<div class="heater"><div class="or fess-chequy-azure-argent fimbriated-or"></div></div>`,
     // The vair family has no single ground, so it isn't checked by default.
     `<div class="heater"><div class="vair chief-or"></div></div>`,
     `<div class="heater"><div class="vair chief-gules"></div></div>`,

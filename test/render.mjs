@@ -174,6 +174,23 @@ const ermineAt = (across) => {
   };
 };
 const { spot: furSpot, ground: furGround } = ermineAt(6);
+/**
+ * The centre of a check on a fess or pale chequy, three checks across its band, as % of the
+ * shield: 10% deep and 9 across on the fess, 10% wide and 12 down on the pale. Below a chief the
+ * field is 70% as tall, so the fess's checks are too.
+ * @param {"fess"|"pale"} ordinary The chequy ordinary.
+ * @param {number} column The check's column from the dexter side, from 0.
+ * @param {number} row The check's row from the top, from 0.
+ * @param {number} [fieldTop] Where the field starts, as % of the shield: 30 below a chief.
+ * @returns {number[]} The check's centre, as [x%, y%].
+ */
+const chequyCheck = (ordinary, column, row, fieldTop = 0) => {
+  const down = (y) => fieldTop + (y * (100 - fieldTop)) / 100;
+  return ordinary === "fess"
+    ? [(100 / 9) * (column + 0.5), down(30 + 10 * row + 5)]
+    : [35 + 10 * column + 5, down((10 / 1.2) * (row + 0.5))];
+};
+
 const ermine4 = ermineAt(4);
 // The heater's curved base, as [x%, y%] points along drawings/heater.svg's cubics.
 const HEATER_BASE = (() => {
@@ -813,6 +830,20 @@ const PROBES = [
   ...charged("azure cross-gules", "on", 15, [[50, 15], [18, 45], [50, 45], [82, 45], [50, 80]], "on a cross"),
   ...charged("azure saltire-gules", "on", 16, [[22, 19.8], [78, 19.8], [50, 45], [22, 70.2], [78, 70.2]], "on a saltire"),
   ...charged("azure pall-gules", "on", 16, [[26, 20.8], [74, 20.8], [50, 75]], "on a pall"),
+  // 073 (chequy): three rows of square checks along the band, the first tincture in dexter chief.
+  { shield: "or fess-chequy-azure-argent", at: [chequyCheck("fess", 0, 0), chequyCheck("fess", 1, 1), chequyCheck("fess", 0, 2), chequyCheck("fess", 8, 0)], expect: "azure", why: "Stewart: azure in the dexter chief check, alternately, and at the sinister end" },
+  { shield: "or fess-chequy-azure-argent", at: [chequyCheck("fess", 1, 0), chequyCheck("fess", 0, 1), chequyCheck("fess", 1, 2), chequyCheck("fess", 8, 1)], expect: "argent", why: "Stewart: argent between the azure checks" },
+  { shield: "or fess-chequy-azure-argent", at: [[50, 28], [50, 62]], expect: "or", why: "Stewart: the field above and below a fess chequy" },
+  { shield: "vert pale-chequy-gules-or", at: [chequyCheck("pale", 0, 0), chequyCheck("pale", 2, 0), chequyCheck("pale", 1, 1), chequyCheck("pale", 0, 2)], expect: "gules", why: "a pale chequy: gules in its dexter chief check, and alternately" },
+  { shield: "vert pale-chequy-gules-or", at: [chequyCheck("pale", 1, 0), chequyCheck("pale", 0, 1), chequyCheck("pale", 2, 1), chequyCheck("pale", 1, 2)], expect: "or", why: "a pale chequy: or between the gules checks" },
+  { shield: "vert pale-chequy-gules-or", at: [[30, 20], [70, 20]], expect: "vert", why: "the field either side of a pale chequy" },
+  { shield: "azure chief-or fess-chequy-gules-argent", at: [chequyCheck("fess", 0, 0, 30), chequyCheck("fess", 1, 1, 30), [6, 51.5]], expect: "gules", why: "a fess chequy below a chief: its first row starts at the fess's top" },
+  { shield: "azure chief-or fess-chequy-gules-argent", at: [chequyCheck("fess", 1, 0, 30), chequyCheck("fess", 0, 1, 30)], expect: "argent", why: "a fess chequy below a chief: argent between the gules checks" },
+  { shield: "azure chief-or fess-chequy-gules-argent", at: [50, 49], expect: "azure", why: "the field between a chief and a fess chequy" },
+  { shield: "azure fess-chequy-ermine-gules", at: furSpot(0, 3), expect: "sable", why: "a spot in a fur fess chequy's check, on the field's grid" },
+  { shield: "azure fess-chequy-ermine-gules", at: [10, 52], expect: "argent", why: "the ground of a fur fess chequy's check" },
+  { shield: "azure fess-chequy-ermine-gules", at: [chequyCheck("fess", 1, 0), chequyCheck("fess", 1, 2)], expect: "gules", why: "the tincture's checks in a fur fess chequy" },
+  ...charged("gules fess-chequy-azure-argent", "on", 22, [[20, 45], [50, 45], [80, 45]], "on a fess chequy"),
   ...charged("azure pile-gules", "on", 14, [[50, 25]], "one on a pile"),
   ...charged("azure pile-gules", "on", 14, [[50, 14], [50, 34], [50, 54]], "three on a pile"),
   // The pile is 12.04% each side of its centre line at 54% down, and a roundel 6.4%.
@@ -1634,6 +1665,8 @@ const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
 const NESTED = SHIELDS.filter((s) => s.inner);
 // The LARGE shield would cover its neighbours on a contact sheet.
 const PLAIN = SHIELDS.filter((s) => !s.items && !s.inner && !s.shield.includes(`w-[${LARGE}px]`));
+// The patterned ordinaries (073), large enough to check by eye.
+const PATTERNED = SHIELDS.filter((s) => /\b(fess|pale)-chequy-/.test(s.shield));
 const TINCTURE_MATCH_THRESHOLD = 12;
 
 const isWithinThreshold = (threshold, gotRgb, wantRgb) => {
@@ -1872,6 +1905,7 @@ try {
         await contactSheet(page, css, PLAIN, 8, `probes-${name}.png`);
         await contactSheet(page, css, DIVIDED, 8, `divisions-${name}.png`);
         await contactSheet(page, css, FURRED, 6, `furs-${name}.png`);
+        await contactSheet(page, css, PATTERNED, 4, `patterned-${name}.png`, 240);
         await contactSheet(page, css, BORDURES, 6, `bordures-${name}.png`, 200);
         await contactSheet(page, css, FUR_BORDURES, 6, `bordures-fur-${name}.png`, 200);
         await cornerSheet(page, css, dir, `bordure-corners-${name}.png`);

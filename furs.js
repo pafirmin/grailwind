@@ -226,6 +226,20 @@ export const furLayers = (fur, theme) => {
 };
 
 /**
+ * Layers joined into one comma-separated value per property.
+ * @param {{image: string, size: string, position: string, repeat: string}[]} layers
+ * @param {string} prefix The property prefix, such as "background" or "--field".
+ * @returns {Object<string, string>} `<prefix>-image`, `-size`, `-position` and `-repeat`.
+ */
+export const joinLayers = (layers, prefix) =>
+  Object.fromEntries(
+    ["image", "size", "position", "repeat"].map((p) => [
+      `${prefix}-${p}`,
+      layers.map((layer) => layer[p]).join(", "),
+    ]),
+  );
+
+/**
  * A fur on its own, as on the field or an ordinary.
  * @param {string} fur A key of FURS.
  * @param {Function} theme Tailwind's theme() lookup.
