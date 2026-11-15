@@ -12,6 +12,7 @@ run("arrangement-needs-ordinary", rule, {
     `<div class="heater"><div class="azure fess-engrailed-or"><div class="charges between"></div></div></div>`,
     `<div class="heater"><div class="gules chevron-ermine"><div class="charges on"></div></div></div>`,
     `<div class="heater"><div class="gules bend-invected-erminois"><div class="charges on"></div></div></div>`,
+    `<div class="heater"><div class="or"><div class="label-azure"><div class="charges on"></div></div></div></div>`,
   ],
   invalid: [
     {
@@ -20,6 +21,10 @@ run("arrangement-needs-ordinary", rule, {
     },
     {
       code: `<div class="heater"><div class="azure chief-or"><div class="charges between"></div></div></div>`,
+      errors: [missing("between")],
+    },
+    {
+      code: `<div class="heater"><div class="or"><div class="label-azure"><div class="charges between"></div></div></div></div>`,
       errors: [missing("between")],
     },
     {

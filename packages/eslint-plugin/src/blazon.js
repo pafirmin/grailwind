@@ -11,6 +11,7 @@ import {
   FRAMES,
   FUR_PATTERNS,
   FURS,
+  LABELS,
   LINES,
   lineOrdinaries,
   METALS,
@@ -82,6 +83,14 @@ for (const tincture of PAINT) {
       fur,
       line,
     });
+  }
+}
+
+// Every label class, e.g. `label-azure` and `label-of-five-points-ermine`, mapped to its parts.
+const LABEL_CLASSES = new Map();
+for (const name of Object.keys(LABELS)) {
+  for (const tincture of PAINT) {
+    LABEL_CLASSES.set(`${name}-${tincture}`, { name, tincture, fur: FUR.has(tincture) });
   }
 }
 
@@ -157,6 +166,22 @@ export function ordinariesOf(classes) {
     found[list].push({ cls, ...match });
   }
   return found;
+}
+
+/**
+ * The label on an element, e.g. `label-azure`.
+ * @param {Set<string>} classes The element's classes.
+ * @returns {{cls: string, name: string, tincture: string, fur: boolean}|undefined} The label's
+ *   class, name, tincture and whether that's a fur, or undefined.
+ */
+export function labelOf(classes) {
+  for (const cls of classes) {
+    const match = LABEL_CLASSES.get(cls);
+    if (match) {
+      return { cls, ...match };
+    }
+  }
+  return undefined;
 }
 
 export const isDivided = (classes) => [...classes].some((cls) => DIVISION_CLASSES.has(cls));

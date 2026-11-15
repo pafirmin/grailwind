@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- The label, e.g. `label-azure`, and `label-of-five-points-azure`. Its own element in the field,
+  drawn throughout over everything but a canton or inescutcheon, and on the chief if there is one.
+  `charges on` inside it puts one charge on each point. The lint checks labels.
+
 ## [0.9.0] - 2026-11-15
 
 ### Added

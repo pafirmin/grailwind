@@ -6,6 +6,13 @@ const error = (message) => ({ message });
 run("rule-of-tincture", rule, {
   valid: [
     `<div class="heater"><div class="or fess-azure"></div></div>`,
+    // A label lies on the chief if there is one, else on the field.
+    `<div class="heater"><div class="or"><div class="label-azure"><div class="charges on"><i class="bezant"></i></div></div></div></div>`,
+    `<div class="heater"><div class="vair"><div class="label-vair"><div class="charges on"><i class="bezant"></i></div></div></div></div>`,
+    `<div class="heater"><div class="argent chevron-gules"><div class="label-azure"></div></div></div>`,
+    `<div class="heater"><div class="vair chevron-gules"><div class="label-azure"></div></div></div>`,
+    `<div class="heater"><div class="gules chief-or"><div class="label-of-five-points-azure"></div></div></div>`,
+    `<div class="heater"><div class="quarterly"><div class="or"></div><div class="gules"></div><div class="label-argent"></div></div></div>`,
     `<div class="heater"><div class="azure bordure-argent"></div></div>`,
     `<div class="heater"><div class="or chevron-gules chief-azure"></div></div>`,
     // A divided field has no single tincture.
@@ -118,6 +125,24 @@ run("rule-of-tincture", rule, {
     },
   ],
   invalid: [
+    {
+      code: `<div class="heater"><div class="azure"><div class="label-or"><div class="charges on"><i class="bezant"></i></div></div></div></div>`,
+      errors: [error("`bezant` puts a bezant Or on Or: metal on metal")],
+    },
+    {
+      code: `<div class="heater"><div class="azure"><div class="label-ermine"><div class="charges on"><i class="bezant"></i></div></div></div></div>`,
+      errors: [
+        error("`bezant` puts a bezant Or on Ermine: metal on metal (ermine counts as a metal)"),
+      ],
+    },
+    {
+      code: `<div class="heater"><div class="argent"><div class="label-or"></div></div></div>`,
+      errors: [error("`label-or` puts a label Or on Argent: metal on metal")],
+    },
+    {
+      code: `<div class="heater"><div class="azure chief-or"><div class="label-argent"></div></div></div>`,
+      errors: [error("`label-argent` puts a label Argent on Or: metal on metal")],
+    },
     {
       code: `<div class="heater"><div class="argent bordure-ermine"></div></div>`,
       errors: [

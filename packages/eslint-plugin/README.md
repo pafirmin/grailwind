@@ -65,6 +65,8 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
 - Charges in a `charges on` container are checked against the ordinary they lie on.
 - Charges at `in-dexter-chief`, `in-chief-point` or `in-sinister-chief`, or in a
   `charges in-chief` container, are checked against the chief, if there is one.
+- A label is checked against the chief if the field has one, otherwise the field, and charges
+  on its points against the label.
 - A plain canton or inescutcheon, one with nothing on it, is checked against the field it lies
   on. An inescutcheon's field is its one child. One with charges, an ordinary or a division
   counts as arms of its own and is exempt.
@@ -112,7 +114,7 @@ the field. It also flags `escutcheon`, which is now `heater`:
 ### `arrangement-needs-ordinary`
 
 `charges between` and `charges on` take their positions from the ordinary on the shield. Without
-one, other than a chief, they have nowhere to go.
+one, other than a chief, they have nowhere to go. `charges on` inside a label is allowed.
 
 ### `one-ordinary`
 

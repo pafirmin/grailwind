@@ -1,5 +1,5 @@
 import { getElements, UNKNOWN } from "../tree.js";
-import { ordinariesOf } from "../blazon.js";
+import { labelOf, ordinariesOf } from "../blazon.js";
 
 export default {
   meta: {
@@ -25,7 +25,9 @@ export default {
           if (ordinariesOf(el.parent.classes).ordinaries.length) {
             continue;
           }
-          for (const arrangement of ["between", "on"]) {
+          // Charges on a label's points are `on` it.
+          const needing = labelOf(el.parent.classes) ? ["between"] : ["between", "on"];
+          for (const arrangement of needing) {
             if (el.classes.has(arrangement)) {
               context.report({ node: el.reportNode, messageId: "missing", data: { arrangement } });
             }

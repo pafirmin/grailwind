@@ -6,6 +6,7 @@ import {
   CHARGES,
   DIVISIONS,
   FURS,
+  LABELS,
   LINES,
   lineOrdinaries,
   OF_THE_FIRST,
@@ -72,7 +73,7 @@ const CLASSES = [
 // The bordure's width and depth as the CSS writes them: an eighth is `calc(100cqw / 8)`.
 const FRAME_BORDER = String.raw`calc\(100cqw \/ ${+(1 / BORDURE_WIDTH).toFixed(3)}\)`;
 const CANTON_BORDER = String.raw`calc\(100cqw \/ ${+(3 / BORDURE_WIDTH).toFixed(3)}\)`;
-const PART = String.raw`:not\(\.charges, \.inescutcheon, \.canton\)`;
+const PART = String.raw`:not\(\.charges, \.inescutcheon, \.canton, \[class\^="label-"\], \[class\*=" label-"\]\)`;
 const NARROWED = String.raw`0\.${String(+(1 - BORDURE_DEPTH).toFixed(3)).slice(2)}`;
 
 // Rules without a plain `.class {` selector, checked by pattern.
@@ -299,6 +300,16 @@ const PATTERNS = {
     /\.cross-engrailed-erminois \{[^]*?&::before \{[^}]*clip-path: polygon\([^;]*\);\s*clip-path: shape\(/,
 };
 
+/**
+ * The CSS with the parts selector on one line, as prettier wraps it in grailwind.css.
+ * @param {string} css Built CSS.
+ * @returns {string} The same, with each `:not(…)` and `nth-child(n of …)` joined up.
+ */
+const unwrapped = (css) =>
+  css
+    .replace(/:not\(([^()]*)\)/g, (_, list) => `:not(${list.replace(/\s+/g, " ").trim()})`)
+    .replace(/(nth-(?:last-)?child)\(\s*(\d+) of (:not\([^()]*\))\s*\)/g, "$1($2 of $3)");
+
 const EXPECTED = {
   // A cornered ordinary takes indented, drawn by hand (064).
   "grailwind.css": {
@@ -339,6 +350,7 @@ const DATA_CLASSES = [
   "saltire-voided-ermine",
   `cross-voided-${OF_THE_FIRST}`,
   ...VOIDABLE.map((o) => `${o}-voided-counterchanged`),
+  ...Object.keys(LABELS).flatMap((l) => [`${l}-or`, `${l}-ermine`, `${l}-${OF_THE_FIRST}`]),
 ];
 
 writeFileSync(
@@ -352,7 +364,7 @@ let buildFailed = false;
 
 try {
   for (const [entry, overrides] of Object.entries(EXPECTED)) {
-    const css = await build({ dir, entry });
+    const css = unwrapped(await build({ dir, entry }));
     checks += CLASSES.length + DATA_CLASSES.length + Object.keys(PATTERNS).length;
     for (const cls of CLASSES) {
       const expected = overrides[cls] ?? true;

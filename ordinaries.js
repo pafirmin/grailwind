@@ -9,6 +9,7 @@ import {
   CHARGES,
   FRAMES,
   FURS,
+  LABELS,
   LINES as LINE_NAMES,
   lineOrdinaries,
   OF_THE_FIRST,
@@ -64,8 +65,9 @@ const polygon = (vertices) => `polygon(${vertices.map(point).join(", ")})`;
 
 const PSEUDO = { chief: "&::after" };
 
-// A split field's parts: its children that aren't over all of it. Written out in grailwind.css.
-const PART = ":not(.charges, .inescutcheon, .canton)";
+// A split field's parts: its children that aren't over all of it. A label is recognised by its
+// `label-` class. Written out in grailwind.css.
+const PART = ':not(.charges, .inescutcheon, .canton, [class^="label-"], [class*=" label-"])';
 
 // The chief surmounts a bordure.
 const INSET = "var(--bordure-inset)";
@@ -1010,6 +1012,35 @@ const layoutVars = () => {
   return [...new Set(allVars)];
 };
 
+// The label, in % of the field: the bar's top and bottom, and the points' width and bottom.
+const LABEL = { top: 9, bar: 14, width: 10, bottom: 28 };
+
+/**
+ * A label's outline: a bar across the field with a straight-sided point hanging from it, centred
+ * at x = 100 * (i + 1) / (n + 1), throughout (to the field's edges).
+ * @param {number} points How many points hang from the bar.
+ * @returns {string} A CSS `polygon()`, in % of the field.
+ */
+const labelPolygon = (points) => {
+  const half = LABEL.width / 2;
+  const vertices = [
+    [0, LABEL.top],
+    [100, LABEL.top],
+    [100, LABEL.bar],
+  ];
+  for (let i = points; i >= 1; i--) {
+    const centre = (100 * i) / (points + 1);
+    vertices.push(
+      [centre + half, LABEL.bar],
+      [centre + half, LABEL.bottom],
+      [centre - half, LABEL.bottom],
+      [centre - half, LABEL.bar],
+    );
+  }
+  vertices.push([0, LABEL.bar]);
+  return polygon(vertices);
+};
+
 // Each tincture's class suffix and colour, and "of the first" (see --the-first in grailwind.css).
 const PAINTS = [
   ...TINCTURES.map((tincture) => [tincture, `var(--color-${tincture})`]),
@@ -1050,7 +1081,7 @@ export default plugin(({ addBase, addUtilities, theme }) => {
   const utilities = {};
 
   // The frame's shape. Inside it, from the bottom: the field's ordinaries (1), its charges, the
-  // bordure's ring (2, set by bordure-*), the chief (3) and its charges (4), a canton or
+  // bordure's ring (2, set by bordure-*), the chief (3) and its charges and a label (4), a canton or
   // inescutcheon (5), and the outline (6). Every frame is drawn as a heater.
   const heater = frameOutline(PATHS.heater);
   for (const frame of FRAMES) {
@@ -1306,6 +1337,33 @@ export default plugin(({ addBase, addUtilities, theme }) => {
         ...counterchanged,
         "clip-path": voidedPolygon(vertices, VOIDS[ordinary], pointBelowChief),
       });
+    }
+  }
+
+  // A label is a child of the field, over everything but a canton or inescutcheon, and on the
+  // chief if there is one. Its shape is in its ::before, so charges on its points aren't clipped.
+  for (const [name, points] of Object.entries(LABELS)) {
+    const clip = labelPolygon(points);
+    const label = (ground) => ({
+      position: "absolute",
+      inset: "0",
+      "z-index": "4",
+      // It lies on a chief, so it and its charges ignore the field's.
+      "--field-top": "0%",
+      ...onVars(ON[name]),
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        inset: "0",
+        "clip-path": clip,
+        ...ground,
+      },
+    });
+    for (const [tincture, colour] of PAINTS) {
+      utilities[`.${name}-${tincture}`] = label({ "background-color": colour });
+    }
+    for (const fur of Object.keys(FURS)) {
+      utilities[`.${name}-${fur}`] = label(furBackground(fur, theme));
     }
   }
 

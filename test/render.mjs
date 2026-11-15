@@ -1467,6 +1467,41 @@ const PROBES = [
   { shield: "azure chevron-gules", charges: "between", items: bezants(3), at: [[24, 22], [76, 22], [50, 70]].flatMap((p) => rim(p, 22)), expect: "or", why: "between a chevron stays inside the outline" },
   { shield: "azure chevron-gules", charges: "between", items: bezants(6), at: [[18, 14], [50, 11], [82, 14], [40, 77], [60, 77], [50, 89]].flatMap((p) => rim(p, 12, 0.8)), expect: "or", why: "six between a chevron stay inside the outline" },
   { shield: "azure", inner: { shield: "gules chevron-argent", charges: "between", items: bezants(3) }, at: [[24, 22], [76, 22], [50, 70]].flatMap((p) => rim(onInner(p), 22 * INNER, 0.75)), expect: "or", why: "between a chevron stays inside an inescutcheon's outline" },
+  // 075: the label is its own element in the field, at z 4. Its bar runs y 9–14% and its points
+  // hang to 28%, 10% wide, at x = 100 (i + 1) / (n + 1).
+  { shield: "azure", label: { shield: "label-or" }, at: [[50, 11.5], [4, 11.5], [96, 11.5]], expect: "or", why: "a label's bar, throughout" },
+  { shield: "azure", label: { shield: "label-or" }, at: [[25, 25], [50, 25], [75, 25]], expect: "or", why: "a label's three points" },
+  { shield: "azure", label: { shield: "label-or" }, at: [[37.5, 21], [62.5, 21], [12, 21], [50, 6], [25, 33]], expect: "azure", why: "the field between a label's points, above its bar and below them" },
+  { shield: "azure", label: { shield: "label-of-five-points-or" }, at: [16.667, 33.333, 50, 66.667, 83.333].map((x) => [x, 25]), expect: "or", why: "a label of five points" },
+  { shield: "azure", label: { shield: "label-of-five-points-or" }, at: [[25, 21], [41.667, 21], [58.333, 21], [75, 21]], expect: "azure", why: "the field between a label of five points" },
+  { shield: "or pale-gules", label: { shield: "label-azure" }, at: [[50, 21], [50, 11.5]], expect: "azure", why: "a label over a pale" },
+  { shield: "or pale-gules", label: { shield: "label-azure" }, at: [[50, 40], [37.5, 21]], expect: "gules", why: "the pale beside a label's points and below them" },
+  // CHASTILLON: the label lies on the chief, over its tincture.
+  { shield: "argent pale-gules chief-or", label: { shield: "label-azure" }, at: [[25, 25], [50, 11.5]], expect: "azure", why: "a label on a chief" },
+  { shield: "argent pale-gules chief-or", label: { shield: "label-azure" }, at: [[37.5, 21], [62.5, 5]], expect: "or", why: "the chief beside a label's points" },
+  { shield: "azure bordure-gules", label: { shield: "label-or" }, at: [px(150, BORDER + 0.115 * FIELD[1]), px(60, BORDER + 0.115 * FIELD[1])], expect: "or", why: "a label runs to the bordure" },
+  { shield: "azure bordure-gules", label: { shield: "label-or" }, at: px(15, BORDER + 0.115 * FIELD[1]), expect: "gules", why: "a label doesn't run over the bordure" },
+  { shield: "azure", label: { shield: "label-or" }, inner: { kind: "canton", shield: "gules" }, at: [[10, 11.5], [25, 25]], expect: "gules", why: "a canton over a label" },
+  { shield: "azure", label: { shield: "label-or" }, inner: { kind: "canton", shield: "gules" }, at: [[50, 11.5], [75, 25]], expect: "or", why: "a label beyond the canton" },
+  // The charges' container ignores the chief's 30%, so each bezant is on its point, with or without one.
+  ...["azure", "gules chief-argent"].flatMap((shield) => [
+    { shield, label: { shield: "label-azure", charges: "on", items: bezants(3) }, at: ON.label.counts[3].points.flatMap((p) => ring(p, ON.label.counts[3].size)), expect: "or", why: `a bezant on each of a label's points, on ${shield}` },
+    { shield, label: { shield: "label-of-five-points-azure", charges: "on", items: bezants(5) }, at: ON["label-of-five-points"].counts[5].points.flatMap((p) => ring(p, ON["label-of-five-points"].counts[5].size)), expect: "or", why: `a bezant on each of five points, on ${shield}` },
+    { shield, label: { shield: "label-azure", charges: "on charge-size-14", items: bezants(3) }, at: ON.label.counts[3].points.map(([x, y]) => [x + 5.8, y]), expect: "or", why: `a bezant wider than its point isn't clipped, on ${shield}` },
+  ]),
+  { shield: "per-pale", quarters: ["or", "argent"], label: { shield: "label-azure" }, at: [[25, 25], [75, 25], [50, 11.5]], expect: "azure", why: "a label over both parts of a per pale field" },
+  { shield: "per-pale", quarters: ["or", "argent"], label: { shield: "label-azure" }, at: [[25, 40], [10, 70]], expect: "or", why: "a per pale field's first part, with a label" },
+  { shield: "per-pale", quarters: ["or", "argent"], label: { shield: "label-azure" }, at: [[75, 40], [90, 70]], expect: "argent", why: "a per pale field's second part, with a label" },
+  { shield: "quarterly", quarters: ["or", "argent", "argent", "or"], label: { shield: "label-azure" }, at: [[25, 25], [75, 25], [50, 11.5]], expect: "azure", why: "a label over quarters 1 and 2" },
+  { shield: "quarterly", quarters: ["or", "argent", "argent", "or"], label: { shield: "label-azure" }, at: [[10, 40], [90, 70]], expect: "or", why: "quarters 1 and 4, with a label" },
+  { shield: "quarterly", quarters: ["or", "argent", "argent", "or"], label: { shield: "label-azure" }, at: [[90, 40], [10, 70]], expect: "argent", why: "quarters 2 and 3, with a label" },
+  // The label's own size, not the ordinary's: a fess has a size for five charges, which the label would inherit.
+  ...["fess-gules"].map((ordinary) => (
+    { shield: `azure ${ordinary}`, label: { shield: "label-of-five-points-or", charges: "on", items: bezants(5) }, at: ON["label-of-five-points"].counts[5].points.flatMap(([x, y]) => [[x - 6, y], [x + 6, y]]), expect: "azure", why: `five bezants on a label stay 9% wide over a ${ordinary}` }
+  )),
+  { shield: "per-pale", quarters: ["or bordure-ermine", "gules bordure-ermine"], label: { shield: "label-azure" }, at: [[52, 60], [60, 70]], expect: "gules", why: "a label isn't a part: the last part keeps its palar side bare" },
+  { shield: "azure", label: { shield: "label-of-five-points-ermine" }, at: furGround(1, 1), expect: "argent", why: "an ermine label's ground" },
+  { shield: "azure", label: { shield: "label-of-five-points-ermine" }, at: [41.667, 21], expect: "azure", why: "the field beside an ermine label's points" },
 ];
 
 const LINES = ["", "-engrailed", "-invected", "-wavy", "-indented", "-embattled"];
@@ -1580,8 +1615,8 @@ const CORNER_SHIELDS = ["engrailed", "invected"].map((line) => ({
 // Tile edges at % positions fall mid-pixel at this width, where seams show.
 const ODD_WIDTH = 155;
 // `more` is a second charges container, as { charges, items }.
-const key = ({ kind, shield, charges, items, inner, first, more, quarters }) =>
-  `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ? JSON.stringify(quarters) : ""}`;
+const key = ({ kind, shield, charges, items, inner, first, more, quarters, label }) =>
+  `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ? JSON.stringify(quarters) : ""}|${label ? key(label) : ""}`;
 const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
 const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
 const NESTED = SHIELDS.filter((s) => s.inner);
@@ -1623,10 +1658,13 @@ const quarterOf = (q) =>
   typeof q === "string"
     ? `<div class="${q}"></div>`
     : `<div class="${q.shield}">${chargesOf(q)}${nestedOf(q.inner)}</div>`;
-const markup = ({ shield, charges, items, inner, first, more, quarters }, attrs = "") => {
+// `label` is a label, as { shield, charges, items }, written last in the field.
+const markup = ({ shield, charges, items, inner, first, more, quarters, label }, attrs = "") => {
   const nested = nestedOf(inner);
   const own = chargesOf({ charges, items }) + (more ? chargesOf(more) : "");
-  const content = (quarters ?? []).map(quarterOf).join("") + (first ? nested + own : own + nested);
+  const labelled = label ? `<div class="${label.shield}">${chargesOf(label)}</div>` : "";
+  const content =
+    (quarters ?? []).map(quarterOf).join("") + (first ? nested + own : own + nested) + labelled;
   // A width, e.g. `w-[305px]!`, goes on the frame; the rest on its field.
   const classes = shield.split(" ");
   const size = classes.filter((cls) => cls.startsWith("w-"));

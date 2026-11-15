@@ -201,11 +201,14 @@ export const BETWEEN = {
   pile: { size: 20, points: [[18, 55], [82, 55]] },
 };
 
+// The label, by class name, and its number of points. It's its own element, not an ordinary.
+export const LABELS = { label: 3, "label-of-five-points": 5 };
+
 // `on` charges shrink on lines that cut deep into the ordinary, by line.
 export const ON_SCALE = { engrailed: 0.8, indented: 0.9 };
 
-// Where charges go for "on", along the ordinary's centre line, by number of charges. A count
-// can set its own size, else the ordinary's applies.
+// Where charges go for "on", along the ordinary's centre line (or a label's points), by number of
+// charges. A count can set its own size, else the ordinary's applies.
 // prettier-ignore
 export const ON = {
   pale: { size: 20, counts: {
@@ -251,6 +254,11 @@ export const ON = {
   pile: { size: 14, counts: {
     1: { points: [[50, 25]] },
     3: { points: [[50, 14], [50, 34], [50, 54]] } } },
+  // One per point, down its middle: x as LABEL's points in ordinaries.js.
+  label: { size: 9, counts: {
+    3: { size: 9, points: [[25, 21], [50, 21], [75, 21]] } } },
+  "label-of-five-points": { size: 9, counts: {
+    5: { size: 9, points: [[16.667, 21], [33.333, 21], [50, 21], [66.667, 21], [83.333, 21]] } } },
 };
 
 const mirror = (points) => points.map(([x, y]) => [x, 100 - y]);

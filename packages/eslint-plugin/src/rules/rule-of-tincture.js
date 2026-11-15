@@ -14,6 +14,7 @@ import {
   isFur,
   isPlain,
   kind,
+  labelOf,
   ordinariesOf,
   sameKind,
   titleCase,
@@ -133,6 +134,15 @@ export default {
             const tincture = fieldTincture(subField.classes);
             check(el, subField.reportNode, tincture, `plain ${sub}`, tincture, ground, "plain");
           }
+          // A label lies on the parent's chief if it has one, else on its field.
+          const label = labelOf(el.classes);
+          if (label && el.parent !== UNKNOWN && el.parent.classes) {
+            const { chiefs: parentChiefs } = ordinariesOf(el.parent.classes);
+            const ground = parentChiefs.length
+              ? parentChiefs[0].tincture
+              : fieldTincture(el.parent.classes);
+            check(el, el.reportNode, label.cls, "label", label.tincture, ground);
+          }
           const isFimbriated = fimbriation && ordinaries.some(isFimbriable);
 
           if (isFimbriated) {
@@ -174,7 +184,9 @@ export default {
               }
 
               let ground = field;
-              if (container.classes.has("on") && ordinaries.length) {
+              if (container.classes.has("on") && label) {
+                ground = label.tincture;
+              } else if (container.classes.has("on") && ordinaries.length) {
                 ground = ordinaries[0].tincture;
               } else if (chiefs.length && inChief(container, charge)) {
                 ground = chiefs[0].tincture;
