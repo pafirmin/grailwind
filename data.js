@@ -183,11 +183,16 @@ export const BETWEEN = {
     2: { points: [[50, 15], [50, 78]] },
     6: { size: 14, points: [[20, 14], [50, 14], [80, 14], [32, 70], [68, 70], [50, 86]] } } },
   bend: { size: 24, points: [[70, 26], [30, 68]], counts: {
+    3: { size: 18, points: [[60, 13], [86, 36], [30, 68]] },
     6: { size: 14, points: [[48, 9], [76, 12], [84, 38], [9, 48], [18, 72], [38, 84]] } } },
   "bend-sinister": { size: 24, points: [[30, 26], [70, 68]], counts: {
+    3: { size: 18, points: [[40, 13], [14, 36], [70, 68]] },
     6: { size: 14, points: [[52, 9], [24, 12], [16, 38], [91, 48], [82, 72], [62, 84]] } } },
   chevron: { size: 22, points: [[24, 22], [76, 22], [50, 70]], counts: {
-    6: { size: 12, points: [[18, 14], [50, 11], [82, 14], [40, 72], [60, 72], [50, 84]] } } },
+    4: { size: 15, points: [[20, 16], [50, 9], [80, 16], [50, 74]] },
+    6: { size: 12, points: [[18, 14], [50, 11], [82, 14], [40, 77], [60, 77], [50, 89]] },
+    9: { size: 11, points: [[14, 12], [30, 12], [22, 26], [70, 12], [86, 12], [78, 26], [43, 73], [57, 73], [50, 86]] },
+    10: { size: 11, points: [[14, 12], [30, 12], [22, 26], [70, 12], [86, 12], [78, 26], [43, 71], [57, 71], [43, 85], [57, 85]] } } },
   cross: { size: 18, points: [[20, 17], [80, 17], [24, 72], [76, 72]] },
   saltire: { size: 16, points: [[50, 13], [14, 45], [86, 45], [50, 84]], counts: {
     2: { points: [[14, 45], [86, 45]] } } },
@@ -199,18 +204,53 @@ export const BETWEEN = {
 // `on` charges shrink on lines that cut deep into the ordinary, by line.
 export const ON_SCALE = { engrailed: 0.8, indented: 0.9 };
 
-// Where charges go for "on", along the ordinary's centre line, by number of charges.
+// Where charges go for "on", along the ordinary's centre line, by number of charges. A count
+// can set its own size, else the ordinary's applies.
 // prettier-ignore
 export const ON = {
-  pale: { size: 20, counts: { 1: [[50, 45]], 2: [[50, 28], [50, 62]], 3: [[50, 18], [50, 45], [50, 72]] } },
-  fess: { size: 22, counts: { 1: [[50, 45]], 2: [[30, 45], [70, 45]], 3: [[20, 45], [50, 45], [80, 45]] } },
-  bend: { size: 18, counts: { 1: [[50, 50]], 2: [[33, 33], [67, 67]], 3: [[24, 24], [50, 50], [76, 76]] } },
-  "bend-sinister": { size: 18, counts: { 1: [[50, 50]], 2: [[67, 33], [33, 67]], 3: [[76, 24], [50, 50], [24, 76]] } },
-  chevron: { size: 15, counts: { 1: [[50, 36]], 3: [[20, 65], [50, 36], [80, 65]] } },
-  cross: { size: 15, counts: { 1: [[50, 45]], 5: [[50, 15], [18, 45], [50, 45], [82, 45], [50, 80]] } },
-  saltire: { size: 16, counts: { 1: [[50, 45]], 5: [[22, 19.8], [78, 19.8], [50, 45], [22, 70.2], [78, 70.2]] } },
-  pall: { size: 16, counts: { 1: [[50, 40]], 3: [[26, 20.8], [74, 20.8], [50, 75]] } },
-  pile: { size: 14, counts: { 1: [[50, 25]], 3: [[50, 14], [50, 34], [50, 54]] } },
+  pale: { size: 20, counts: {
+    1: { points: [[50, 45]] },
+    2: { points: [[50, 28], [50, 62]] },
+    3: { points: [[50, 18], [50, 45], [50, 72]] },
+    4: { size: 18, points: [[50, 13], [50, 35], [50, 57], [50, 79]] },
+    5: { size: 15, points: [[50, 12], [50, 29], [50, 46], [50, 63], [50, 80]] } } },
+  fess: { size: 22, counts: {
+    1: { points: [[50, 45]] },
+    2: { points: [[30, 45], [70, 45]] },
+    3: { points: [[20, 45], [50, 45], [80, 45]] },
+    4: { size: 18, points: [[17, 45], [39, 45], [61, 45], [83, 45]] },
+    5: { size: 15, points: [[14, 45], [32, 45], [50, 45], [68, 45], [86, 45]] } } },
+  bend: { size: 18, counts: {
+    1: { points: [[50, 50]] },
+    2: { points: [[33, 33], [67, 67]] },
+    3: { points: [[24, 24], [50, 50], [76, 76]] },
+    4: { size: 16, points: [[22, 22], [40.7, 40.7], [59.3, 59.3], [78, 78]] },
+    5: { size: 12, points: [[17, 17], [32, 32], [47, 47], [62, 62], [77, 77]] } } },
+  "bend-sinister": { size: 18, counts: {
+    1: { points: [[50, 50]] },
+    2: { points: [[67, 33], [33, 67]] },
+    3: { points: [[76, 24], [50, 50], [24, 76]] },
+    4: { size: 16, points: [[78, 22], [59.3, 40.7], [40.7, 59.3], [22, 78]] },
+    5: { size: 12, points: [[83, 17], [68, 32], [53, 47], [38, 62], [23, 77]] } } },
+  chevron: { size: 15, counts: {
+    1: { points: [[50, 36]] },
+    2: { points: [[28, 57], [72, 57]] },
+    3: { points: [[20, 65], [50, 36], [80, 65]] },
+    5: { size: 13, points: [[50, 36], [35, 51], [65, 51], [20, 66], [80, 66]] } } },
+  cross: { size: 15, counts: {
+    1: { points: [[50, 45]] },
+    4: { points: [[50, 15], [18, 45], [82, 45], [50, 80]] },
+    5: { points: [[50, 15], [18, 45], [50, 45], [82, 45], [50, 80]] } } },
+  saltire: { size: 16, counts: {
+    1: { points: [[50, 45]] },
+    4: { points: [[22, 19.8], [78, 19.8], [22, 70.2], [78, 70.2]] },
+    5: { points: [[22, 19.8], [78, 19.8], [50, 45], [22, 70.2], [78, 70.2]] } } },
+  pall: { size: 16, counts: {
+    1: { points: [[50, 40]] },
+    3: { points: [[26, 20.8], [74, 20.8], [50, 75]] } } },
+  pile: { size: 14, counts: {
+    1: { points: [[50, 25]] },
+    3: { points: [[50, 14], [50, 34], [50, 54]] } } },
 };
 
 const mirror = (points) => points.map(([x, y]) => [x, 100 - y]);
@@ -226,7 +266,7 @@ for (const ordinary of REVERSIBLE) {
   };
   ON[reversed(ordinary)] = {
     size: ON[ordinary].size,
-    counts: mapValues(ON[ordinary].counts, mirror),
+    counts: mapValues(ON[ordinary].counts, (count) => ({ ...count, points: mirror(count.points) })),
   };
 }
 
@@ -249,7 +289,7 @@ export const BETWEEN_LINED = {
     indented: { points: [[70, 26], [24, 72]] },
   },
   chevron: {
-    embattled: { counts: { 6: { size: 10, points: [[16, 13], [50, 8], [84, 13], [40, 72], [60, 72], [50, 84]] } } },
+    embattled: { counts: { 6: { size: 10, points: [[16, 13], [50, 8], [84, 13], [40, 77], [60, 77], [50, 89]] } } },
   },
   "chevron-reversed": {
     embattled: { points: [[26, 76], [74, 76], [50, 24]] },

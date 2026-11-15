@@ -16,6 +16,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   impalement. A chief on that part goes under the bordure.
 - Vair and potent, e.g. `vair`, `counter-vair`, `potent` and `vairy-or-gules`.
 - `fur-<n>` sets how many tiles of a fur go across, e.g. `fur-3` for beffroi.
+- More charge counts: 7, 9 and 10 on a plain field; 4 on a cross or saltire, 2 and 5 on a chevron
+  and 4 and 5 on a pale, fess or bend with `on`; 3 round a bend and 4, 9 and 10 round a chevron
+  with `between`.
 
 ### Changed
 

@@ -722,8 +722,8 @@ const PROBES = [
   ...charged("azure", "", 50, [[50, 45]], "one charge"),
   ...charged("azure", "", 30, [[50, 24], [50, 66]], "two charges"),
   ...charged("azure", "", 28, [[28, 25], [72, 25], [50, 64]], "three charges, 2 and 1"),
-  ...charged("azure", "", 24, [[30, 24], [70, 24], [32, 60], [68, 60]], "four charges"),
-  ...charged("azure", "", 22, [[27, 20], [73, 20], [50, 42], [32, 64], [68, 64]], "five charges, in saltire"),
+  ...charged("azure", "", 24, [[30, 24], [70, 24], [30, 60], [70, 60]], "four charges"),
+  ...charged("azure", "", 22, [[27, 20], [73, 20], [50, 42], [27, 64], [73, 64]], "five charges, in saltire"),
   ...charged("azure", "", 20, [[20, 18], [50, 18], [80, 18], [35, 42], [65, 42], [50, 66]], "six charges"),
   { ...gap("azure", "", 3), at: [50, 25], why: "three charges: a gap between the top two" },
 
@@ -794,7 +794,7 @@ const PROBES = [
   ...charged("azure bend-gules", "between", 24, [[70, 26], [30, 68]], "between a bend"),
   ...charged("azure bend-sinister-gules", "between", 24, [[30, 26], [70, 68]], "between a bend sinister"),
   ...charged("azure chevron-gules", "between", 22, [[24, 22], [76, 22], [50, 70]], "between a chevron"),
-  ...charged("azure chevron-gules", "between", 12, [[18, 14], [50, 11], [82, 14], [40, 72], [60, 72], [50, 84]], "six between a chevron"),
+  ...charged("azure chevron-gules", "between", 12, [[18, 14], [50, 11], [82, 14], [40, 77], [60, 77], [50, 89]], "six between a chevron"),
   ...charged("azure cross-gules", "between", 18, [[20, 17], [80, 17], [24, 72], [76, 72]], "between a cross"),
   ...charged("azure saltire-gules", "between", 16, [[50, 13], [14, 45], [86, 45], [50, 84]], "between a saltire"),
   ...charged("azure pall-gules", "between", 18, [[50, 11], [18, 56], [82, 56]], "between a pall"),
@@ -1036,15 +1036,15 @@ const PROBES = [
   { shield: "per-pale-ermine-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: [30, 45], expect: "gules", why: "a counterchanged charge on the ermine half" },
   { shield: "per-pale-ermine-gules", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: furSpot(4, 2), expect: "sable", why: "a counterchanged charge on the gules half, on the field's spot grid" },
   ...[
-    ["per-pale-argent-gules", ring(ON.chevron.counts[3][0], ON.chevron.size), "argent", "gules", "a plain field"],
-    ["per-pale-ermine-gules", [ON.chevron.counts[3][0]], "argent", "gules", "a fur field"],
-    ["gyronny-argent-gules", ring(ON.chevron.counts[3][0], ON.chevron.size), "argent", "gules", "gyronny keeps its tinctures' order"],
+    ["per-pale-argent-gules", ring(ON.chevron.counts[3].points[0], ON.chevron.size), "argent", "gules", "a plain field"],
+    ["per-pale-ermine-gules", [ON.chevron.counts[3].points[0]], "argent", "gules", "a fur field"],
+    ["gyronny-argent-gules", ring(ON.chevron.counts[3].points[0], ON.chevron.size), "argent", "gules", "gyronny keeps its tinctures' order"],
   ].flatMap(([division, dexter, dexterTincture, sinisterTincture, what]) => {
     const shield = `${division} chevron-counterchanged`;
     const on = { shield, charges: "on counterchanged", items: Array(3).fill("roundel") };
     return [
       { ...on, at: dexter, expect: dexterTincture, why: `a counterchanged charge on a counterchanged chevron, dexter: ${what}` },
-      { ...on, at: ring(ON.chevron.counts[3][2], ON.chevron.size), expect: sinisterTincture, why: `a counterchanged charge on a counterchanged chevron, sinister: ${what}` },
+      { ...on, at: ring(ON.chevron.counts[3].points[2], ON.chevron.size), expect: sinisterTincture, why: `a counterchanged charge on a counterchanged chevron, sinister: ${what}` },
     ];
   }),
   { shield: "per-pale-argent-gules chevron-counterchanged", charges: "on counterchanged", items: Array(3).fill("roundel"), more: { charges: "between counterchanged", items: Array(3).fill("roundel") }, at: ring(BETWEEN.chevron.points[0], BETWEEN.chevron.size), expect: "gules", why: "a counterchanged charge between stays swapped, beside one on a counterchanged chevron" },
@@ -1054,8 +1054,8 @@ const PROBES = [
     const shield = "per-pale-argent-gules chevron-counterchanged";
     const on = { shield, charges: "on counterchanged", items: Array(3).fill("roundel"), inner };
     return [
-      { ...on, at: [onSub(ON.chevron.counts[3][0])], expect: "azure", why: `the ${kind}'s own counterchanged charge, dexter, doesn't take the shield's field` },
-      { ...on, at: [onSub(ON.chevron.counts[3][2])], expect: "or", why: `the ${kind}'s own counterchanged charge, sinister, doesn't take the shield's field` },
+      { ...on, at: [onSub(ON.chevron.counts[3].points[0])], expect: "azure", why: `the ${kind}'s own counterchanged charge, dexter, doesn't take the shield's field` },
+      { ...on, at: [onSub(ON.chevron.counts[3].points[2])], expect: "or", why: `the ${kind}'s own counterchanged charge, sinister, doesn't take the shield's field` },
     ];
   }),
   { shield: "per-pale-ermine-gules fess-counterchanged", at: [25, 45], expect: "gules", why: "a counterchanged fess on the ermine half" },
@@ -1070,7 +1070,31 @@ const PROBES = [
   { shield: "azure chevron-engrailed-ermine", at: [20.56, 75.21], expect: "azure", why: "a bite in a fur engrailed chevron" },
   { shield: "azure fimbriated-gules fess-ermine", at: [50, 29], expect: "azure", why: "a fur fess isn't fimbriated" },
   ...charged("azure fess-ermine", "on", 22, [[20, 45], [50, 45], [80, 45]], "on a fess ermine"),
-  ...charged("azure fess-gules", "on", 22, [[27, 20], [73, 20], [50, 42], [32, 64], [68, 64]], "five on a fess fall back to the default"),
+  ...charged("azure pile-gules", "on", 14, [[27, 20], [73, 20], [50, 42], [27, 64], [73, 64]], "five on a pile fall back to the default"),
+
+  // 040: more counts, on a plain field, `on` and `between`.
+  ...charged("azure", "", 20, [[24, 18], [50, 18], [76, 18], [24, 42], [50, 42], [76, 42], [50, 66]], "seven charges, 3-3-1"),
+  ...charged("azure", "", 17, [[22, 16], [50, 16], [78, 16], [24, 38], [50, 38], [76, 38], [32, 60], [50, 60], [68, 60]], "nine charges, 3-3-3"),
+  ...charged("azure", "", 15, [[17, 15], [39, 15], [61, 15], [83, 15], [28, 35], [50, 35], [72, 35], [39, 55], [61, 55], [50, 75]], "ten charges, 4-3-2-1"),
+  ...charged("azure cross-gules", "on", 15, [[50, 15], [18, 45], [82, 45], [50, 80]], "four on a cross"),
+  ...charged("azure saltire-gules", "on", 16, [[22, 19.8], [78, 19.8], [22, 70.2], [78, 70.2]], "four on a saltire"),
+  ...charged("azure chevron-gules", "on", 15, [[28, 57], [72, 57]], "two on a chevron"),
+  ...charged("azure chevron-gules", "on", 13, [[50, 36], [35, 51], [65, 51], [20, 66], [80, 66]], "five on a chevron"),
+  ...charged("azure fess-gules", "on", 18, [[17, 45], [39, 45], [61, 45], [83, 45]], "four on a fess"),
+  ...charged("azure fess-gules", "on", 15, [[14, 45], [32, 45], [50, 45], [68, 45], [86, 45]], "five on a fess"),
+  ...charged("azure pale-gules", "on", 18, [[50, 13], [50, 35], [50, 57], [50, 79]], "four on a pale"),
+  ...charged("azure pale-gules", "on", 15, [[50, 12], [50, 29], [50, 46], [50, 63], [50, 80]], "five on a pale"),
+  ...charged("azure bend-gules", "on", 16, [[22, 22], [40.7, 40.7], [59.3, 59.3], [78, 78]], "four on a bend"),
+  ...charged("azure bend-gules", "on", 12, [[17, 17], [32, 32], [47, 47], [62, 62], [77, 77]], "five on a bend"),
+  ...charged("azure bend-sinister-gules", "on", 16, [[78, 22], [59.3, 40.7], [40.7, 59.3], [22, 78]], "four on a bend sinister"),
+  ...charged("azure bend-sinister-gules", "on", 12, [[83, 17], [68, 32], [53, 47], [38, 62], [23, 77]], "five on a bend sinister"),
+  ...charged("azure chevron-reversed-gules", "on", 15, [[28, 43], [72, 43]], "two on a chevron reversed"),
+  ...charged("azure chevron-reversed-gules", "on", 13, [[50, 64], [35, 49], [65, 49], [20, 34], [80, 34]], "five on a chevron reversed"),
+  ...charged("azure chevron-gules", "between", 15, [[20, 16], [50, 9], [80, 16], [50, 74]], "four between a chevron"),
+  ...charged("azure chevron-gules", "between", 11, [[14, 12], [30, 12], [22, 26], [70, 12], [86, 12], [78, 26], [43, 73], [57, 73], [50, 86]], "nine between a chevron"),
+  ...charged("azure chevron-gules", "between", 11, [[14, 12], [30, 12], [22, 26], [70, 12], [86, 12], [78, 26], [43, 71], [57, 71], [43, 85], [57, 85]], "ten between a chevron"),
+  ...charged("azure bend-gules", "between", 18, [[60, 13], [86, 36], [30, 68]], "three between a bend"),
+  ...charged("azure bend-sinister-gules", "between", 18, [[40, 13], [14, 36], [70, 68]], "three between a bend sinister"),
 
   // Inescutcheon: `at` is still on the outer shield; onInner maps the inescutcheon's own points.
   { shield: "azure", inner: { shield: "gules" }, at: [50, 45], expect: "gules", why: "an inescutcheon at the fess point" },
@@ -1089,7 +1113,7 @@ const PROBES = [
   ...nested("azure fess-or", { shield: "gules pale-argent", charges: "between" }, 18, [[18, 42], [82, 42]], "two between a pale on an inescutcheon, on a shield with a fess"),
   // Probed as size 12, though the chevron's charges are 15: at a third of the scale, 0.8 of a 15's
   // radius lands on the bezant's antialiased edge in Chromium.
-  ...nested("azure fess-or", { shield: "gules chevron-argent", charges: "on" }, 12, [[50, 24], [50, 66]], "two on a chevron on an inescutcheon, on a shield with a fess"),
+  ...nested("azure fess-or", { shield: "gules chevron-argent", charges: "on" }, 12, [[28, 57], [72, 57]], "two on a chevron on an inescutcheon, on a shield with a fess"),
   { shield: "azure", inner: { shield: "per-pale-argent-gules", charges: "counterchanged", items: ["roundel"] }, at: onInner([40, 45]), expect: "gules", why: "a counterchanged charge on an inescutcheon, dexter half" },
   { shield: "azure", inner: { shield: "per-pale-argent-gules", charges: "counterchanged", items: ["roundel"] }, at: onInner([60, 45]), expect: "argent", why: "a counterchanged charge on an inescutcheon, sinister half" },
   { shield: "azure", inner: { shield: "gules cross-azure fimbriated-argent" }, at: onInner([36.5, 15]), expect: "argent", why: "a fimbriated cross on an inescutcheon" },
@@ -1405,20 +1429,43 @@ const PROBES = [
   // No default placement overflows the heater's outline, on the shield or on an inescutcheon.
   ...[
     ["", 3, 28, [[28, 25], [72, 25], [50, 64]]],
-    ["", 4, 24, [[30, 24], [70, 24], [32, 60], [68, 60]]],
+    ["", 4, 24, [[30, 24], [70, 24], [30, 60], [70, 60]]],
     ["", 6, 20, [[20, 18], [50, 18], [80, 18], [35, 42], [65, 42], [50, 66]]],
     ["in-bend", 2, 28, [[30, 26], [70, 64]]],
     ["in-bend", 3, 22, [[22, 16], [50, 45], [78, 74]]],
     ["in-base", 3, 22, [[30, 72], [50, 84], [70, 72]]],
-  ].flatMap(([charges, count, size, points]) => [
-    { shield: "azure", charges, items: bezants(count), at: points.flatMap((p) => rim(p, size)), expect: "or", why: `${count} ${charges || "charges"} stay inside the outline` },
-    { shield: "azure", inner: { shield: "gules", charges, items: bezants(count) }, at: points.flatMap((p) => rim(onInner(p), size * INNER, 0.75)), expect: "or", why: `${count} ${charges || "charges"} stay inside an inescutcheon's outline` },
+    ["", 7, 20, [[24, 18], [50, 18], [76, 18], [24, 42], [50, 42], [76, 42], [50, 66]]],
+    ["", 9, 17, [[22, 16], [50, 16], [78, 16], [24, 38], [50, 38], [76, 38], [32, 60], [50, 60], [68, 60]]],
+    ["", 10, 15, [[17, 15], [39, 15], [61, 15], [83, 15], [28, 35], [50, 35], [72, 35], [39, 55], [61, 55], [50, 75]]],
+    ["on", 4, 15, [[50, 15], [18, 45], [82, 45], [50, 80]], "cross"],
+    ["on", 4, 16, [[22, 19.8], [78, 19.8], [22, 70.2], [78, 70.2]], "saltire"],
+    ["on", 2, 15, [[28, 57], [72, 57]], "chevron"],
+    ["on", 5, 13, [[50, 36], [35, 51], [65, 51], [20, 66], [80, 66]], "chevron"],
+    ["on", 4, 18, [[17, 45], [39, 45], [61, 45], [83, 45]], "fess"],
+    ["on", 5, 15, [[14, 45], [32, 45], [50, 45], [68, 45], [86, 45]], "fess"],
+    ["on", 4, 18, [[50, 13], [50, 35], [50, 57], [50, 79]], "pale"],
+    ["on", 5, 15, [[50, 12], [50, 29], [50, 46], [50, 63], [50, 80]], "pale"],
+    ["on", 4, 16, [[22, 22], [40.7, 40.7], [59.3, 59.3], [78, 78]], "bend"],
+    ["on", 5, 12, [[17, 17], [32, 32], [47, 47], [62, 62], [77, 77]], "bend"],
+    ["on", 4, 16, [[78, 22], [59.3, 40.7], [40.7, 59.3], [22, 78]], "bend-sinister"],
+    ["on", 5, 12, [[83, 17], [68, 32], [53, 47], [38, 62], [23, 77]], "bend-sinister"],
+    ["on", 2, 15, [[28, 43], [72, 43]], "chevron-reversed"],
+    ["on", 5, 13, [[50, 64], [35, 49], [65, 49], [20, 34], [80, 34]], "chevron-reversed"],
+    ["between", 4, 15, [[20, 16], [50, 9], [80, 16], [50, 74]], "chevron"],
+    ["between", 9, 11, [[14, 12], [30, 12], [22, 26], [70, 12], [86, 12], [78, 26], [43, 73], [57, 73], [50, 86]], "chevron"],
+    ["between", 10, 11, [[14, 12], [30, 12], [22, 26], [70, 12], [86, 12], [78, 26], [43, 71], [57, 71], [43, 85], [57, 85]], "chevron"],
+    ["between", 3, 18, [[60, 13], [86, 36], [30, 68]], "bend"],
+    ["between", 3, 18, [[40, 13], [14, 36], [70, 68]], "bend-sinister"],
+  ].flatMap(([charges, count, size, points, ordinary]) => [
+    // Small charges anti-alias into their neighbours at the rim, so the smaller fractions only catch gross overflow.
+    { shield: `azure${ordinary ? ` ${ordinary}-gules` : ""}`, charges, items: bezants(count), at: points.flatMap((p) => rim(p, size, size < 14 ? 0.8 : 0.9)), expect: "or", why: `${count} ${charges || "charges"}${ordinary ? ` of a ${ordinary}` : ""} stay inside the outline` },
+    { shield: "azure", inner: { shield: `gules${ordinary ? ` ${ordinary}-argent` : ""}`, charges, items: bezants(count) }, at: points.flatMap((p) => rim(onInner(p), size * INNER, size < 20 ? 0.5 : 0.75)), expect: "or", why: `${count} ${charges || "charges"}${ordinary ? ` of a ${ordinary}` : ""} stay inside an inescutcheon's outline` },
   ]),
   ...["dexter-base", "base-point", "sinister-base"].map((name) => (
     { shield: "azure", charges: "", items: [`bezant in-${name}`], at: rim(POINTS[name], 22), expect: "or", why: `in ${name} stays inside the outline` }
   )),
   { shield: "azure chevron-gules", charges: "between", items: bezants(3), at: [[24, 22], [76, 22], [50, 70]].flatMap((p) => rim(p, 22)), expect: "or", why: "between a chevron stays inside the outline" },
-  { shield: "azure chevron-gules", charges: "between", items: bezants(6), at: [[18, 14], [50, 11], [82, 14], [40, 72], [60, 72], [50, 84]].flatMap((p) => rim(p, 12, 0.8)), expect: "or", why: "six between a chevron stay inside the outline" },
+  { shield: "azure chevron-gules", charges: "between", items: bezants(6), at: [[18, 14], [50, 11], [82, 14], [40, 77], [60, 77], [50, 89]].flatMap((p) => rim(p, 12, 0.8)), expect: "or", why: "six between a chevron stay inside the outline" },
   { shield: "azure", inner: { shield: "gules chevron-argent", charges: "between", items: bezants(3) }, at: [[24, 22], [76, 22], [50, 70]].flatMap((p) => rim(onInner(p), 22 * INNER, 0.75)), expect: "or", why: "between a chevron stays inside an inescutcheon's outline" },
 ];
 
@@ -1432,13 +1479,16 @@ const CONTACT = [
   ...VOIDED.map(([o]) => ({ shield: `azure ${o}-voided-or` })),
 ];
 // Torteaux on and between every ordinary under every line, to tune ON_SCALE and BETWEEN_LINED by
-// eye: `on` at the largest count, `between` at the default count and at six.
+// eye: `on` at the largest count, `between` at the default count and at six, nine and ten.
 const torteaux = (n) => Array(n).fill("torteau");
 const LINED_CHARGES = Object.keys(BETWEEN).flatMap((o) =>
   LINES.filter((line) => !line || lineOrdinaries(line.slice(1)).includes(o)).flatMap((line) => {
     const shield = `azure ${o}${line}-argent`;
     const onCount = Math.max(...Object.keys(ON[o].counts).map(Number));
-    const counts = [BETWEEN[o].points.length, ...(BETWEEN[o].counts?.[6] ? [6] : [])];
+    const counts = [
+      BETWEEN[o].points.length,
+      ...[3, 4, 6, 9, 10].filter((n) => BETWEEN[o].counts?.[n]),
+    ];
     return [
       { shield, charges: "on", items: torteaux(onCount) },
       ...counts.map((n) => ({ shield, charges: "between", items: torteaux(n) })),

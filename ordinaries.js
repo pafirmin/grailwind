@@ -972,8 +972,11 @@ const mergeLined = (ordinary, line) => {
 
 const onVars = ({ size, counts }, scale = 1) => {
   const vars = { "--on-size": `${+(size * scale).toFixed(2)}%` };
-  for (const [count, points] of Object.entries(counts)) {
-    points.forEach(([left, top], i) => {
+  for (const [count, override] of Object.entries(counts)) {
+    if (override.size !== undefined) {
+      vars[`--on-${count}-size`] = `${+(override.size * scale).toFixed(2)}%`;
+    }
+    override.points.forEach(([left, top], i) => {
       vars[`--on-${count}-${i + 1}-x`] = `${left}%`;
       vars[`--on-${count}-${i + 1}-y`] = `${top}%`;
     });

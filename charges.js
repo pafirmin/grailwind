@@ -2,7 +2,7 @@
  * Grailwind CSS: charges and their arrangement.
  */
 import plugin from "tailwindcss/plugin";
-import { POINTS, ROUNDELS } from "./data.js";
+import { BETWEEN, BETWEEN_LINED, ON, POINTS, ROUNDELS } from "./data.js";
 import { AT } from "./furs.js";
 
 const star = (cx, cy, r, points = 5) => {
@@ -67,9 +67,12 @@ const DEFAULTS = {
   1: { size: 50, points: [[50, 45]] },
   2: { size: 30, points: [[50, 24], [50, 66]] },
   3: { size: 28, points: [[28, 25], [72, 25], [50, 64]] },
-  4: { size: 24, points: [[30, 24], [70, 24], [32, 60], [68, 60]] },
-  5: { size: 22, points: [[27, 20], [73, 20], [50, 42], [32, 64], [68, 64]] },
+  4: { size: 24, points: [[30, 24], [70, 24], [30, 60], [70, 60]] },
+  5: { size: 22, points: [[27, 20], [73, 20], [50, 42], [27, 64], [73, 64]] },
   6: { size: 20, points: [[20, 18], [50, 18], [80, 18], [35, 42], [65, 42], [50, 66]] },
+  7: { size: 20, points: [[24, 18], [50, 18], [76, 18], [24, 42], [50, 42], [76, 42], [50, 66]] },
+  9: { size: 17, points: [[22, 16], [50, 16], [78, 16], [24, 38], [50, 38], [76, 38], [32, 60], [50, 60], [68, 60]] },
+  10: { size: 15, points: [[17, 15], [39, 15], [61, 15], [83, 15], [28, 35], [50, 35], [72, 35], [39, 55], [61, 55], [50, 75]] },
 };
 
 const POINT_SIZE = 22;
@@ -188,6 +191,15 @@ const atPoint = (name) => {
     : place([left, top], POINT_SIZE);
 };
 
+/**
+ * @param {object[]} layouts Entries of `ON`, `BETWEEN` or `BETWEEN_LINED`, with optional `counts`.
+ * @returns {number[]} Every number of charges some layout places, ascending.
+ */
+const countKeys = (layouts) =>
+  [...new Set(layouts.flatMap((layout) => Object.keys(layout.counts ?? {}).map(Number)))].sort(
+    (a, b) => a - b,
+  );
+
 const hasCount = (n) => `:has(> :nth-child(${n}):last-child)`;
 
 export default plugin(({ addUtilities, matchUtilities }) => {
@@ -264,8 +276,12 @@ export default plugin(({ addUtilities, matchUtilities }) => {
       "--charge-width": "var(--charge-size, var(--between-size))",
     };
   }
-  // The counts some ordinary overrides in BETWEEN's `counts` (see data.js).
-  for (const count of [2, 6]) {
+  // The counts some ordinary overrides in `counts` (see data.js).
+  const betweenCounts = countKeys([
+    ...Object.values(BETWEEN),
+    ...Object.values(BETWEEN_LINED).flatMap((lines) => Object.values(lines)),
+  ]);
+  for (const count of betweenCounts) {
     for (let i = 1; i <= count; i++) {
       between[`&${hasCount(count)} > :nth-child(${i})`] = {
         left: `var(--between-${count}-${i}-x, var(--between-${i}-x))`,
@@ -279,7 +295,7 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   // Falls back to the plain-field default when the ordinary has no points for this count.
   // An undefined var() would otherwise unset `left`/`top` instead of  deferring to the :where() default.
   const on = {};
-  for (const count of [1, 2, 3, 5]) {
+  for (const count of countKeys(Object.values(ON))) {
     const fallback = DEFAULTS[count];
     for (let i = 1; i <= count; i++) {
       const [left, top] = fallback?.points[i - 1] ?? [];
@@ -290,7 +306,7 @@ export default plugin(({ addUtilities, matchUtilities }) => {
       on[`&${hasCount(count)} > :nth-child(${i})`] = {
         left: at("x", left),
         top: at("y", top),
-        "--charge-width": `var(--charge-size, var(--on-size, ${fallback?.size ?? 16}%))`,
+        "--charge-width": `var(--charge-size, var(--on-${count}-size, var(--on-size, ${fallback?.size ?? 16}%)))`,
       };
     }
   }

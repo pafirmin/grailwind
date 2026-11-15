@@ -88,6 +88,12 @@ const PATTERNS = {
     /\.charges \{[^]*?&:where\(:has\( > :nth-child\(5\):last-child\)\) > :where\(:nth-child\(3\)\) \{\s*left: 50%;\s*top: 42%;/,
   "fess-or publishes between points by count": /\.fess-or \{[^}]*--between-2-1-x: 50%;/,
   "fess-or publishes a size for six between": /\.fess-or \{[^}]*--between-6-size: 14%;/,
+  "fess-or publishes a size for four on": /\.fess-or \{[^}]*--on-4-size: 18%;/,
+  "four on take their count's size":
+    /\.on:has\( > :nth-child\(4\):last-child\) > :nth-child\(4\) \{[^}]*--charge-width: var\(--charge-size, var\(--on-4-size, var\(--on-size, 24%\)\)\);/,
+  "chevron-or publishes sizes for nine and ten between":
+    /\.chevron-or \{[^}]*--between-9-size: 11%;[^}]*--between-10-size: 11%;/,
+  "bend-or publishes a size for three between": /\.bend-or \{[^}]*--between-3-size: 18%;/,
   "two between read their count, then fall back by index":
     /\.between:has\( > :nth-child\(2\):last-child\) > :nth-child\(1\) \{\s*left: var\(--between-2-1-x, var\(--between-1-x\)\);/,
   "six between take their count's size":
