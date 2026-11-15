@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-15
+
 ### Added
 
 - Engrailed and invected bordures, e.g. `bordure-engrailed-or`. On a frame the field grows into the
@@ -235,7 +237,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release: tinctures, divisions, ordinaries, charges, strict mode and
 custom SVG charges.
 
-[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/pafirmin/grailwind/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/pafirmin/grailwind/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/pafirmin/grailwind/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/pafirmin/grailwind/compare/v0.6.0...v0.7.0
