@@ -506,7 +506,8 @@
 
 /* Canton: a third of the shield each way in dexter chief, so a ninth of it, and
  * 5:6 like the shield, so everything on it places as on a shield. Over every
- * ordinary and charge, as a later addition to the arms, and over the bordure. */
+ * ordinary and charge, as a later addition to the arms, and over the bordure.
+ * Outlined in sable like the inescutcheon, so a canton of the field's tincture shows. */
 @utility canton {
   position: absolute;
   z-index: 5;
@@ -514,6 +515,12 @@
   left: calc(-1 * var(--outer-inset, 0px));
   top: calc(-1 * var(--outer-inset, 0px));
   aspect-ratio: 5 / 6;
+  /* Its outline, on the two edges inside the shield, outside its box where nothing on it can
+   * cover it. 2px, as OUTLINE_WIDTH in ordinaries.js. */
+  box-shadow:
+    2px 0 0 var(--color-sable),
+    0 2px 0 var(--color-sable),
+    2px 2px 0 var(--color-sable);
   /* Like the shield, so a chief on it surmounts its own bordure. */
   overflow: clip;
   overflow-clip-margin: border-box;

@@ -1144,6 +1144,14 @@ const PROBES = [
   { shield: "sable", inner: { kind: "canton", shield: "argent cross-gules" }, at: onCanton([20, 15]), expect: "argent", why: "the canton between the cross's arms" },
   { shield: "azure", inner: { kind: "canton", shield: "per-bend-or-gules" }, at: onCanton([75, 20]), expect: "or", why: "a divided canton, above the line" },
   { shield: "azure", inner: { kind: "canton", shield: "per-bend-or-gules" }, at: onCanton([20, 75]), expect: "gules", why: "a divided canton, below the line" },
+  // The canton's 2px outline lies outside its right and bottom edges; it's 100 × 120px. A quarter's
+  // canton is 50 × 60px, and the notch is where a lone 2px 2px shadow misses its bottom-left end.
+  { shield: "argent", inner: { kind: "canton", shield: "argent" }, at: [px(101, 60), px(50, 121), px(101, 121)], expect: "sable", why: "a canton of the field's tincture is outlined, to its corner" },
+  { shield: "argent", inner: { kind: "canton", shield: "argent" }, at: [px(106, 60), px(50, 126), px(106, 126)], expect: "argent", why: "a canton's outline is 2px" },
+  { shield: "argent", inner: { kind: "canton", shield: "argent cross-gules" }, at: px(101, 54), expect: "sable", why: "a cross on a canton doesn't cover its outline" },
+  { shield: "argent", inner: { kind: "canton", shield: "argent chief-gules" }, at: px(101, 15), expect: "sable", why: "a chief on a canton doesn't cover its outline" },
+  { shield: "azure bordure-or", inner: { kind: "canton", shield: "argent" }, at: [px(101, 60), px(60, 121)], expect: "sable", why: "a canton over the bordure is outlined" },
+  { shield: "quarterly", quarters: ["azure", { shield: "argent", inner: { kind: "canton", shield: "argent" } }, "azure", "azure"], at: [px(151, 61), px(175, 61), px(201, 30)], expect: "sable", why: "a canton in quarter 2 is outlined, with no notch at its bottom-left" },
   // Lined ordinaries (012): just outside the fixed charge, where the plain layout's charge was.
   { shield: "azure chevron-engrailed-argent", charges: "on", items: Array(3).fill("torteau"), at: [[13.67, 65], [86.33, 65]], expect: "argent", why: "engrailed shrinks the chevron's side charges" },
   { shield: "azure bend-engrailed-argent", charges: "between", items: Array(2).fill("torteau"), at: [[30, 59], [34, 60]], expect: "azure", why: "the engrailed bend's lower charge is moved off the edge" },
