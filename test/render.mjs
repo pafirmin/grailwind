@@ -17,6 +17,15 @@ const ORDINARIES = [
   "bar",
   "two-bars",
   "three-bars",
+  "bendlet",
+  "two-bendlets",
+  "three-bendlets",
+  "pallet",
+  "two-pallets",
+  "three-pallets",
+  "chevronel",
+  "two-chevronels",
+  "three-chevronels",
   "bend",
   "bend-sinister",
   "chevron",
@@ -590,6 +599,60 @@ const PROBES = [
   { shield: "per-pale-or-gules bar-counterchanged chief-azure", at: [25, 45], expect: "or", why: "nothing left of a counterchanged bar where it was" },
   { shield: "gules bar-ermine", at: furSpot(1, 2), expect: "sable", why: "a spot on a fur bar" },
   { shield: "gules bar-ermine", at: [50, 30], expect: "gules", why: "the field above a fur bar" },
+  // 059 (diminutives and cotises): bendlets are 20 wide in x − y, centred 20 or 40 apart and joined
+  // round the top-left corner; pallets are 15 wide, joined along the top; chevronels' peaks are 13
+  // deep, centred 35 down, or 22 and 48, or 14, 40 and 66.
+  { shield: "azure bendlet-or", at: [[30, 30], [50, 50], [5, 3]], expect: "or", why: "the bendlet is drawn" },
+  { shield: "azure bendlet-or", at: [[45, 30], [30, 45]], expect: "azure", why: "the field either side of the bendlet" },
+  { shield: "azure two-bendlets-or", at: [[40, 20], [70, 50], [20, 40], [50, 70]], expect: "or", why: "both bendlets are drawn" },
+  { shield: "azure two-bendlets-or", at: [[30, 30], [50, 50], [60, 20], [20, 60], [3, 3], [6, 2.5], [2.5, 6]], expect: "azure", why: "the field between, by the seam and around the bendlets" },
+  { shield: "azure three-bendlets-or", at: [[60, 20], [30, 30], [60, 60], [20, 60]], expect: "or", why: "all three bendlets are drawn" },
+  { shield: "azure three-bendlets-or", at: [[40, 20], [60, 40], [20, 40], [40, 60], [20, 2.5], [2.5, 20], [80, 10]], expect: "azure", why: "the field between, by the seam and around the bendlets" },
+  { shield: "azure three-bendlets-engrailed-or", at: [[69.08, 22.05], [71.21, 38.1], [48.61, 41.81], [42.39, 49.19], [28.79, 61.9], [22.58, 69.62]], expect: "azure", why: "bites in each bendlet's edges" },
+  { shield: "azure three-bendlets-engrailed-or", at: [[60, 20], [30, 30], [20, 60]], expect: "or", why: "each engrailed bendlet is drawn" },
+  ...["engrailed", "embattled"].map((line) => (
+    { shield: `azure three-bendlets-${line}-or`, at: [[20, 2.5], [2.5, 20]], expect: "azure", why: `the ${line} bendlets' seam stays open` }
+  )),
+  // A battlement reaches 3 units either side of the edge, 3.9% across a bendlet's; these are 1.95%
+  // either side of its lower edges, 10 along, over two merlons' length.
+  { shield: "azure three-bendlets-embattled-or", at: [...Array(10).keys()].flatMap((i) => [[55 + 1.5 * i, 23.05 + 1.5 * i], [30 + 1.5 * i, 38.05 + 1.5 * i]]), expect: "or", why: "bendlets embattled are plain below, inside" },
+  { shield: "azure three-bendlets-embattled-or", at: [...Array(10).keys()].flatMap((i) => [[55 + 1.5 * i, 26.95 + 1.5 * i], [30 + 1.5 * i, 41.95 + 1.5 * i]]), expect: "azure", why: "bendlets embattled are plain below" },
+  { shield: "gules bendlet-azure fimbriated-argent", at: [[18, 30], [42, 30]], expect: "argent", why: "the bendlet's fimbriation" },
+  { shield: "gules bendlet-azure fimbriated-argent", at: [30, 30], expect: "azure", why: "the fimbriated bendlet itself" },
+  { shield: "gules bendlet-azure fimbriated-argent", at: [[14, 30], [46, 30]], expect: "gules", why: "the field beyond the bendlet's fimbriation" },
+  { shield: "gules two-bendlets-azure fimbriated-argent", at: [[38, 30], [62, 30], [28, 60], [52, 60]], expect: "argent", why: "each bendlet's fimbriation" },
+  { shield: "gules two-bendlets-azure fimbriated-argent", at: [[50, 30], [40, 60]], expect: "azure", why: "the fimbriated bendlets themselves" },
+  { shield: "gules two-bendlets-azure fimbriated-argent", at: [[33, 30], [67, 30], [45, 45]], expect: "gules", why: "the field between and beyond fimbriated bendlets" },
+  { shield: "azure pallet-or", at: [[50, 20], [44, 50], [56, 50]], expect: "or", why: "the pallet is drawn" },
+  { shield: "azure pallet-or", at: [[40, 50], [60, 50]], expect: "azure", why: "the field either side of the pallet" },
+  { shield: "azure two-pallets-or", at: [[35, 30], [65, 30], [35, 2.5], [65, 2.5]], expect: "or", why: "both pallets are drawn" },
+  { shield: "azure two-pallets-or", at: [[50, 30], [50, 2.5], [20, 30], [80, 30]], expect: "azure", why: "the field between, by the seam and around the pallets" },
+  { shield: "azure three-pallets-or", at: [[20, 30], [50, 30], [80, 30]], expect: "or", why: "all three pallets are drawn" },
+  { shield: "azure three-pallets-or", at: [[35, 30], [65, 30], [35, 2.5], [65, 2.5], [8, 30], [92, 30]], expect: "azure", why: "the field between, by the seam and around the pallets" },
+  { shield: "azure two-pallets-engrailed-or", at: [[29.83, 50], [40.17, 50], [59.83, 50], [70.17, 50]], expect: "azure", why: "bites in each pallet's edges" },
+  { shield: "azure two-pallets-engrailed-or", at: [[35, 50], [65, 50]], expect: "or", why: "each engrailed pallet is drawn" },
+  { shield: "azure two-pallets-engrailed-or", at: [50, 2.5], expect: "azure", why: "the engrailed pallets' seam stays open" },
+  { shield: "gules pallet-azure fimbriated-argent", at: [[41, 40], [59, 40]], expect: "argent", why: "the pallet's fimbriation" },
+  { shield: "gules pallet-azure fimbriated-argent", at: [50, 40], expect: "azure", why: "the fimbriated pallet itself" },
+  { shield: "gules pallet-azure fimbriated-argent", at: [[38, 40], [62, 40]], expect: "gules", why: "the field beyond the pallet's fimbriation" },
+  { shield: "gules three-pallets-azure fimbriated-argent", at: [[11, 40], [29, 40], [41, 40], [59, 40], [71, 40], [89, 40]], expect: "argent", why: "each pallet's fimbriation" },
+  { shield: "gules three-pallets-azure fimbriated-argent", at: [[20, 40], [50, 40], [80, 40]], expect: "azure", why: "the fimbriated pallets themselves" },
+  { shield: "gules three-pallets-azure fimbriated-argent", at: [[35, 40], [65, 40]], expect: "gules", why: "the field between fimbriated pallets" },
+  { shield: "gules pallet-ermine", at: furSpot(3, 1), expect: "sable", why: "a spot on a fur pallet" },
+  { shield: "gules pallet-ermine", at: furGround(2, 1), expect: "argent", why: "a fur pallet's ground" },
+  { shield: "per-pale-or-gules two-pallets-counterchanged", at: [35, 40], expect: "gules", why: "a counterchanged pallet's dexter one" },
+  { shield: "per-pale-or-gules two-pallets-counterchanged", at: [[65, 40], [20, 40]], expect: "or", why: "a counterchanged pallet's sinister one, and the dexter field" },
+  { shield: "azure chevronel-or", at: [[50, 35], [25, 60], [75, 60]], expect: "or", why: "the chevronel is drawn" },
+  { shield: "azure chevronel-or", at: [[50, 25], [50, 45], [25, 52], [25, 68]], expect: "azure", why: "the field above and below the chevronel" },
+  { shield: "azure two-chevronels-or", at: [[50, 22], [50, 48], [25, 47], [75, 47]], expect: "or", why: "both chevronels are drawn" },
+  { shield: "azure two-chevronels-or", at: [[50, 35], [25, 60], [50, 10], [50, 60], [15, 70]], expect: "azure", why: "the field between and around the chevronels" },
+  { shield: "azure three-chevronels-or", at: [[50, 14], [50, 40], [50, 66], [25, 39], [75, 65]], expect: "or", why: "all three chevronels are drawn" },
+  { shield: "azure three-chevronels-or", at: [[50, 27], [50, 53], [50, 80], [25, 52], [75, 52], [10, 10]], expect: "azure", why: "the field between and around the chevronels" },
+  { shield: "azure three-chevronels-or", at: [50, 5], expect: "azure", why: "three chevronels start 7.5 down" },
+  { shield: "azure three-chevronels-engrailed-or", at: [[23.19, 36.54], [26.81, 41.46], [70.56, 56.29], [73.19, 67.46], [34.54, 77.36], [61.76, 81.81]], expect: "azure", why: "bites in each chevronel's edges" },
+  { shield: "azure three-chevronels-engrailed-or", at: [[50, 14], [50, 40], [50, 66], [25, 39], [75, 65]], expect: "or", why: "each engrailed chevronel is drawn" },
+  { shield: "per-pale-or-gules three-chevronels-counterchanged", at: [25, 39], expect: "gules", why: "counterchanged chevronels' dexter half" },
+  { shield: "per-pale-or-gules three-chevronels-counterchanged", at: [[75, 39], [25, 52]], expect: "or", why: "counterchanged chevronels' sinister half, and the field between" },
   // The pile's sides run from (17, 0) and (83, 0) to (50, 85), so at 40% down they're at 32.53 and 67.47.
   { shield: "azure pile-or", at: [[50, 20], [50, 50], [50, 78], [34.03, 40], [65.97, 40]], expect: "or", why: "the pile is drawn, down to near its tip" },
   { shield: "azure pile-or", at: [[20, 20], [80, 20], [31.03, 40], [68.97, 40], [50, 88]], expect: "azure", why: "the field either side and below the tip" },
@@ -1851,13 +1914,16 @@ const probe = async (page, css) => {
   ].join("\n");
   // Whole-pixel rows, at least the tallest probe shield (306px wide, 367.2px tall), so each
   // shield starts on a whole y and a seam probe doesn't depend on the rows above it. The replace
-  // must match grid()'s gap text. A LARGE shield takes two cells each way.
+  // must match grid()'s gap text. A LARGE shield takes two cells each way. Eight columns keep the
+  // page under Chromium's 32767px screenshot limit.
   await page.setContent(
-    grid(css, WIDTH, cells).replace(
-      "gap: 20px;",
-      `gap: 20px; grid-auto-rows: 368px; align-items: start; }
+    grid(css, WIDTH, cells)
+      .replace("repeat(6,", "repeat(8,")
+      .replace(
+        "gap: 20px;",
+        `gap: 20px; grid-auto-rows: 368px; align-items: start; }
   [class~="w-[${LARGE}px]!"] { grid-area: span 2 / span 2;`,
-    ),
+      ),
   );
 
   const boxes = await page.evaluate(() =>

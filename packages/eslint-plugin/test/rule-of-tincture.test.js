@@ -6,6 +6,7 @@ const error = (message) => ({ message });
 run("rule-of-tincture", rule, {
   valid: [
     `<div class="heater"><div class="or fess-azure"></div></div>`,
+    `<div class="heater"><div class="or three-chevronels-gules"></div></div>`,
     // A label lies on the chief if there is one, else on the field.
     `<div class="heater"><div class="or"><div class="label-azure"><div class="charges on"><i class="bezant"></i></div></div></div></div>`,
     `<div class="heater"><div class="vair"><div class="label-vair"><div class="charges on"><i class="bezant"></i></div></div></div></div>`,
@@ -171,6 +172,12 @@ run("rule-of-tincture", rule, {
     {
       code: `<div class="heater"><div class="or fess-argent"></div></div>`,
       errors: [error("`fess-argent` puts a fess Argent on Or: metal on metal")],
+    },
+    {
+      code: `<div class="heater"><div class="azure three-chevronels-gules"></div></div>`,
+      errors: [
+        error("`three-chevronels-gules` puts a three chevronels Gules on Azure: colour on colour"),
+      ],
     },
     {
       code: `<div class="heater"><div class="or cross-voided-argent"></div></div>`,

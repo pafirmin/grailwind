@@ -36,6 +36,38 @@ const ORDINARIES = {
     [0, 20], [100, 20], [100, 30], [0, 30], [0, 40], [100, 40],
     [100, 50], [0, 50], [0, 60], [100, 60], [100, 70], [0, 70],
   ],
+  // Diminutives are half their ordinary's width, a width apart, joined along the shield's edge:
+  // bendlets round the dexter chief corner, pallets along the top, chevronels down the dexter side
+  // (the lowest of three along the base too).
+  bendlet: [[0, 0], [10, 0], [100, 90], [100, 100], [90, 100], [0, 10]],
+  "two-bendlets": [
+    [30, 0], [100, 70], [100, 90], [10, 0], [0, 0],
+    [0, 10], [90, 100], [70, 100], [0, 30], [0, 0],
+  ],
+  "three-bendlets": [
+    [50, 0], [100, 50], [100, 70], [30, 0], [10, 0], [100, 90], [100, 100],
+    [90, 100], [0, 10], [0, 30], [70, 100], [50, 100], [0, 50], [0, 0],
+  ],
+  pallet: [[42.5, 0], [57.5, 0], [57.5, 100], [42.5, 100]],
+  "two-pallets": [
+    [72.5, 0], [72.5, 100], [57.5, 100], [57.5, 0],
+    [42.5, 0], [42.5, 100], [27.5, 100], [27.5, 0],
+  ],
+  "three-pallets": [
+    [87.5, 0], [87.5, 100], [72.5, 100], [72.5, 0], [57.5, 0], [57.5, 100],
+    [42.5, 100], [42.5, 0], [27.5, 0], [27.5, 100], [12.5, 100], [12.5, 0],
+  ],
+  // The lowest chevronel's feet run off the base.
+  chevronel: [[50, 28.5], [100, 78.5], [100, 91.5], [50, 41.5], [0, 91.5], [0, 78.5]],
+  "two-chevronels": [
+    [0, 65.5], [50, 15.5], [100, 65.5], [100, 78.5], [50, 28.5], [0, 78.5],
+    [0, 91.5], [50, 41.5], [100, 91.5], [100, 100], [95.5, 100], [50, 54.5], [4.5, 100], [0, 100],
+  ],
+  "three-chevronels": [
+    [0, 57.5], [50, 7.5], [100, 57.5], [100, 70.5], [50, 20.5], [0, 70.5],
+    [0, 83.5], [50, 33.5], [100, 83.5], [100, 96.5], [50, 46.5], [0, 96.5], [0, 100],
+    [9.5, 100], [50, 59.5], [90.5, 100], [77.5, 100], [50, 72.5], [22.5, 100], [0, 100],
+  ],
   bend: [[0, 0], [20, 0], [100, 80], [100, 100], [80, 100], [0, 20]],
   "bend-sinister": [[100, 0], [80, 0], [0, 80], [0, 100], [20, 100], [100, 20]],
   chevron: [[50, 22], [100, 72], [100, 98], [50, 48], [0, 98], [0, 72]],
@@ -210,6 +242,12 @@ const BANDS = {
   bar: [band("y", 38, 52)],
   "two-bars": [band("y", 27, 39), band("y", 51, 63)],
   "three-bars": [band("y", 20, 30), band("y", 40, 50), band("y", 60, 70)],
+  bendlet: [band("u-v", -10, 10)],
+  "two-bendlets": [band("u-v", -30, -10), band("u-v", 10, 30)],
+  "three-bendlets": [band("u-v", -50, -30), band("u-v", -10, 10), band("u-v", 30, 50)],
+  pallet: [band("x", 42.5, 57.5)],
+  "two-pallets": [band("x", 27.5, 42.5), band("x", 57.5, 72.5)],
+  "three-pallets": [band("x", 12.5, 27.5), band("x", 42.5, 57.5), band("x", 72.5, 87.5)],
   bend: [band("u-v", -20, 20)],
   "bend-sinister": [band("u+v", 80, 120)],
   chevron: [
@@ -400,12 +438,14 @@ const chequyLayers = (ordinary, first, second, theme) => {
 // Lines of partition. Scallops are round on the 5:6 shield; below a chief the
 // box is shorter, so they are slightly squashed.
 const SCALLOP = 14;
-const SCALLOPS = { chevron: 10 };
+const SCALLOPS = { chevron: 10, chevronel: 10, "two-chevronels": 10, "three-chevronels": 10 };
 // Wavy half-waves, longer where the default reads as beads: the bend, cross and cornered ordinaries.
 // prettier-ignore
 const WAVES = {
   bend: 21, "bend-sinister": 21, cross: 20,
   chevron: 28, saltire: 28, pall: 28,
+  bendlet: 21, "two-bendlets": 21, "three-bendlets": 21,
+  chevronel: 28, "two-chevronels": 28, "three-chevronels": 28,
 };
 const LENGTHS = { wavy: WAVES };
 
@@ -536,6 +576,7 @@ const BATTLEMENT_HEIGHT = 6;
 // prettier-ignore
 const UPPER_ONLY = [
   "fess", "bar", "two-bars", "three-bars", "bend", "bend-sinister", "chevron", "chevron-reversed",
+  "bendlet", "two-bendlets", "three-bendlets", "chevronel", "two-chevronels", "three-chevronels",
 ];
 
 // Battlements centred on the edge, in phase across a band like `wavy`, but merlon opposite
