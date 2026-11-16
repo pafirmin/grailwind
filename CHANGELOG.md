@@ -13,8 +13,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `charges on` inside it puts one charge on each point. The lint checks labels.
 - The cross bottony, `cross-bottony`: each arm ends in three round knobs.
 - Diminutives, named by count like the bars: `bendlet-*`, `pallet-*` and `chevronel-*`, and
-  `two-` and `three-` of each. They take lines, furs and counterchanged; bendlets and pallets
-  also fimbriation.
+  `two-` and `three-` of each. They take lines, furs, counterchanged and voided; bendlets and
+  pallets also fimbriation.
 - The fess and pale chequy, e.g. `fess-chequy-azure-argent`: three rows of checks, one tincture
   possibly a fur. The lint lets them lie on any field and doesn't check charges on them.
 - The bordure compony and chequy, e.g. `bordure-compony-or-sable`, one tincture possibly a fur.

@@ -113,6 +113,15 @@ export const VOIDABLE = [
   "saltire",
   "pall",
   "pile",
+  "bendlet",
+  "two-bendlets",
+  "three-bendlets",
+  "pallet",
+  "two-pallets",
+  "three-pallets",
+  "chevronel",
+  "two-chevronels",
+  "three-chevronels",
   ...REVERSIBLE.map(reversed),
 ];
 

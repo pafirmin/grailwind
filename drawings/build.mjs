@@ -18,6 +18,7 @@ const FIGURES = {
   "chevron-wavy": 133,
   "chevron-indented": 132,
   "chevron-embattled": 130,
+  "chevronel-wavy": 133,
   "cross-indented": 159,
   "cross-embattled": 158,
   "saltire-wavy": 189,

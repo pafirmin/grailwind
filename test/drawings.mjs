@@ -205,14 +205,153 @@ check(
 
 // The generator can't draw these lines round a corner, so a cornered ordinary takes them only
 // once it's drawn.
-const CORNERED = ["chevron", "cross", "saltire", "pall", "pile"].flatMap((o) => [
-  o,
-  `${o}-reversed`,
-]);
+const CORNERED = [
+  ...["chevron", "cross", "saltire", "pall", "pile"].flatMap((o) => [o, `${o}-reversed`]),
+  "chevronel",
+  "two-chevronels",
+  "three-chevronels",
+];
 for (const line of ["indented", "embattled"]) {
   for (const ordinary of lineOrdinaries(line).filter((o) => CORNERED.includes(o))) {
     check(`${ordinary}-${line} is drawn`, `${ordinary}-${line}` in DRAWN);
   }
+}
+
+/**
+ * A drawing's subpaths, each starting at its "M".
+ * @param {Array[]} segments A drawing, as in paths.js.
+ * @returns {Array[][]} The subpaths.
+ */
+const subpaths = (segments) => {
+  const parts = [];
+  for (const segment of segments) {
+    if (segment[0] === "M") {
+      parts.push([]);
+    }
+    parts.at(-1).push(segment);
+  }
+  return parts;
+};
+
+// Where each command keeps its y values; the rest of its numbers don't move.
+const Y_INDEXES = { M: [1], L: [1], C: [1, 3, 5], A: [6] };
+
+/**
+ * How far down each segment of `moved` lies from the same segment of `original`, if every point
+ * of the segment moved by the same amount and none moved across.
+ * @param {Array[]} original A drawing, as in paths.js.
+ * @param {Array[]} moved The same drawing, its points moved up or down.
+ * @returns {(number|null)[]|null} Each segment's move (null for "Z"), or null if they don't match.
+ */
+const segmentMoves = (original, moved) => {
+  if (original.length !== moved.length) {
+    return null;
+  }
+  const moves = original.map(([command, ...n], i) => {
+    const [movedCommand, ...m] = moved[i];
+    if (command !== movedCommand || n.length !== m.length) {
+      return undefined;
+    }
+    if (command === "Z") {
+      return null;
+    }
+    const ys = Y_INDEXES[command];
+    const down = m[ys[0]] - n[ys[0]];
+    const matches = n.every((value, j) =>
+      ys.includes(j) ? Math.abs(m[j] - value - down) < 1e-6 : m[j] === value,
+    );
+    return matches ? down : undefined;
+  });
+  return moves.includes(undefined) ? null : moves;
+};
+
+/**
+ * Whether a drawing is the same drawing moved down, every point by the same amount.
+ * @param {Array[]} original A drawing, as in paths.js.
+ * @param {Array[]} moved The drawing to compare.
+ * @param {number} down The expected move, in real units.
+ * @returns {boolean} True if every point moved by `down`.
+ */
+const movedBy = (original, moved, down) =>
+  segmentMoves(original, moved)?.every((move) => move === null || Math.abs(move - down) < 1e-6) ??
+  false;
+
+/**
+ * How far a chevron segment moves to narrow it to a chevronel, worked out from which side of the
+ * chevron's centre line, y = 42 + 1.2|x − 50|, the segment ends: a flank join takes the edge it
+ * ends on.
+ * @param {Array} segment One segment of a chevron drawing, as in paths.js.
+ * @returns {number|null} 7.8 (down) on the upper edge, -7.8 on the lower, null for "Z".
+ */
+const expectedMove = (segment) => {
+  if (segment[0] === "Z") {
+    return null;
+  }
+  const [x, y] = [segment.at(-2), segment.at(-1)];
+  return y < 42 + 1.2 * Math.abs(x - 50) ? 7.8 : -7.8;
+};
+
+// 059 (diminutives and cotises): the chevron's drawing narrowed by 7.8 units an edge, stacked a
+// chevronel's width (15.6) apart, three moved down by eye per line.
+for (const [line, shift] of [
+  ["indented", 6],
+  ["embattled", 14.4],
+]) {
+  const chevron = PATHS[`chevron-${line}`];
+  const single = DRAWN[`chevronel-${line}`];
+  const moves = single && segmentMoves(chevron, single);
+  const expectedMoves = chevron.map(expectedMove);
+  const peakYs = chevron
+    .filter((segment) => segment.at(-2) === 50)
+    .map((segment) => segment.at(-1));
+  const peakMove = (y) =>
+    moves?.[chevron.findIndex((segment) => segment.at(-2) === 50 && segment.at(-1) === y)];
+  check(
+    `chevronel-${line} is chevron-${line} with its upper edge moved 7.8 units down, its lower up`,
+    moves?.every((move, i) =>
+      move === null ? expectedMoves[i] === null : Math.abs(move - expectedMoves[i]) < 1e-6,
+    ),
+    `  ${JSON.stringify(single)}`,
+  );
+  check(
+    `chevronel-${line}'s upper peak moved down and its lower peak up`,
+    Math.abs(peakMove(Math.min(...peakYs)) - 7.8) < 1e-6 &&
+      Math.abs(peakMove(Math.max(...peakYs)) + 7.8) < 1e-6,
+  );
+}
+
+// The wavy chevronel is drawn, not derived.
+check(
+  "chevronel-wavy is its drawing",
+  "chevronel-wavy" in PATHS &&
+    JSON.stringify(DRAWN["chevronel-wavy"]) === JSON.stringify(PATHS["chevronel-wavy"]),
+);
+
+for (const [line, shift] of [
+  ["indented", 6],
+  ["embattled", 14.4],
+  ["wavy", 6],
+]) {
+  const single = DRAWN[`chevronel-${line}`];
+  for (const [name, offsets] of [
+    ["two-chevronels", [-15.6, 15.6]],
+    ["three-chevronels", [-31.2, 0, 31.2].map((offset) => +(offset + shift).toFixed(2))],
+  ]) {
+    const parts = subpaths(DRAWN[`${name}-${line}`] ?? []);
+    check(
+      `${name}-${line} is chevronel-${line} at ${offsets.join(", ")}`,
+      parts.length === offsets.length &&
+        parts.every((part, i) => movedBy(single, part, offsets[i])),
+      `  ${parts.length} subpaths`,
+    );
+  }
+  const three = DRAWN[`three-chevronels-${line}`];
+  const shape = three ? pathShape(three) : "";
+  check(
+    `three-chevronels-${line}'s shape moves to each later chevronel`,
+    shape.match(/move to/g)?.length === 2 && shape.endsWith("close)"),
+    `  ${shape}`,
+  );
 }
 
 if (failures) {

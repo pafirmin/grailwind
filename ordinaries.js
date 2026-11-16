@@ -455,6 +455,16 @@ const VOIDS = {
   pale: 7.5, fess: 9, bar: 4.2, bend: 7.7, "bend-sinister": 7.7,
   chevron: 5, cross: 6, saltire: 6, pall: 6, pile: 8.8,
 };
+// A diminutive is half its ordinary, so its void is half too.
+for (const [diminutive, ordinary] of [
+  ["bendlet", "bend"],
+  ["pallet", "pale"],
+  ["chevronel", "chevron"],
+]) {
+  for (const name of [diminutive, `two-${diminutive}s`, `three-${diminutive}s`]) {
+    VOIDS[name] = VOIDS[ordinary] / 2;
+  }
+}
 for (const ordinary of REVERSIBLE) {
   if (SCALLOPS[ordinary]) {
     SCALLOPS[`${ordinary}-reversed`] = SCALLOPS[ordinary];
@@ -713,11 +723,13 @@ const draftOutline = (ordinary, name) => outline(...generated(ordinary, name));
 const generatedShape = (ordinary, name) => shape(...generated(ordinary, name));
 
 // Drawn shapes are segments in real units: ["M", x, y], ["L", x, y], ["C", x1, y1, x2, y2, x, y],
-// ["A", rx, ry, rotation, large, sweep, x, y] and ["Z"].
+// ["A", rx, ry, rotation, large, sweep, x, y] and ["Z"]. A later "M" starts another subpath.
 const pathShape = (segments) => {
   const [, startX, startY] = segments[0];
   const commands = segments.slice(1).map(([command, ...n]) => {
     switch (command) {
+      case "M":
+        return `move to ${at([n[0], n[1]])}`;
       case "L":
         return `line to ${at([n[0], n[1]])}`;
       case "C":
@@ -1212,6 +1224,98 @@ for (const key of Object.keys(PATHS)) {
   if (REVERSIBLE.includes(ordinary) && !upperOnly && !(reversedKey in PATHS)) {
     DRAWN[reversedKey] = flipPath(PATHS[key]);
   }
+}
+
+/**
+ * A segment moved down, its control points too.
+ * @param {Array} segment One drawn segment, as in paths.js.
+ * @param {number} down How far to move it, in real units; negative moves it up.
+ * @returns {Array} The moved segment.
+ */
+const moveSegment = ([command, ...n], down) => {
+  switch (command) {
+    case "M":
+    case "L":
+      return [command, n[0], num(n[1] + down)];
+    case "C":
+      return [command, n[0], num(n[1] + down), n[2], num(n[3] + down), n[4], num(n[5] + down)];
+    case "A":
+      return [command, ...n.slice(0, 6), num(n[6] + down)];
+    default:
+      return [command];
+  }
+};
+
+// The plain chevron's peak runs 26.4–57.6 and the chevronel's 34.2–49.8.
+const CHEVRONEL_INSET = 7.8;
+
+/**
+ * A chevronel from a chevron drawing: its upper edge moved down and its lower edge up, each by
+ * CHEVRONEL_INSET. The edges change at the flank joins, lines along x = 0 or x = 100.
+ * @param {Array[]} segments The chevron's drawing, as in paths.js, only "L" and "C" after "M".
+ * @returns {Array[]} The chevronel's drawing.
+ */
+const narrowed = (segments) => {
+  const end = (segment) => [segment.at(-2), segment.at(-1)];
+  const onFlank = (from, to) => [0, W].some((x) => from[0] === x && to[0] === x);
+  const edgeOf = [];
+  let edge = 0;
+  let previous = end(segments[0]);
+  for (const segment of segments) {
+    if (segment[0] === "L" && onFlank(previous, end(segment))) {
+      edge = 1 - edge;
+    }
+    edgeOf.push(edge);
+    if (segment[0] !== "Z") {
+      previous = end(segment);
+    }
+  }
+  const meanY = [0, 1].map((side) => {
+    const ys = segments
+      .filter((segment, i) => edgeOf[i] === side && segment[0] !== "Z")
+      .map((segment) => segment.at(-1));
+    return ys.reduce((sum, y) => sum + y, 0) / ys.length;
+  });
+  const upper = meanY[0] < meanY[1] ? 0 : 1;
+  return segments.map((segment, i) =>
+    moveSegment(segment, edgeOf[i] === upper ? CHEVRONEL_INSET : -CHEVRONEL_INSET),
+  );
+};
+
+/**
+ * Copies of a drawing moved down by each offset, as one drawing of several subpaths.
+ * @param {Array[]} segments A closed drawing, as in paths.js.
+ * @param {number[]} offsets How far down to move each copy, in real units.
+ * @returns {Array[]} The copies, each starting with its own "M".
+ */
+const stacked = (segments, offsets) =>
+  offsets.flatMap((offset) => segments.map((segment) => moveSegment(segment, offset)));
+
+// A chevronel's width, which is also the gap between two.
+const CHEVRONEL_STEP = 15.6;
+// Lines whose chevronel is the chevron's drawing narrowed, unless drawn.
+const NARROWED = ["indented", "embattled"];
+// How far three chevronels sit below the stack the polygon first had, in real units, by eye.
+const THREE_CHEVRONELS_SHIFT = {
+  indented: 6,
+  embattled: 14.4,
+  wavy: 6,
+};
+// A drawn `chevronel-<line>` takes precedence over a narrowed one. Without either, the line is
+// generated from the polygon.
+for (const [line, shift] of Object.entries(THREE_CHEVRONELS_SHIFT)) {
+  const single =
+    PATHS[`chevronel-${line}`] ??
+    (NARROWED.includes(line) ? narrowed(PATHS[`chevron-${line}`]) : undefined);
+  if (!single) {
+    continue;
+  }
+  DRAWN[`chevronel-${line}`] = single;
+  DRAWN[`two-chevronels-${line}`] = stacked(single, [-CHEVRONEL_STEP, CHEVRONEL_STEP]);
+  DRAWN[`three-chevronels-${line}`] = stacked(
+    single,
+    [-2 * CHEVRONEL_STEP, 0, 2 * CHEVRONEL_STEP].map((offset) => offset + shift),
+  );
 }
 
 const betweenVars = ({ size, points, counts = {} }) => {

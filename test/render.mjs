@@ -474,6 +474,17 @@ const VOIDED = [
   // The arms' outer outline moved up along them, clear of the heater's point.
   ["pall-reversed", [50, 20], [[41, 20], [59, 20], [28, 88], [25, 69.6], [72, 88], [75, 69.6]], [20, 20]],
   ["pile-reversed", [50, 60], [[37.15, 60], [62.85, 60]], [20, 60]],
+  // Diminutives, half their ordinary's void: an outline either side of each piece's hole.
+  ["bendlet", [50, 50], [[42.5, 50], [57.5, 50]], [75, 25]],
+  ["two-bendlets", [[30, 50], [70, 50]], [[22.5, 50], [37.5, 50], [62.5, 50], [77.5, 50]], [50, 50]],
+  ["three-bendlets", [[10, 50], [50, 50], [90, 50]], [[17.5, 50], [42.5, 50], [57.5, 50], [82.5, 50]], [30, 50]],
+  ["pallet", [50, 50], [[44.4, 50], [55.6, 50]], [20, 50]],
+  ["two-pallets", [[35, 50], [65, 50]], [[29.4, 50], [40.6, 50], [59.4, 50], [70.6, 50]], [50, 50]],
+  ["three-pallets", [[20, 50], [50, 50], [80, 50]], [[14.4, 50], [25.6, 50], [44.4, 50], [55.6, 50], [74.4, 50], [85.6, 50]], [35, 50]],
+  ["chevronel", [25, 60], [[25, 55.2], [25, 64.9]], [25, 45]],
+  ["two-chevronels", [[25, 47], [25, 73]], [[25, 42.2], [25, 51.9], [25, 68.2], [25, 77.9]], [25, 60]],
+  // At x = 40, clear of the heater's base.
+  ["three-chevronels", [[40, 24], [40, 50], [40, 76]], [[40, 19.2], [40, 28.9], [40, 45.2], [40, 54.9], [40, 71.2], [40, 80.9]], [40, 37]],
 ];
 
 // `at` is [x%, y%] of the shield. Bite and bulge points are at the middle scallop of an inner
@@ -653,6 +664,29 @@ const PROBES = [
   { shield: "azure three-chevronels-engrailed-or", at: [[50, 14], [50, 40], [50, 66], [25, 39], [75, 65]], expect: "or", why: "each engrailed chevronel is drawn" },
   { shield: "per-pale-or-gules three-chevronels-counterchanged", at: [25, 39], expect: "gules", why: "counterchanged chevronels' dexter half" },
   { shield: "per-pale-or-gules three-chevronels-counterchanged", at: [[75, 39], [25, 52]], expect: "or", why: "counterchanged chevronels' sinister half, and the field between" },
+  // Indented and embattled chevronels are the chevron's drawings with each edge moved 6.5% in: the
+  // indented's peak runs 28.5–41.5, the embattled's tower 19.4 down to its lower peak at 41.5.
+  // Two are 13 above and below; three 26 apart, moved down 5% (indented) or 12% (embattled).
+  { shield: "azure chevronel-indented-or", at: [[50, 30], [50, 40], [40, 40], [60, 40]], expect: "or", why: "the indented chevronel is drawn" },
+  { shield: "azure chevronel-indented-or", at: [[50, 25], [50, 45]], expect: "azure", why: "the field above and below the indented chevronel's peak, inside the chevron's" },
+  { shield: "azure chevronel-embattled-or", at: [[50, 22], [50, 40], [28.11, 45.83], [71.89, 45.83], [25, 64.75], [75, 64.75]], expect: "or", why: "the embattled chevronel's tower, peak, merlons and plain lower edge" },
+  { shield: "azure chevronel-embattled-or", at: [[50, 16], [50, 45], [20.43, 53.52], [79.57, 53.52], [25, 68.25], [75, 68.25]], expect: "azure", why: "the field above its tower, below its peak, in its crenels and below its lower edge" },
+  { shield: "azure two-chevronels-indented-or", at: [[50, 22], [50, 48], [25, 47]], expect: "or", why: "both indented chevronels are drawn" },
+  { shield: "azure two-chevronels-indented-or", at: [[50, 35], [50, 10], [50, 58]], expect: "azure", why: "the field between and around the indented chevronels" },
+  { shield: "azure two-chevronels-embattled-or", at: [[50, 10], [50, 25], [50, 36], [50, 50]], expect: "or", why: "both embattled chevronels are drawn" },
+  { shield: "azure two-chevronels-embattled-or", at: [[50, 30.5], [50, 4]], expect: "azure", why: "the field between and above the embattled chevronels" },
+  { shield: "azure three-chevronels-indented-or", at: [[50, 14], [50, 40], [50, 66]], expect: "or", why: "all three indented chevronels are drawn" },
+  { shield: "azure three-chevronels-indented-or", at: [[50, 5], [50, 27], [50, 53], [50, 80]], expect: "azure", why: "the field between and around the indented chevronels" },
+  { shield: "azure three-chevronels-embattled-or", at: [[50, 8], [50, 24], [50, 34], [50, 50], [50, 60], [50, 76]], expect: "or", why: "all three embattled chevronels are drawn" },
+  { shield: "azure three-chevronels-embattled-or", at: [[50, 29.5], [50, 55.5]], expect: "azure", why: "the field between the embattled chevronels" },
+  { shield: "azure three-chevronels-embattled-or", at: [50, 3], expect: "azure", why: "the top chevronel's tower clears the shield's top" },
+  // The wavy chevronel is drawn: its peak runs 29.95–39.97. Three are moved down 5%.
+  { shield: "azure chevronel-wavy-or", at: [50, 35], expect: "or", why: "the wavy chevronel's peak is drawn" },
+  { shield: "azure chevronel-wavy-or", at: [[50, 25], [50, 45], [35, 53.5]], expect: "azure", why: "the field around the drawn wavy chevronel, where the generated one would reach" },
+  { shield: "azure two-chevronels-wavy-or", at: [[50, 22], [50, 48]], expect: "or", why: "both wavy chevronels are drawn" },
+  { shield: "azure two-chevronels-wavy-or", at: [[50, 10], [50, 35], [50, 60]], expect: "azure", why: "the field between and around the wavy chevronels" },
+  { shield: "azure three-chevronels-wavy-or", at: [[50, 14], [50, 40], [50, 66]], expect: "or", why: "all three wavy chevronels are drawn" },
+  { shield: "azure three-chevronels-wavy-or", at: [[50, 7], [50, 27], [50, 53]], expect: "azure", why: "the field between the wavy chevronels, and above the top one, moved down" },
   // The pile's sides run from (17, 0) and (83, 0) to (50, 85), so at 40% down they're at 32.53 and 67.47.
   { shield: "azure pile-or", at: [[50, 20], [50, 50], [50, 78], [34.03, 40], [65.97, 40]], expect: "or", why: "the pile is drawn, down to near its tip" },
   { shield: "azure pile-or", at: [[20, 20], [80, 20], [31.03, 40], [68.97, 40], [50, 88]], expect: "azure", why: "the field either side and below the tip" },
