@@ -46,11 +46,12 @@ const ermineTile = (fill) =>
 // The vair family's pane is PANE wide, and its row as high as its outline. Each outline is the
 // pane's right side, from its top down to its base, about the pane's centre line; the left side
 // mirrors it. Each side is symmetric about its own midpoint, so the gap between two panes is the
-// same pane reversed.
-const PANE = 30;
-const VAIR_ROW = 32;
+// same pane reversed. A vair row is 1.08 panes high, the heater's chief quarters' height over
+// width (45% of 6/5 over a half), so n panes across one are n whole rows down it.
+const PANE = 75;
+const VAIR_ROW = 81;
 const SLOPE = VAIR_ROW / 4;
-const POTENT_ROW = 18;
+const POTENT_ROW = 45;
 const OUTLINES = {
   // Slope to the shoulder, upright side, flare to the base corner.
   vair: [
@@ -141,10 +142,30 @@ const across = (fallback) => `var(--fur-across, ${fallback})`;
 const SHIFT = `calc(-100% / (4 * (${across(6)} - 1)))`;
 const FIELDS = {
   ermine: { size: `calc(100% / ${across(6)}) auto`, position: `${SHIFT} ${SHIFT}` },
-  // A whole number of panes, from the top left.
-  vair: { size: `calc(100% / ${across(4)}) auto`, position: "0 0" },
+  // A whole number of panes, from the top left, or below a frame's outline (see vairBelow).
+  vair: {
+    size: `calc(100% / ${across(4)}) var(--vair-height, auto)`,
+    position: "0 var(--vair-top, 0px)",
+  },
   potent: { size: `calc(100% / ${across(3)}) auto`, position: "0 0" },
 };
+/**
+ * Starts a vair field's panes below a frame's outline, so their points are whole, with the rows
+ * squashed by the outline's width so whole rows still end on a line, such as the fess point.
+ * @param {string} outline The outline's width, e.g. "2px".
+ * @param {string} [line] Where the rows end, as a share of the box's height, e.g. "100%" for
+ *   the bottom of a chief quarter. Without it the panes only move down.
+ * @param {number} [rowsPerPane] Rows above the line for each pane across: 1 in a chief quarter,
+ *   as VAIR_ROW is 1.08 panes; 0.5 above the fess point on the whole field.
+ * @returns {Record<string, string>} --vair-top, and --vair-height for the tile's two rows.
+ */
+export const vairBelow = (outline, line, rowsPerPane) => ({
+  "--vair-top": outline,
+  ...(line && {
+    "--vair-height": `calc(2 * (${line} - ${outline}) / (${rowsPerPane} * ${across(4)}))`,
+  }),
+});
+
 /**
  * @param {string} fur A key of FURS.
  * @returns {{ size: string, position: string }} The CSS background-size and -position of its tile.

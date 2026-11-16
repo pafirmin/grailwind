@@ -178,7 +178,7 @@ const PATTERNS = {
   "a bordure ermine paints its tile on the ring, sized to the bordure":
     /\.bordure-ermine \{[^]*?:has\( ?> &\)::after \{\s*content: "";\s*background-color: var\(--color-argent\);\s*background-image: url\("data:image\/svg[^"]*"\);\s*background-size: calc\(1\.4 \* var\(--bordure-width\)\) auto;\s*background-position: center calc\(var\(--bordure-width\) \/ 2\);\s*background-repeat: repeat;/,
   "a bordure vair has one row of panes across the ring":
-    /\.bordure-vair \{[^]*?:has\( ?> &\)::after \{[^}]*background-size: calc\(var\(--bordure-width\) \* 30 \/ 32\) auto;\s*background-position: center 0;/,
+    /\.bordure-vair \{[^]*?:has\( ?> &\)::after \{[^}]*background-size: calc\(var\(--bordure-width\) \* 75 \/ 81\) auto;\s*background-position: center 0;/,
   "a lined fur bordure is clipped like the tincture ones":
     /\.bordure-engrailed-ermine \{[^]*?:has\( ?> &\)::after \{[^}]*background-image: url[^}]*clip-path: polygon\(evenodd, [^;]*\);\s*clip-path: shape\(nonzero from 0 0,/,
   "a bordure on a per-pale part sets its ring's half, and has no border on the palar side":
@@ -293,7 +293,11 @@ const PATTERNS = {
   "ermine's offset follows the tiles across":
     /\.ermine \{[^}]*background-size: calc\(100% \/ var\(--fur-across, 6\)\) auto;\s*background-position: calc\(-100% \/ \(4 \* \(var\(--fur-across, 6\) - 1\)\)\) calc\(-100% \/ \(4 \* \(var\(--fur-across, 6\) - 1\)\)\);/,
   "vair is 4 across from the top left, its argent panes on an azure ground":
-    /\.vair \{[^}]*background-color: var\(--color-azure\);[^}]*background-image: url\("data:image\/svg\+xml,[^"]*%23[^"]*"\);\s*background-size: calc\(100% \/ var\(--fur-across, 4\)\) auto;\s*background-position: 0 0;/,
+    /\.vair \{[^}]*background-color: var\(--color-azure\);[^}]*background-image: url\("data:image\/svg\+xml,[^"]*%23[^"]*"\);\s*background-size: calc\(100% \/ var\(--fur-across, 4\)\) var\(--vair-height, auto\);\s*background-position: 0 var\(--vair-top, 0px\);/,
+  "vair in a chief quarter starts below the outline, with whole rows down to the fess point":
+    /\.quarterly:is\(\.heater, \.heater \*\) > :nth-child\(-n \+ 2 of [^{]*\{\s*--vair-top: 2px;\s*--vair-height: calc\(2 \* \(100% - 2px\) \/ \(1 \* var\(--fur-across, 4\)\)\);/,
+  "vair on the field starts below the outline, with whole rows down to the fess point":
+    /:is\(\.heater, \.inescutcheon\) > :not\([^{]*\{\s*--vair-top: 2px;\s*--vair-height: calc\(2 \* \(45% - 2px\) \/ \(0\.5 \* var\(--fur-across, 4\)\)\);/,
   "potent is 3 across":
     /\.potent \{[^}]*background-size: calc\(100% \/ var\(--fur-across, 3\)\) auto;/,
   "an engrailed fur ordinary falls back to a polygon":

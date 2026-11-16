@@ -19,7 +19,8 @@ import {
   TINCTURES,
   VOIDABLE,
 } from "./data.js";
-import { furBackground, ringBackground } from "./furs.js";
+import { FESS_POINT } from "./divisions.js";
+import { furBackground, ringBackground, vairBelow } from "./furs.js";
 import { PATHS } from "./paths.js";
 
 // prettier-ignore
@@ -1076,6 +1077,27 @@ export default plugin(({ addBase, addUtilities, theme }) => {
   addBase({
     [`.inescutcheon, .inescutcheon > *, .canton, :is(.heater, .heater *):is(.quarterly, .per-pale, .per-fess) > ${PART}`]:
       Object.fromEntries(layoutVars().map((name) => [name, "initial"])),
+  });
+
+  // Vair's points reach the top edge, so on a part under the frame's outline the panes start
+  // below it, and in the parts above a fess-point line the rows still end on it.
+  const FRAME = ":is(.heater, .inescutcheon)";
+  const ON_SHIELD = ":is(.heater, .heater *)";
+  const TWO_PARTS = `:has(> :nth-child(2 of ${PART}):nth-last-child(1 of ${PART}))`;
+  addBase({
+    [`${FRAME} > ${PART}`]: vairBelow(OUTLINE_WIDTH, `${FESS_POINT}%`, 0.5),
+    [`${FRAME} > .per-pale > ${PART}, ${FRAME} > .per-fess > :nth-child(1 of ${PART})`]:
+      vairBelow(OUTLINE_WIDTH),
+    [`${FRAME} > .per-fess${ON_SHIELD}${TWO_PARTS} > :nth-child(1 of ${PART})`]: vairBelow(
+      OUTLINE_WIDTH,
+      "100%",
+      0.5,
+    ),
+    [`${FRAME} > .quarterly${ON_SHIELD} > :nth-child(-n + 2 of ${PART})`]: vairBelow(
+      OUTLINE_WIDTH,
+      "100%",
+      1,
+    ),
   });
 
   const utilities = {};

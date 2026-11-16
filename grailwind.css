@@ -42,6 +42,16 @@
   syntax: "*";
   inherits: false;
 }
+/* Where a vair field's panes start and its tile's height, on a part under a frame's outline
+ * (vairBelow in furs.js). Not inherited, so an ordinary or charge of vair on it is unmoved. */
+@property --vair-top {
+  syntax: "*";
+  inherits: false;
+}
+@property --vair-height {
+  syntax: "*";
+  inherits: false;
+}
 @property --field-image {
   syntax: "*";
   inherits: false;

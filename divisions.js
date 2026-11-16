@@ -8,7 +8,7 @@ import { PATHS } from "./paths.js";
 
 // The fess point, in % down the shield: horizontal lines of partition pass through it, as the
 // cross and fess do.
-const FESS_POINT = 45;
+export const FESS_POINT = 45;
 
 // The background-position that puts a tile FESS_POINT% high just below the fess point.
 const BASE_TILES = ((100 * FESS_POINT) / (100 - FESS_POINT)).toFixed(2);
