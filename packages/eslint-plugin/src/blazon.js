@@ -34,6 +34,13 @@ const TINCTURE = new Set([...TINCTURES, ...FUR]);
 const PAINT = new Set([...TINCTURE, OF_THE_FIRST]);
 const CHARGE = new Set([...CHARGES, ...Object.keys(ROUNDELS)]);
 const FIMBRIATIONS = new Set([...TINCTURES, OF_THE_FIRST].map((t) => `fimbriated-${t}`));
+// Each cotise class, e.g. `double-cotised-or`, mapped to its tincture: null for the ordinary's own.
+const COTISATIONS = new Map(
+  ["cotised", "double-cotised"].flatMap((kind) => [
+    [kind, null],
+    ...[...TINCTURES, OF_THE_FIRST].map((t) => [`${kind}-${t}`, t]),
+  ]),
+);
 const CHIEF_POINTS = new Set(["in-dexter-chief", "in-chief-point", "in-sinister-chief"]);
 const POINT_CLASSES = new Set(Object.keys(POINTS).map((point) => `in-${point}`));
 export const ALL_ARRANGEMENTS = ["between", "on", ...ARRANGEMENTS];
@@ -218,7 +225,7 @@ export const frameOf = (classes) => FRAMES.find((frame) => classes.has(frame));
 
 /**
  * The classes that belong on a field: its tincture or division, its ordinaries, chief and
- * bordure, and their fimbriation.
+ * bordure, and their fimbriation or cotises.
  * @param {Set<string>} classes The element's classes.
  * @returns {string[]} Those of `classes` that do.
  */
@@ -229,7 +236,8 @@ export const fieldClassesOf = (classes) =>
       DIVISIONS.includes(cls) ||
       DIVISION_CLASSES.has(cls) ||
       ORDINARY_CLASSES.has(cls) ||
-      FIMBRIATIONS.has(cls),
+      FIMBRIATIONS.has(cls) ||
+      COTISATIONS.has(cls),
   );
 
 /**
@@ -314,6 +322,17 @@ export function fimbriationOf(classes) {
   return found.length === 1
     ? { cls: found[0], tincture: found[0].slice("fimbriated-".length) }
     : null;
+}
+
+/**
+ * The element's cotises, e.g. `cotised-or`.
+ * @param {Set<string>} classes The element's classes.
+ * @returns {{cls: string, tincture: string|null}|null} The class and the cotises' own tincture
+ *   (null for the ordinary's), or null if there's not exactly one.
+ */
+export function cotisationOf(classes) {
+  const found = [...classes].filter((cls) => COTISATIONS.has(cls));
+  return found.length === 1 ? { cls: found[0], tincture: COTISATIONS.get(found[0]) } : null;
 }
 
 export const chargeName = (classes) =>

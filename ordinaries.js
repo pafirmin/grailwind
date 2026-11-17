@@ -4,11 +4,13 @@
 import plugin from "tailwindcss/plugin";
 import {
   BETWEEN,
+  BETWEEN_COTISED,
   BETWEEN_LINED,
   BORDURE_LINES,
   BORDURE_PATTERNS,
   CHARGES,
   CHEQUY,
+  COTISABLE,
   FRAMES,
   FURS,
   LABELS,
@@ -16,6 +18,7 @@ import {
   lineOrdinaries,
   OF_THE_FIRST,
   ON,
+  ON_COTISED,
   ON_SCALE,
   REVERSIBLE,
   TINCTURES,
@@ -191,6 +194,31 @@ const voidedPolygon = (vertices, distance, format = point) => {
   return `polygon(evenodd, ${outerStr}, ${innerStr})`;
 };
 
+/**
+ * A cotised ordinary, as nested loops cut with evenodd: the ordinary narrowed by `inset`, then each
+ * cotise's inner and outer edge. Like voidedPolygon(), every loop starts at the same side on the
+ * shield's edge, so the jumps between loops run along that edge and add no area.
+ * @param {number[][]} vertices The plain ordinary's polygon, in %.
+ * @param {{inset: number, width: number, gap: number}} cotise How far each side of the ordinary
+ *   moves in, a cotise's width and its gap from the ordinary, in real units.
+ * @param {number} pairs The cotises on each side: 1 for cotised, 2 for double cotised.
+ * @returns {string} A CSS `polygon()`.
+ */
+const cotisedPolygon = (vertices, { inset, width, gap }, pairs) => {
+  const distances = [-inset];
+  for (let i = 0; i < pairs; i++) {
+    const inside = distances.at(-1) + gap;
+    distances.push(inside, inside + width);
+  }
+  const edge = vertices.findIndex((v, i) => onShieldEdge(v, vertices[(i + 1) % vertices.length]));
+  const loops = distances.map((distance) => {
+    const offsets = widen(vertices, distance);
+    const loop = vertices.map(([x, y], i) => [x + offsets[i][0], y + offsets[i][1]]);
+    return [...rotate(loop, edge), loop[edge]].map(point).join(", ");
+  });
+  return `polygon(evenodd, ${loops.join(", ")})`;
+};
+
 const shift = (v, d) =>
   num(d) === 0
     ? pct(v)
@@ -224,6 +252,7 @@ const diagonal = (kind, halfWidth, tile) => {
   return {
     kind,
     tile,
+    halfWidth,
     stops: [50 - offset, 50 + offset],
   };
 };
@@ -348,6 +377,152 @@ const bands = (layers, colour) => ({
     .join(", "),
   "background-repeat": "no-repeat",
 });
+
+// A cotised ordinary's whole group, the ordinary narrowed with its gaps and cotises, as a multiple
+// of the plain ordinary's width: single and double. Chosen by eye (059-cotised-widths.png).
+// prettier-ignore
+const COTISES = {
+  pale: { single: 1.25, double: 1.25 }, fess: { single: 1.25, double: 1.25 },
+  bar: { single: 1.25, double: 1.25 }, bend: { single: 1.25, double: 1.25 },
+  "bend-sinister": { single: 1.25, double: 1.25 }, chevron: { single: 1.25, double: 1.25 },
+  cross: { single: 1.25, double: 1.25 }, saltire: { single: 1.25, double: 1.25 },
+  pall: { single: 1.25, double: 1.25 }, pile: { single: 1.25, double: 1.25 },
+};
+for (const ordinary of REVERSIBLE) {
+  COTISES[`${ordinary}-reversed`] = COTISES[ordinary];
+}
+
+// % of a band's kind per real unit across it.
+const PER_UNIT = { x: 100 / W, y: 100 / H, "u-v": Math.hypot(100 / W, 100 / H) };
+PER_UNIT["u+v"] = PER_UNIT["u-v"];
+
+/**
+ * The plain ordinary's width across, from its first band. The pile tapers, so its is its width at
+ * half its length: half its width at the top.
+ * @param {string} ordinary One of COTISABLE.
+ * @returns {number} The width, in real units.
+ */
+const plainWidth = (ordinary) => {
+  const layer = BANDS[ordinary].find((l) => !l.stripe);
+  if (layer.halfWidth) {
+    return 2 * layer.halfWidth;
+  }
+  if (layer.stops) {
+    const xs = ORDINARIES[ordinary].map(([x]) => x);
+    return ((Math.max(...xs) - Math.min(...xs)) * W) / 100 / 2;
+  }
+  return (layer.to - layer.from) / PER_UNIT[layer.kind];
+};
+
+// COTISES' keys, by the cotises on each side.
+const COTISED_NAMES = { 1: "single", 2: "double" };
+
+/**
+ * A cotised ordinary's geometry. FD's proportions hold within the group: the cotise is a quarter of
+ * the narrowed ordinary and the gap one cotise, so the group is 8 cotises across, or 12 double.
+ * @param {string} ordinary One of COTISABLE.
+ * @param {number} pairs The cotises on each side: 1 for cotised, 2 for double cotised.
+ * @param {number} [multiple] The group's width as a multiple of the plain ordinary's.
+ * @returns {{inset: number, width: number, gap: number}} How far each side of the ordinary moves
+ *   in, a cotise's width and its gap, in real units.
+ */
+const cotiseGeometry = (ordinary, pairs, multiple = COTISES[ordinary][COTISED_NAMES[pairs]]) => {
+  const plain = plainWidth(ordinary);
+  const width = (plain * multiple) / (pairs === 2 ? 12 : 8);
+  return { inset: (plain - 4 * width) / 2, width, gap: width };
+};
+/**
+ * The ordinary's bands narrowed by `inset` each side. A stripe moves to the narrowed edge it lay
+ * against and reaches `reach` beyond it, past the outer cotise. A half's tile is its side's, so it
+ * follows the side's ends; a seam ends with the point it runs down to.
+ * @param {object[]} layers The plain ordinary's BANDS.
+ * @param {number} inset How far each side moves in, in real units.
+ * @param {number} reach How far out the outer cotise ends from the narrowed edge, in real units.
+ * @param {(vertex: number[]) => number[]} moved A vertex of the plain ordinary, narrowed.
+ * @returns {object[]} The narrowed layers.
+ */
+const narrowedBands = (layers, inset, reach, moved) => {
+  const narrowed = layers.map((layer) => {
+    if (layer.halfWidth) {
+      return diagonal(layer.kind, layer.halfWidth - inset, layer.tile);
+    }
+    if (layer.stops) {
+      // The side runs corner to corner: top left to bottom right for u-v, else top right to bottom left.
+      const [x0, y0, x1, y1] = layer.tile;
+      const leaning = layer.kind === "u-v";
+      const [a, b] = (
+        leaning
+          ? [
+              [x0, y0],
+              [x1, y1],
+            ]
+          : [
+              [x1, y0],
+              [x0, y1],
+            ]
+      ).map(moved);
+      return { ...layer, tile: leaning ? [a[0], a[1], b[0], b[1]] : [b[0], a[1], a[0], b[1]] };
+    }
+    if (layer.seam) {
+      // It stops 2 short of the pile's point, at the end that isn't on the shield's edge.
+      const [x0, y0, x1, y1] = layer.tile;
+      const end = y1 === 100 ? y0 : y1;
+      const point = [50, end + (y1 === 100 ? -2 : 2)];
+      const shift = moved(point)[1] - point[1];
+      return { ...layer, tile: y1 === 100 ? [x0, y0 + shift, x1, y1] : [x0, y0, x1, y1 + shift] };
+    }
+    const shift = inset * PER_UNIT[layer.kind];
+    return layer.stripe ? layer : { ...layer, from: layer.from + shift, to: layer.to - shift };
+  });
+  return narrowed.map((layer, i) => {
+    if (!layer.stripe) {
+      return layer;
+    }
+    const plain = layers.find((l) => l.kind === layer.kind && !l.stripe);
+    const band = narrowed[layers.indexOf(plain)];
+    const length = Math.ceil(reach * PER_UNIT[layer.kind]) + 2;
+    return layers[i].to <= plain.from
+      ? { ...layer, from: band.from - length, to: band.from }
+      : { ...layer, from: band.to, to: band.to + length };
+  });
+};
+
+/**
+ * A cotisable ordinary's vars on its own element, for `cotised` and `double-cotised`: the clip, and
+ * the narrowed bands that repaint it over a cotise in its own tincture.
+ * @param {string} ordinary One of COTISABLE.
+ * @param {string} colour The ordinary's paint, e.g. "var(--color-argent)".
+ * @param {{single: number, double: number}} [multiples] The groups' widths, as COTISES.
+ * @returns {Object<string, string>} --clip-cotised, --bands-cotised and their double.
+ */
+const cotisedVars = (ordinary, colour, multiples = COTISES[ordinary]) => {
+  const vars = {};
+  const vertices = ORDINARIES[ordinary];
+  const plain = bands(BANDS[ordinary], colour);
+  for (const [kind, pairs] of Object.entries(COTISED)) {
+    const geometry = cotiseGeometry(ordinary, pairs, multiples[COTISED_NAMES[pairs]]);
+    const reach = pairs * (geometry.gap + geometry.width);
+    const offsets = widen(vertices, -geometry.inset);
+    const moved = (vertex) => {
+      const i = vertices.findIndex(([x, y]) => x === vertex[0] && y === vertex[1]);
+      return [vertex[0] + offsets[i][0], vertex[1] + offsets[i][1]];
+    };
+    const layers = narrowedBands(BANDS[ordinary], geometry.inset, reach, moved);
+    const narrowed = bands(layers, colour);
+    vars[`--clip-${kind}`] = cotisedPolygon(vertices, geometry, pairs);
+    vars[`--bands-${kind}`] = layers
+      .map((l) => gradient(l, l.stripe ? "var(--cotise, transparent)" : colour))
+      .join(", ");
+    // Only a narrowed tile, as the pile's, moves its layers.
+    if (narrowed["background-size"] !== plain["background-size"]) {
+      vars[`--band-sizes-${kind}`] = narrowed["background-size"];
+    }
+    if (narrowed["background-position"] !== plain["background-position"]) {
+      vars[`--band-positions-${kind}`] = narrowed["background-position"];
+    }
+  }
+  return vars;
+};
 
 // Whole checks along each band, none cut at the shield's edge. The fess's odd count mirrors about
 // the pale, as in FD 668, its checks 7% narrower than square. The pale's are square.
@@ -1336,12 +1511,38 @@ const betweenVars = ({ size, points, counts = {} }) => {
   return vars;
 };
 
+/**
+ * A `between` layout with overrides on top, a count's points replaced whole.
+ * @param {object} plain The plain ordinary's layout, from BETWEEN.
+ * @param {object|undefined} override Its size, points or counts to replace, or nothing.
+ * @returns {object} The merged layout.
+ */
+const mergeLayout = (plain, override) =>
+  override ? { ...plain, ...override, counts: { ...plain.counts, ...override.counts } } : plain;
+
 // The plain ordinary's `between` layout, with a line's overrides on top.
-const mergeLined = (ordinary, line) => {
-  const plain = BETWEEN[ordinary];
-  const lined = BETWEEN_LINED[ordinary]?.[line];
-  return lined ? { ...plain, ...lined, counts: { ...plain.counts, ...lined.counts } } : plain;
-};
+const mergeLined = (ordinary, line) =>
+  mergeLayout(BETWEEN[ordinary], BETWEEN_LINED[ordinary]?.[line]);
+
+// Cotises on each side, by modifier.
+const COTISED = { cotised: 1, "double-cotised": 2 };
+
+/**
+ * The plain ordinary's `between` layout, with its cotises' overrides on top.
+ * @param {string} ordinary A cotisable ordinary, e.g. "bend".
+ * @param {string} kind A key of COTISED.
+ * @returns {object} The merged layout.
+ */
+const mergeCotised = (ordinary, kind) =>
+  mergeLayout(BETWEEN[ordinary], BETWEEN_COTISED[ordinary]?.[kind]);
+
+/**
+ * The plain ordinary's `on` layout, with its cotises' overrides on top, before scaling.
+ * @param {string} ordinary A cotisable ordinary with an `on` layout, e.g. "pile".
+ * @param {string} kind A key of COTISED.
+ * @returns {object} The merged layout.
+ */
+const mergeOnCotised = (ordinary, kind) => mergeLayout(ON[ordinary], ON_COTISED[ordinary]?.[kind]);
 
 const onVars = ({ size, counts }, scale = 1) => {
   const vars = { "--on-size": `${+(size * scale).toFixed(2)}%` };
@@ -1369,6 +1570,18 @@ const layoutVars = () => {
   for (const [ordinary, lines] of Object.entries(BETWEEN_LINED)) {
     for (const line of Object.keys(lines)) {
       allVars.push(...Object.keys(betweenVars(mergeLined(ordinary, line))));
+    }
+  }
+
+  for (const [ordinary, kinds] of Object.entries(BETWEEN_COTISED)) {
+    for (const kind of Object.keys(kinds)) {
+      allVars.push(...Object.keys(betweenVars(mergeCotised(ordinary, kind))));
+    }
+  }
+
+  for (const [ordinary, kinds] of Object.entries(ON_COTISED)) {
+    for (const kind of Object.keys(kinds)) {
+      allVars.push(...Object.keys(onVars(mergeOnCotised(ordinary, kind))));
     }
   }
 
@@ -1429,6 +1642,8 @@ export {
   BORDURE_WIDTH,
   bordurePath,
   CORNER_LOBE,
+  cotiseGeometry,
+  cotisedVars,
   outlinePoints,
   SCALLOP_DEPTH,
   draftOutline,
@@ -1622,6 +1837,57 @@ export default plugin(({ addBase, addUtilities, theme }) => {
     };
   }
 
+  // A cotisable ordinary sets its own clips and narrowed bands (cotisedVars), so these needn't know
+  // the ordinary. Bare `cotised` is all the ordinary's tincture, so it keeps the plain bands.
+  for (const kind of Object.keys(COTISED)) {
+    utilities[`.${kind}`] = { "--cotise-clip": `var(--clip-${kind})` };
+    for (const [tincture, colour] of PAINTS) {
+      utilities[`.${kind}-${tincture}`] = {
+        "--cotise-clip": `var(--clip-${kind})`,
+        "--cotise-bands": `var(--bands-${kind})`,
+        "--cotise-band-sizes": `var(--band-sizes-${kind})`,
+        "--cotise-band-positions": `var(--band-positions-${kind})`,
+        "--cotise": colour,
+      };
+    }
+  }
+
+  /**
+   * The plain bands' background, its image swapped for the narrowed bands when cotised.
+   * @param {object} background From bands().
+   * @param {object|false} cotised Whether the ordinary is cotisable.
+   * @returns {object} The background declarations.
+   */
+  const cotisedBackground = (background, cotised) =>
+    cotised
+      ? {
+          ...background,
+          "background-image": `var(--cotise-bands, ${background["background-image"]})`,
+          "background-size": `var(--cotise-band-sizes, ${background["background-size"]})`,
+          "background-position": `var(--cotise-band-positions, ${background["background-position"]})`,
+        }
+      : background;
+
+  /**
+   * A cotisable ordinary's layouts when cotised: `on` charges scaled with the narrowed ordinary,
+   * and `between` charges moved off the cotises.
+   * @param {string} ordinary One of COTISABLE.
+   * @returns {object} The rules, for its own element.
+   */
+  const cotisedRules = (ordinary) => {
+    const rules = {};
+    for (const [kind, pairs] of Object.entries(COTISED)) {
+      const classes = [kind, ...PAINTS.map(([tincture]) => `${kind}-${tincture}`)];
+      const { width } = cotiseGeometry(ordinary, pairs);
+      rules[`&:is(${classes.map((cls) => `.${cls}`).join(", ")})`] = {
+        ...(BETWEEN_COTISED[ordinary]?.[kind] && betweenVars(mergeCotised(ordinary, kind))),
+        ...(ON[ordinary] &&
+          onVars(mergeOnCotised(ordinary, kind), (4 * width) / plainWidth(ordinary))),
+      };
+    }
+    return rules;
+  };
+
   // Isolated, so an ordinary in a quarter paints under the shield's own ordinary. A frame's field
   // isn't, so the frame's bordure ring can go between its ordinaries and its chief.
   const ordinaryRules = (ordinary, pseudo, line) => ({
@@ -1699,22 +1965,36 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       ),
     };
 
+    // Only a cotisable ordinary's ::before takes the cotises, so no other's is painted in them.
+    const cotised = COTISABLE.includes(ordinary) && cotisedRules(ordinary);
     for (const [tincture, colour] of PAINTS) {
-      utilities[`.${ordinary}-${tincture}`] = ordinaryRules(ordinary, {
-        ...placed,
-        ...(BANDS[ordinary]
-          ? {
-              "--fimbriated": "inherit",
-              "--fimbriation": "inherit",
-              "background-color": `var(--fimbriation, ${colour})`,
-              ...bands(BANDS[ordinary], colour),
-              "clip-path": widenedPolygon(vertices),
-            }
-          : {
-              "background-color": colour,
-              "clip-path": plain,
-            }),
-      });
+      utilities[`.${ordinary}-${tincture}`] = {
+        ...ordinaryRules(ordinary, {
+          ...placed,
+          ...(BANDS[ordinary]
+            ? {
+                "--fimbriated": "inherit",
+                "--fimbriation": "inherit",
+                ...(cotised && {
+                  "--cotise-clip": "inherit",
+                  "--cotise-bands": "inherit",
+                  "--cotise-band-sizes": "inherit",
+                  "--cotise-band-positions": "inherit",
+                  "--cotise": "inherit",
+                }),
+                "background-color": `var(--fimbriation, var(--cotise, ${colour}))`,
+                ...cotisedBackground(bands(BANDS[ordinary], colour), cotised),
+                "clip-path": cotised
+                  ? `var(--cotise-clip, ${widenedPolygon(vertices)})`
+                  : widenedPolygon(vertices),
+              }
+            : {
+                "background-color": colour,
+                "clip-path": plain,
+              }),
+        }),
+        ...(cotised && { ...cotisedVars(ordinary, colour), ...cotised }),
+      };
       // Not fimbriated.
       for (const [name, line] of Object.entries(LINES)) {
         if (!lineOrdinaries(name).includes(ordinary)) {

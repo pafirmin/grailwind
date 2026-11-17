@@ -22,6 +22,59 @@
   syntax: "*";
   inherits: false;
 }
+/* Not inherited, so a cotised shield can't cotise an ordinary in a quarter or on an inescutcheon. */
+@property --cotise-clip {
+  syntax: "*";
+  inherits: false;
+}
+@property --cotise {
+  syntax: "*";
+  inherits: false;
+}
+@property --clip-cotised {
+  syntax: "*";
+  inherits: false;
+}
+@property --clip-double-cotised {
+  syntax: "*";
+  inherits: false;
+}
+@property --cotise-bands {
+  syntax: "*";
+  inherits: false;
+}
+@property --bands-cotised {
+  syntax: "*";
+  inherits: false;
+}
+@property --bands-double-cotised {
+  syntax: "*";
+  inherits: false;
+}
+@property --cotise-band-sizes {
+  syntax: "*";
+  inherits: false;
+}
+@property --cotise-band-positions {
+  syntax: "*";
+  inherits: false;
+}
+@property --band-sizes-cotised {
+  syntax: "*";
+  inherits: false;
+}
+@property --band-sizes-double-cotised {
+  syntax: "*";
+  inherits: false;
+}
+@property --band-positions-cotised {
+  syntax: "*";
+  inherits: false;
+}
+@property --band-positions-double-cotised {
+  syntax: "*";
+  inherits: false;
+}
 @property --counterchange-color {
   syntax: "*";
   inherits: false;

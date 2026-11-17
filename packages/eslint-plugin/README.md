@@ -64,6 +64,8 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
   it aren't checked.
 - A fimbriated ordinary is checked against its fimbriation, and the fimbriation against the
   field: `or chevron-sable fimbriated-argent` is metal on metal (Argent on Or).
+- Cotises in their own tincture are checked against the field: `or bend-azure cotised-or` is
+  metal on metal. Bare `cotised` is the ordinary's tincture.
 - Charges in a `charges` container are checked against the field.
 - Charges in a `charges on` container are checked against the ordinary they lie on.
 - Charges at `in-dexter-chief`, `in-chief-point` or `in-sinister-chief`, or in a
@@ -142,6 +144,8 @@ Modifiers that would otherwise do nothing:
   the container.
 - `fimbriated-*` needs a plain tinctured ordinary. A chief, and an engrailed, invected, wavy,
   indented, embattled, voided, fur, chequy or counterchanged ordinary, aren't fimbriated.
+- `cotised` and `double-cotised` (also `cotised-or` and the like) need an ordinary other than a
+  chief on the same element: a cotise never stands alone, and a chief is never cotised.
 - `counterchanged` doesn't work on a charge with a transform (`rotate-*`, `scale-*`, `skew-*`,
   `translate-*`): the charge shows its own small copy of the field instead.
 

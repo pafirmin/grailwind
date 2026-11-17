@@ -3,6 +3,7 @@ import { getElements, UNKNOWN } from "../tree.js";
 import {
   chargeName,
   chargeTincture,
+  cotisationOf,
   describe,
   fieldOf,
   fieldTincture,
@@ -147,6 +148,12 @@ export default {
 
           if (isFimbriated) {
             check(el, el.reportNode, fimbriation.cls, "fimbriation", fimbriation.tincture, field);
+          }
+
+          // Cotises in their own tincture lie on the field; bare `cotised` is the ordinary's.
+          const cotisation = cotisationOf(el.classes);
+          if (cotisation?.tincture && ordinaries.length) {
+            check(el, el.reportNode, cotisation.cls, "cotise", cotisation.tincture, field);
           }
 
           for (const o of ordinaries) {

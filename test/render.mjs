@@ -3,8 +3,16 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium, firefox } from "playwright";
-import { BETWEEN, DIVISIONS, lineOrdinaries, ON, POINTS } from "../data.js";
-import { BORDURE_WIDTH, bordurePath, CORNER_LOBE, SCALLOP_DEPTH } from "../ordinaries.js";
+import { BETWEEN, BETWEEN_COTISED, DIVISIONS, lineOrdinaries, ON, POINTS } from "../data.js";
+import {
+  BORDURE_WIDTH,
+  bordurePath,
+  CORNER_LOBE,
+  cotiseGeometry,
+  cotisedVars,
+  ORDINARIES as SHAPES,
+  SCALLOP_DEPTH,
+} from "../ordinaries.js";
 import { PATHS } from "../paths.js";
 import { build, root } from "./build.mjs";
 
@@ -487,6 +495,316 @@ const VOIDED = [
   ["three-chevronels", [[40, 24], [40, 50], [40, 76]], [[40, 19.2], [40, 28.9], [40, 45.2], [40, 54.9], [40, 71.2], [40, 80.9]], [40, 37]],
 ];
 
+/**
+ * A point as % of the shield, in real units: the shield is 100 × 120.
+ * @param {number[]} point [x%, y%].
+ * @returns {number[]} [x, y] in real units.
+ */
+const toReal = ([x, y]) => [x, y * 1.2];
+/**
+ * The unit normal of a→b, in real units, on the left as it's walked on screen: up when walking right.
+ * @param {number[]} a The edge's start, as % of the shield.
+ * @param {number[]} b Its end.
+ * @returns {number[]} The normal, in real units.
+ */
+const leftOf = (a, b) => {
+  const [[ax, ay], [bx, by]] = [toReal(a), toReal(b)];
+  const length = Math.hypot(bx - ax, by - ay);
+  return [(by - ay) / length, -(bx - ax) / length];
+};
+/**
+ * A point on an ordinary's edge and its outward step, with the field on the edge's left.
+ * @param {number[]} a The edge's start, as % of the shield.
+ * @param {number[]} b Its end.
+ * @param {number} t How far along it, from 0 to 1.
+ * @returns {{at: number[], step: number[]}} The point, and a unit step out from it in real units.
+ */
+const alongEdge = (a, b, t) => ({
+  at: [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t],
+  step: leftOf(a, b),
+});
+/**
+ * An ordinary's corner and the step along its bisector that moves one unit out from both edges, as
+ * a mitred outline does.
+ * @param {number[]} a The vertex before, as % of the shield.
+ * @param {number[]} corner The corner.
+ * @param {number[]} b The vertex after.
+ * @returns {{at: number[], step: number[]}} The corner, and the step in real units.
+ */
+const atCorner = (a, corner, b) => {
+  const [n1, n2] = [leftOf(a, corner), leftOf(corner, b)];
+  const dot = 1 + n1[0] * n2[0] + n1[1] * n2[1];
+  return { at: corner, step: [(n1[0] + n2[0]) / dot, (n1[1] + n2[1]) / dot] };
+};
+// The middle of a cotised fess's upper cotise, in % down the shield: the fess's top is at 36 units.
+const FESS_COTISE = (() => {
+  const { inset, width, gap } = cotiseGeometry("fess", 1);
+  return (36 + inset - gap - width / 2) / 1.2;
+})();
+/**
+ * An edge probe upside down, for a reversed ordinary.
+ * @param {{at: number[], step: number[]}} edge A point on the edge, as % of the shield, and its
+ *   outward step in real units.
+ * @returns {{at: number[], step: number[]}} The same, mirrored as y → 100 − y.
+ */
+const mirrorProbe = ({ at: [x, y], step: [dx, dy] }) => ({ at: [x, 100 - y], step: [dx, -dy] });
+
+// Each cotisable ordinary's edges and corners, the field on each edge's left, to probe its cotises
+// from cotiseGeometry() in ordinaries.js. The chevron's stripes are probed just past its peak, at x + y = 85
+// and x − y = 15, where the other arm's narrowed band runs on into the cotises above it.
+// prettier-ignore
+const COTISED_EDGES = {
+  pale: [alongEdge([65, 0], [65, 100], 0.3), alongEdge([35, 100], [35, 0], 0.7)],
+  fess: [alongEdge([100, 60], [0, 60], 0.5), alongEdge([0, 30], [100, 30], 0.3)],
+  bar: [alongEdge([100, 52], [0, 52], 0.5), alongEdge([0, 38], [100, 38], 0.5)],
+  bend: [alongEdge([20, 0], [100, 80], 0.5), alongEdge([80, 100], [0, 20], 0.5)],
+  "bend-sinister": [alongEdge([0, 80], [80, 0], 0.5), alongEdge([100, 20], [20, 100], 0.5)],
+  chevron: [
+    alongEdge([0, 72], [50, 22], 0.5), alongEdge([50, 22], [100, 72], 0.5),
+    alongEdge([50, 22], [100, 72], 0.13), alongEdge([0, 72], [50, 22], 0.87),
+    atCorner([0, 72], [50, 22], [100, 72]), atCorner([100, 98], [50, 48], [0, 98]),
+    alongEdge([50, 48], [0, 98], 0.4),
+  ],
+  cross: [
+    atCorner([62, 0], [62, 35], [100, 35]), atCorner([38, 100], [38, 55], [0, 55]),
+    alongEdge([62, 35], [100, 35], 0.75),
+  ],
+  saltire: [
+    atCorner([16.35, 0], [50, 30.28], [83.65, 0]), atCorner([100, 14.72], [66.35, 45], [100, 75.28]),
+    atCorner([94.76, 100], [50, 59.72], [5.24, 100]), atCorner([0, 75.28], [33.65, 45], [0, 14.72]),
+  ],
+};
+// The pall's arms, its top notch, its Y junction's two inner corners and its foot; the pile's sides
+// and its point.
+// prettier-ignore
+Object.assign(COTISED_EDGES, {
+  pall: [
+    alongEdge([17.33, 0], [50, 26.14], 0.5), atCorner([17.33, 0], [50, 26.14], [82.67, 0]),
+    alongEdge([38, 44.26], [0, 13.86], 0.5), atCorner([38, 100], [38, 44.26], [0, 13.86]),
+    atCorner([100, 13.86], [62, 44.26], [62, 100]), alongEdge([62, 44.26], [62, 100], 0.5),
+  ],
+  pile: [
+    alongEdge([50, 85], [17, 0], 0.5), alongEdge([83, 0], [50, 85], 0.5),
+    atCorner([83, 0], [50, 85], [17, 0]),
+  ],
+});
+COTISED_EDGES["chevron-reversed"] = COTISED_EDGES.chevron.map(mirrorProbe);
+COTISED_EDGES["pall-reversed"] = COTISED_EDGES.pall.map(mirrorProbe);
+COTISED_EDGES["pile-reversed"] = COTISED_EDGES.pile.map(mirrorProbe);
+
+/**
+ * Probes across a cotised ordinary's edges: the ordinary, each gap, each cotise and the field
+ * beyond, at the middle of each, where on the shield.
+ * @param {string} ordinary One of COTISABLE.
+ * @param {number} pairs The cotises each side: 1 for `cotised`, 2 for `double-cotised`.
+ * @param {string} cotise The cotises' tincture, as its class suffix or "" for the ordinary's own.
+ * @returns {object[]} The probes, on `azure <ordinary>-argent`.
+ */
+const cotisedProbes = (ordinary, pairs, cotise) => {
+  const { inset, width, gap } = cotiseGeometry(ordinary, pairs);
+  const modifier = `${pairs === 2 ? "double-" : ""}cotised${cotise && `-${cotise}`}`;
+  const shield = `azure ${ordinary}-argent ${modifier}`;
+  // Out from the plain ordinary's edge; the cotised one is narrowed by `inset`.
+  const rings = [
+    [-2, "argent", "the ordinary"],
+    [gap / 2, "azure", "the gap"],
+    [gap + width / 2, cotise || "argent", "the cotise"],
+    [1.5 * gap + width, "azure", pairs === 2 ? "the outer gap" : "the field beyond"],
+    ...(pairs === 2
+      ? [
+          [2 * gap + 1.5 * width, cotise || "argent", "the outer cotise"],
+          [2.5 * gap + 2 * width, "azure", "the field beyond"],
+        ]
+      : []),
+  ];
+  return rings.flatMap(([distance, expect, part]) => {
+    const out = distance - inset;
+    const at = COTISED_EDGES[ordinary]
+      .map(({ at: [x, y], step: [dx, dy] }) => [x + dx * out, y + (dy * out) / 1.2])
+      .filter(([x, y]) => x >= 3 && x <= 97 && onShield(x, y));
+    const why = `${part} of a ${ordinary} ${modifier.replaceAll("-", " ")}`;
+    return at.length ? [{ shield, at, expect, why }] : [];
+  });
+};
+/**
+ * Probes that three torteaux `on` a cotised bend or fess are scaled to the narrowed ordinary: each
+ * keeps its centre, the ordinary shows just past its scaled rim along the ordinary (where an
+ * unscaled one would reach), and the gap shows beside it.
+ * @param {string} ordinary "bend" or "fess".
+ * @param {number} pairs The cotises each side: 1 for `cotised`, 2 for `double-cotised`.
+ * @returns {object[]} The probes, on `azure <ordinary>-argent`.
+ */
+const onCotisedProbes = (ordinary, pairs) => {
+  const { width } = cotiseGeometry(ordinary, pairs);
+  const { size, points } = { size: ON[ordinary].size, ...ON[ordinary].counts[3] };
+  const plain = { bend: 40 / Math.hypot(1, 100 / 120), fess: 36 }[ordinary];
+  const radius = 0.46 * size;
+  const scaled = (radius * 4 * width) / plain;
+  // Unit steps in real units: along the ordinary, and across it.
+  const [along, across] =
+    ordinary === "bend"
+      ? [
+          [0.64, 0.768],
+          [0.768, -0.64],
+        ]
+      : [
+          [1, 0],
+          [0, 1],
+        ];
+  /**
+   * A point moved along a step.
+   * @param {number[]} point As % of the shield.
+   * @param {number[]} direction A unit step, in real units.
+   * @param {number} distance How far, in real units.
+   * @returns {number[]} The moved point, as % of the shield.
+   */
+  const step = ([x, y], [dx, dy], distance) => [x + dx * distance, y + (dy * distance) / 1.2];
+  const modifier = `${pairs === 2 ? "double-" : ""}cotised-or`;
+  const shield = `azure ${ordinary}-argent ${modifier}`;
+  /**
+   * One probe on this shield's three torteaux.
+   * @param {number[][]} at The points, as % of the shield.
+   * @param {string} expect The tincture they must all show.
+   * @param {string} why What the probe checks.
+   * @returns {object} The probe.
+   */
+  const probe = (at, expect, why) => ({
+    shield,
+    charges: "on",
+    items: Array(3).fill("torteau"),
+    at,
+    expect,
+    why: `${why}, on a ${ordinary} ${modifier.replaceAll("-", " ")}`,
+  });
+  return [
+    probe(points, "gules", "three torteaux"),
+    probe(
+      points.flatMap((p) => [
+        step(p, along, (scaled + radius) / 2),
+        step(p, along, -(scaled + radius) / 2),
+      ]),
+      "argent",
+      "the torteaux are scaled with the narrowed ordinary",
+    ),
+    probe(
+      points.flatMap((p) => [step(p, across, 2.5 * width), step(p, across, -2.5 * width)]),
+      "azure",
+      "the torteaux stay within it",
+    ),
+  ];
+};
+// A gules charge that fills its whole box, as the box is what must clear the cotises.
+const BOX_CHARGE =
+  "charge-[url(data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201%201'%3E%3Crect%20width='1'%20height='1'/%3E%3C/svg%3E)] gules";
+/**
+ * The point on a cotised ordinary's outer cotise, 0.75 units in from its outer edge, nearest a
+ * charge's box beside the ordinary, or deepest inside it: where the cotise shows between the
+ * charge and the ordinary, if the charge is clear of it.
+ * @param {string} ordinary One of COTISABLE.
+ * @param {string} kind "cotised" or "double-cotised".
+ * @param {number[]} point The charge's centre, as % of the shield.
+ * @param {number} size The charge's width, as % of the shield's.
+ * @returns {number[]} The point, as % of the shield.
+ */
+const nearestCotise = (ordinary, kind, point, size) => {
+  const clip = cotisedVars(ordinary, "c")[`--clip-${kind}`];
+  const points = clip
+    .slice("polygon(evenodd, ".length, -1)
+    .split(", ")
+    .map((pair) => pair.split(" ").map((value) => parseFloat(value)));
+  const loopSize = SHAPES[ordinary].length + 1;
+  const [inner, outer] = [points.length - 2 * loopSize, points.length - loopSize].map((start) =>
+    points.slice(start, start + loopSize - 1),
+  );
+  // Each loop's vertices move linearly with its distance out, so this is the loop 0.75 units in.
+  const across = 1 - 0.75 / cotiseGeometry(ordinary, kind === "cotised" ? 1 : 2).width;
+  const loop = inner.map(([x, y], i) =>
+    toReal([x + across * (outer[i][0] - x), y + across * (outer[i][1] - y)]),
+  );
+  const onEdge = (a, b) =>
+    (a[0] === b[0] && (a[0] === 0 || a[0] === 100)) ||
+    (a[1] === b[1] && (a[1] === 0 || a[1] === 120));
+  const [cx, cy] = toReal(point);
+  const half = size / 2;
+  // How far a point is outside the box, or negative, how deep inside it.
+  const fromBox = ([x, y]) => {
+    const [dx, dy] = [Math.abs(x - cx) - half, Math.abs(y - cy) - half];
+    return dx > 0 || dy > 0 ? Math.hypot(Math.max(dx, 0), Math.max(dy, 0)) : Math.max(dx, dy);
+  };
+  let best = null;
+  loop.forEach((a, i) => {
+    const b = loop[(i + 1) % loop.length];
+    if (onEdge(a, b)) {
+      return;
+    }
+    for (let t = 0; t <= 1; t += 1 / 400) {
+      const near = [a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])];
+      if (!best || fromBox(near) < fromBox(best)) {
+        best = near;
+      }
+    }
+  });
+  return [best[0], best[1] / 1.2];
+};
+// Each cotised `between` layout that moves, by ordinary and count, from BETWEEN_COTISED.
+const BETWEEN_MOVED = [
+  ["bend", 2],
+  ["bend", 3],
+  ["bend-sinister", 2],
+  ["chevron", 3],
+  ["chevron-reversed", 3],
+  ["chevron-reversed", 6],
+  ["saltire", 4],
+  ["pall", 3],
+  ["pall-reversed", 3],
+];
+/**
+ * Ring probes on torteaux `between` a cotised ordinary, at its BETWEEN_COTISED points.
+ * @param {string} ordinary One of BETWEEN_COTISED's ordinaries.
+ * @param {number} count How many torteaux.
+ * @param {string} modifier "cotised-or" or "double-cotised-or".
+ * @returns {object[]} One probe per torteau.
+ */
+const betweenCotisedProbes = (ordinary, count, modifier) => {
+  const layout = BETWEEN_COTISED[ordinary][modifier.replace(/-or$/, "")];
+  const entry = layout.counts?.[count] ?? layout;
+  const size = entry.size ?? layout.size ?? BETWEEN[ordinary].size;
+  return entry.points.map((point, i) => ({
+    shield: `azure ${ordinary}-argent ${modifier}`,
+    charges: "between",
+    items: Array(count).fill("torteau"),
+    at: ring(point, size),
+    expect: "gules",
+    why: `torteau ${i + 1} of ${count} between a ${ordinary} ${modifier.replaceAll("-", " ")}, off its cotises`,
+  }));
+};
+/**
+ * A probe that the outer cotise shows where each charge BETWEEN_COTISED moves would reach it at
+ * its plain place: between the moved charge and the ordinary.
+ * @param {string} ordinary One of BETWEEN_COTISED's ordinaries.
+ * @param {number} count How many charges.
+ * @param {string} modifier "cotised-or" or "double-cotised-or".
+ * @returns {object} The probe.
+ */
+const betweenClearProbe = (ordinary, count, modifier) => {
+  const kind = modifier.replace(/-or$/, "");
+  const layout = BETWEEN_COTISED[ordinary][kind];
+  const plain = BETWEEN[ordinary].counts?.[count] ?? BETWEEN[ordinary];
+  const plainSize = plain.size ?? BETWEEN[ordinary].size;
+  const moved = layout.counts?.[count]?.points ?? layout.points;
+  return {
+    shield: `azure ${ordinary}-argent ${modifier}`,
+    charges: "between",
+    items: Array(count).fill(BOX_CHARGE),
+    at: plain.points
+      .filter((point, i) => point.join() !== moved[i].join())
+      .map((point) => nearestCotise(ordinary, kind, point, plainSize))
+      .filter(([x, y]) => onShield(x, y)),
+    expect: "or",
+    why: `the cotise shows between each moved charge of ${count} and a ${ordinary} ${kind.replace("-", " ")}`,
+  };
+};
+
 // `at` is [x%, y%] of the shield. Bite and bulge points are at the middle scallop of an inner
 // edge, half the scallop's depth from the straight edge. Charges are bezants, whose centres
 // sit at the points in charges.js and the ordinaries' `between`/`on` tables.
@@ -557,6 +875,40 @@ const PROBES = [
   { shield: "azure pale-indented-or", at: [[63, 47.6], [37, 41.7]], expect: "azure", why: "a notch opposite each point" },
 
   { shield: "or chevron-gules chief-azure", at: [50, 38], expect: "or", why: "the chevron moves below a chief" },
+
+  // 059 (diminutives and cotises): each cotisable ordinary cotised and double cotised in or, and
+  // the bend and chevron in their own tincture.
+  ...Object.keys(COTISED_EDGES).flatMap((o) => [...cotisedProbes(o, 1, "or"), ...cotisedProbes(o, 2, "or")]),
+  ...["bend", "chevron"].flatMap((o) => [...cotisedProbes(o, 1, ""), ...cotisedProbes(o, 2, "")]),
+  // On a cotised pile the lowest of three `on` charges moves up off the narrowed point: to 50% single
+  // and 46% double. Double, its box at the plain 54% reached 2.9 units either side of the centre at
+  // 55%, past the narrowed pile's edge 1.5 units out, into the gap.
+  { shield: "azure pile-argent cotised-or", charges: "on", items: Array(3).fill(BOX_CHARGE), at: [50, 50], expect: "gules", why: "the lowest of three on a pile cotised moves up" },
+  { shield: "azure pile-argent double-cotised-or", charges: "on", items: Array(3).fill(BOX_CHARGE), at: [50, 46], expect: "gules", why: "the lowest of three on a pile double cotised moves up" },
+  { shield: "azure pile-argent double-cotised-or", charges: "on", items: Array(3).fill(BOX_CHARGE), at: [[47.5, 55], [52.5, 55]], expect: "azure", why: "and leaves the gap beside the narrowed point clear" },
+  { shield: "azure pile-reversed-argent double-cotised-or", charges: "on", items: Array(3).fill(BOX_CHARGE), at: [50, 54], expect: "gules", why: "mirrored on a pile reversed double cotised" },
+  { shield: "azure pile-reversed-argent double-cotised-or", charges: "on", items: Array(3).fill(BOX_CHARGE), at: [[47.5, 45], [52.5, 45]], expect: "azure", why: "and leaves the gap beside its narrowed point clear" },
+  // On a cotised ordinary, `on` charges scale with it and `between` charges move off the cotises.
+  ...["bend", "fess"].flatMap((o) => [...onCotisedProbes(o, 1), ...onCotisedProbes(o, 2)]),
+  ...BETWEEN_MOVED.flatMap(([o, count]) => [...betweenCotisedProbes(o, count, "cotised-or"), ...betweenCotisedProbes(o, count, "double-cotised-or")]),
+  ...BETWEEN_MOVED.flatMap(([o, count]) => [betweenClearProbe(o, count, "cotised-or"), betweenClearProbe(o, count, "double-cotised-or")]),
+  // Moved up and shrunk, the reversed chevron's top torteau leaves the field below it.
+  { shield: "azure chevron-reversed-argent cotised-or", charges: "between", items: Array(3).fill("torteau"), at: [50, 36.5], expect: "azure", why: "the top of three torteaux between a reversed chevron cotised moves up" },
+  { shield: "azure bend-argent cotised-or", charges: "between", items: Array(6).fill("torteau"), at: BETWEEN.bend.counts[6].points.flatMap((p) => ring(p, BETWEEN.bend.counts[6].size)), expect: "gules", why: "DE BOHUN's six between a bend cotised" },
+  { shield: "azure bend-argent cotised-or", charges: "between", items: Array(6).fill(BOX_CHARGE), at: BETWEEN.bend.counts[6].points.map((point) => nearestCotise("bend", "cotised", point, BETWEEN.bend.counts[6].size)), expect: "or", why: "the cotise beside each of DE BOHUN's six shows" },
+  // Only a cotisable ordinary takes them: a bendlet keeps its own tincture to its edges.
+  { shield: "azure bendlet-argent cotised-or", at: [[50, 50], [45, 50], [55, 50]], expect: "argent", why: "a bendlet isn't cotised" },
+  { shield: "azure bendlet-argent cotised-or", at: [[50, 35], [50, 65], [50, 30], [50, 70]], expect: "azure", why: "nor is the field beside it" },
+  // On an argent field, a bendlet or pallet argent cotised sable is argent to its edges: if its ::before
+  // took --cotise, sable would show under the bands' softened edges.
+  { shield: "argent bendlet-argent cotised-sable", at: Array.from({ length: 21 }, (_, i) => 20 + i * 2.5).flatMap((y) => [[y + 10, y], [y - 10, y]]), expect: "argent", why: "a bendlet's edges show no cotise" },
+  { shield: "argent pallet-argent cotised-sable", at: [30, 50, 70].flatMap((y) => [42.2, 42.4, 42.5, 42.6, 42.8, 57.2, 57.4, 57.5, 57.6, 57.8].map((x) => [x, y])), expect: "argent", why: "a pallet's edges show no cotise" },
+  // A cotised fess's clip in quarter 1 (0–50 by 0–45) would put its narrowed fess about the
+  // quarter's 45%, 20.25% of the shield, and paint the pale's ground or. The shield's own cotises
+  // lie lower. On an inescutcheon, the fess would be about the inescutcheon's 45%.
+  { shield: "quarterly fess-gules cotised-or", quarters: ["azure pale-argent", "azure", "azure", "azure"], at: [[8, 20.25], [42, 20.25]], expect: "azure", why: "a cotised shield doesn't cotise a quarter's ordinary" },
+  { shield: "quarterly fess-gules cotised-or", quarters: ["azure pale-argent", "azure", "azure", "azure"], at: [[8, FESS_COTISE], [92, FESS_COTISE]], expect: "or", why: "the shield's own cotise, over the quarters" },
+  { shield: "azure fess-gules cotised-or", inner: { shield: "azure pale-argent" }, at: [onInner([8, 45]), onInner([92, 45])], expect: "azure", why: "a cotised shield doesn't cotise an inescutcheon's ordinary" },
 
   ...VOIDED.flatMap(([o, hole, outline, outside]) => [
     { shield: `gules ${o}-voided-argent`, at: hole, expect: "gules", why: `the hole in a ${o} voided` },

@@ -68,6 +68,11 @@ run("rule-of-tincture", rule, {
     `<div class="heater"><div class="gules"><div class="charges"><i class="mullet ermine"></i></div></div></div>`,
     `<div class="heater"><div class="azure fess-ermine"><div class="charges on"><i class="mullet gules"></i></div></div></div>`,
     `<div class="heater"><div class="per-pale-ermine-gules fess-or"></div></div>`,
+    // Cotises in their own tincture lie on the field; bare `cotised` takes the ordinary's.
+    `<div class="heater"><div class="azure bend-argent cotised-or"></div></div>`,
+    `<div class="heater"><div class="or fess-azure double-cotised"></div></div>`,
+    // A chief isn't cotised, so the cotise touches nothing (modifier-needs-target reports it).
+    `<div class="heater"><div class="or chief-azure cotised-or"></div></div>`,
     // Engrailed and fur ordinaries aren't fimbriated, so the fimbriation touches nothing.
     `<div class="heater"><div class="gules fess-ermine fimbriated-gules"></div></div>`,
     `<div class="heater"><div class="azure fess-engrailed-or fimbriated-azure"></div></div>`,
@@ -248,6 +253,19 @@ run("rule-of-tincture", rule, {
       // Children of a `charges` container are charges even without a shape class.
       code: `<div class="heater"><div class="azure"><div class="charges"><span class="gules"></span></div></div></div>`,
       errors: [error("`gules` puts a charge Gules on Azure: colour on colour")],
+    },
+    {
+      code: `<div class="heater"><div class="or bend-azure cotised-or"></div></div>`,
+      errors: [error("`cotised-or` puts a cotise Or on Or: metal on metal")],
+    },
+    {
+      // Grailwind draws a bendlet without its cotises, but heraldry still puts them on the field.
+      code: `<div class="heater"><div class="or bendlet-azure cotised-or"></div></div>`,
+      errors: [error("`cotised-or` puts a cotise Or on Or: metal on metal")],
+    },
+    {
+      code: `<div class="heater"><div class="gules fess-argent double-cotised-azure"></div></div>`,
+      errors: [error("`double-cotised-azure` puts a cotise Azure on Gules: colour on colour")],
     },
     {
       // The fimbriation touches the field.

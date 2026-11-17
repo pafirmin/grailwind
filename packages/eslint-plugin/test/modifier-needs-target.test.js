@@ -3,6 +3,7 @@ import { run } from "./run.js";
 
 const noDivision = (cls) => ({ messageId: "noDivision", data: { cls } });
 const noOrdinary = (cls) => ({ messageId: "noOrdinary", data: { cls } });
+const noCotisable = (cls) => ({ messageId: "noCotisable", data: { cls } });
 const transformed = (cls) => ({ messageId: "transformed", data: { cls } });
 
 run("modifier-needs-target", rule, {
@@ -18,6 +19,23 @@ run("modifier-needs-target", rule, {
     `<div class="heater"><div class="gules pile-azure fimbriated-argent"></div></div>`,
     `<div class="heater"><div class="per-pale-argent-gules"><div class="charges counterchanged"><i class="roundel"></i></div></div></div>`,
     `<div class="heater"><div class="per-bend-or-vert"><div class="charges"><i class="mullet counterchanged"></i></div></div></div>`,
+    `<div class="heater"><div class="azure bend-argent cotised-or"></div></div>`,
+    `<div class="heater"><div class="or fess-azure double-cotised"></div></div>`,
+    `<div class="heater"><div class="azure chevron-reversed-argent double-cotised-of-the-first"></div></div>`,
+    // Grailwind draws these without their cotises, but they're cotisable in heraldry.
+    `<div class="heater"><div class="ermine fess-engrailed-gules cotised-sable"></div></div>`,
+    `<div class="heater"><div class="gules bend-ermine cotised"></div></div>`,
+    `<div class="heater"><div class="gules cross-voided-or double-cotised"></div></div>`,
+    `<div class="heater"><div class="gules fess-chequy-or-azure cotised-argent"></div></div>`,
+    `<div class="heater"><div class="per-pale-or-gules saltire-counterchanged cotised"></div></div>`,
+    `<div class="heater"><div class="gules bend-or fimbriated-argent cotised-argent"></div></div>`,
+    `<div class="heater"><div class="azure pall-argent double-cotised"></div></div>`,
+    `<div class="heater"><div class="vert pile-reversed-or cotised-argent"></div></div>`,
+    // Grailwind doesn't cotise the diminutives or two and three bars, but heraldry allows it.
+    `<div class="heater"><div class="azure bendlet-argent cotised-or"></div></div>`,
+    `<div class="heater"><div class="gules three-bars-or double-cotised"></div></div>`,
+    // A chief beside a cotisable ordinary: the cotises are the ordinary's.
+    `<div class="heater"><div class="azure fess-argent chief-or cotised"></div></div>`,
     // A plain field is fine for charges that aren't counterchanged.
     `<div class="heater"><div class="azure"><div class="charges"><i class="mullet or"></i></div></div></div>`,
     // The top level of a file may be inside a divided field elsewhere.
@@ -97,6 +115,19 @@ run("modifier-needs-target", rule, {
     {
       code: `<div class="heater"><div class="gules cross-voided-or fimbriated-argent"></div></div>`,
       errors: [noOrdinary("fimbriated-argent")],
+    },
+    {
+      code: `<div class="heater"><div class="azure cotised-or"></div></div>`,
+      errors: [
+        {
+          message:
+            "`cotised-or` needs an ordinary to cotise: a cotise never stands alone, and a chief is never cotised",
+        },
+      ],
+    },
+    {
+      code: `<div class="heater"><div class="azure chief-or cotised"></div></div>`,
+      errors: [noCotisable("cotised")],
     },
     {
       // A fur field isn't divided.

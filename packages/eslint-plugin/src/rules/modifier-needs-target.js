@@ -1,5 +1,5 @@
 import { getElements, UNKNOWN } from "../tree.js";
-import { fimbriationOf, isDivided, isFimbriable, ordinariesOf } from "../blazon.js";
+import { cotisationOf, fimbriationOf, isDivided, isFimbriable, ordinariesOf } from "../blazon.js";
 
 // Any transform makes a charge the containing block for its fixed, swapped layer.
 const TRANSFORM = /^-?(rotate|scale|skew|translate)(-|$)/;
@@ -8,7 +8,8 @@ export default {
   meta: {
     type: "problem",
     docs: {
-      description: "Disallow counterchanged or fimbriated classes that have nothing to apply to",
+      description:
+        "Disallow counterchanged, fimbriated or cotised classes that have nothing to apply to",
       url: "https://github.com/pafirmin/grailwind/tree/main/packages/eslint-plugin#modifier-needs-target",
     },
     schema: [],
@@ -16,6 +17,8 @@ export default {
       noDivision: "`{{cls}}` needs a divided field to swap, e.g. `per-pale-argent-gules`",
       noOrdinary:
         "`{{cls}}` needs a plain tinctured ordinary to edge: a chief, and an engrailed, invected, wavy, indented, embattled, fur, chequy or counterchanged ordinary, aren't fimbriated",
+      noCotisable:
+        "`{{cls}}` needs an ordinary to cotise: a cotise never stands alone, and a chief is never cotised",
       transformed:
         "`{{cls}}` breaks `counterchanged`: a transformed charge shows its own small copy of the field",
     },
@@ -42,6 +45,13 @@ export default {
           const fimbriation = fimbriationOf(el.classes);
           if (fimbriation && !ordinaries.some(isFimbriable)) {
             report(el.reportNode, "noOrdinary", fimbriation.cls);
+          }
+
+          // Heraldry only: any ordinary but the chief is cotisable, though grailwind draws some
+          // without their cotises.
+          const cotisation = cotisationOf(el.classes);
+          if (cotisation && !ordinaries.length) {
+            report(el.reportNode, "noCotisable", cotisation.cls);
           }
 
           if (el.classes.has("charges")) {

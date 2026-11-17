@@ -34,6 +34,10 @@ run("field-in-shield", rule, {
       errors: [onFrame("bordure-compony-or-sable")],
     },
     {
+      code: `<div class="heater bend-argent cotised-or"></div>`,
+      errors: [onFrame("bend-argent"), onFrame("cotised-or")],
+    },
+    {
       code: `<div class="heater quarterly"><div class="or"></div><div class="gules"></div></div>`,
       errors: [onFrame("quarterly")],
     },

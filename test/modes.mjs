@@ -3,7 +3,9 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   ARRANGEMENTS,
+  BETWEEN_COTISED,
   CHARGES,
+  COTISABLE,
   DIVISIONS,
   FURS,
   LABELS,
@@ -20,6 +22,7 @@ import {
   BORDURE_DEPTH,
   BORDURE_WIDTH,
   bordurePath,
+  cotiseGeometry,
   frameOutline,
   outlinePoints,
 } from "../ordinaries.js";
@@ -103,10 +106,50 @@ const PATTERNS = {
     /\.fimbriated-argent \{\s*--fimbriated: 1;\s*--fimbriation: var\(--color-argent\);/,
   "fimbriation vars don't inherit":
     /@property --fimbriated \{\s*syntax: "\*";\s*inherits: false;[^]*@property --fimbriation \{\s*syntax: "\*";\s*inherits: false;/,
-  "an ordinary opts in to fimbriation":
-    /\.cross-azure \{[^]*?&::before \{[^}]*--fimbriated: inherit;\s*--fimbriation: inherit;\s*background-color: var\(--fimbriation, var\(--color-azure\)\);/,
+  "an ordinary opts in to fimbriation and cotises":
+    /\.cross-azure \{[^]*?&::before \{[^}]*--fimbriated: inherit;\s*--fimbriation: inherit;\s*--cotise-clip: inherit;\s*--cotise-bands: inherit;\s*--cotise-band-sizes: inherit;\s*--cotise-band-positions: inherit;\s*--cotise: inherit;\s*background-color: var\(--fimbriation, var\(--cotise, var\(--color-azure\)\)\);/,
   "a fimbriated ordinary is widened":
-    /\.cross-azure \{[^]*?&::before \{[^}]*clip-path: polygon\(calc\(38% - 3% \* var\(--fimbriated, 0\)\) 0,/,
+    /\.cross-azure \{[^]*?&::before \{[^}]*clip-path: var\(--cotise-clip, polygon\(calc\(38% - 3% \* var\(--fimbriated, 0\)\) 0,/,
+  "cotised-or sets the cotises' clip, narrowed bands and tincture":
+    /\.cotised-or \{\s*--cotise-clip: var\(--clip-cotised\);\s*--cotise-bands: var\(--bands-cotised\);\s*--cotise-band-sizes: var\(--band-sizes-cotised\);\s*--cotise-band-positions: var\(--band-positions-cotised\);\s*--cotise: var\(--color-or\);/,
+  "bare cotised keeps the plain bands": /\.cotised \{\s*--cotise-clip: var\(--clip-cotised\);\s*\}/,
+  "double-cotised takes the double clip":
+    /\.double-cotised \{\s*--cotise-clip: var\(--clip-double-cotised\);/,
+  "cotise vars don't inherit": new RegExp(
+    [
+      "--cotise-clip",
+      "--cotise",
+      "--clip-cotised",
+      "--clip-double-cotised",
+      "--cotise-bands",
+      "--bands-cotised",
+      "--bands-double-cotised",
+      "--cotise-band-sizes",
+      "--cotise-band-positions",
+      "--band-sizes-cotised",
+      "--band-sizes-double-cotised",
+      "--band-positions-cotised",
+      "--band-positions-double-cotised",
+    ]
+      .map((name) => String.raw`@property ${name} \{\s*syntax: "\*";\s*inherits: false;`)
+      .join("[^]*"),
+  ),
+  "a cotisable ordinary sets its clips and bands on its element, not its ::before":
+    /\.cross-azure \{[^]*?&::before \{[^}]*\}\s*&:not\([^{]*\{[^}]*\}\s*--clip-cotised: polygon\(evenodd, [^;]*\);\s*--bands-cotised: linear-gradient\([^;]*\);\s*--clip-double-cotised: polygon\(evenodd, [^;]*\);\s*--bands-double-cotised: linear-gradient\(/,
+  "a cotisable ordinary's bands give way to the narrowed ones":
+    /\.cross-azure \{[^]*?&::before \{[^}]*background-image: var\(--cotise-bands, linear-gradient\(/,
+  "a cotised bend's on charges scale with it, 0.625 single and 0.4167 double": new RegExp(
+    String.raw`\.bend-or \{[^]*?&:is\(\.cotised, [^{]*\{[^}]*--on-size: 11\.25%;[^]*?&:is\(\.double-cotised, [^{]*\{[^}]*--on-size: 7\.5%;`,
+  ),
+  "a cotised bend's between charges move off the cotises":
+    /\.bend-or \{[^]*?&:is\(\.cotised, [^{]*\{[^}]*--between-1-x: 72\.5%;/,
+  "a cotised pile's narrowed point moves its bands' tiles":
+    /\.pile-or \{[^]*?--band-sizes-cotised: [^;]+;\s*--band-positions-cotised: [^;]+;/,
+  "a cross keeps its bands' tiles": /\.cross-or \{(?:(?!--band-sizes-)[^])*?\n  \}/,
+  "a bendlet isn't cotisable, so its ::before doesn't take the cotises":
+    /\.bendlet-or \{\s*position: relative;\s*&::before \{(?:(?!--cotise[\w-]*:)[^}])*\}/,
+  "nor does a pallet's":
+    /\.pallet-or \{\s*position: relative;\s*&::before \{(?:(?!--cotise[\w-]*:)[^}])*\}/,
   "a division publishes its swap":
     /\.per-pale-or-gules \{[^}]*--counterchange-image: linear-gradient\(to right, var\(--color-gules\) 50%, var\(--color-or\) 50%\);/,
   "quarterly splits at the fess point":
@@ -254,7 +297,7 @@ const PATTERNS = {
     /\.per-pale-or-gules \{[^}]*--field-first: var\(--color-or\);/,
   "of the first doesn't set a field's first": /\.of-the-first \{(?:(?!--field-first)[^}])*\}/,
   "a bend of the first":
-    /\.bend-of-the-first \{[^]*?&::before \{[^}]*background-color: var\(--fimbriation, var\(--the-first, transparent\)\);/,
+    /\.bend-of-the-first \{[^]*?&::before \{[^}]*background-color: var\(--fimbriation, var\(--cotise, var\(--the-first, transparent\)\)\);/,
   "charges are centred with margins, not translate":
     /\.charges \{[^]*?& > \* \{(?:(?!translate)[^}])*margin: calc\(var\(--charge-width\) \/ -2\) 0 0 calc\(var\(--charge-width\) \/ -2\);/,
   "charges pass the swap down": /\.charges \{[^}]*--counterchange-image: inherit;/,
@@ -339,6 +382,11 @@ const DATA_CLASSES = [
   // Names the ESLint plugin builds from these lists.
   ...ORDINARIES.map((o) => `${o}-counterchanged`),
   ...TINCTURES.map((t) => `fimbriated-${t}`),
+  ...["cotised", "double-cotised"].flatMap((c) => [
+    c,
+    ...[...TINCTURES, OF_THE_FIRST].map((t) => `${c}-${t}`),
+  ]),
+  ...COTISABLE.map((o) => `${o}-or`),
   "counterchanged",
   ...Object.keys(FURS),
   ...Object.keys(FURS).map((f) => `fess-${f}`),
@@ -406,6 +454,17 @@ try {
   furChecks["a fur alone still defines its ground's colour"] = /--color-or: #f5c518;/.test(
     await build({ dir, source: "erminois.html" }),
   );
+  // One layout serves both cotised and double-cotised only while both groups are as wide.
+  for (const [ordinary, kinds] of Object.entries(BETWEEN_COTISED)) {
+    checks++;
+    const group = (pairs) => cotiseGeometry(ordinary, pairs).width * (pairs === 2 ? 12 : 8);
+    if (kinds.cotised === kinds["double-cotised"] && Math.abs(group(1) - group(2)) > 1e-9) {
+      failures++;
+      console.error(
+        `✗ BETWEEN_COTISED["${ordinary}"] shares one layout for cotised and double-cotised, which assumes COTISES["${ordinary}"] gives both the same multiple: split it`,
+      );
+    }
+  }
   checks += Object.keys(furChecks).length;
   for (const [name, ok] of Object.entries(furChecks)) {
     if (!ok) {

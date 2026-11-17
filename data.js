@@ -125,6 +125,23 @@ export const VOIDABLE = [
   ...REVERSIBLE.map(reversed),
 ];
 
+// Ordinaries that can be cotised, e.g. `bend-argent cotised-or`.
+export const COTISABLE = [
+  "pale",
+  "fess",
+  "bar",
+  "bend",
+  "bend-sinister",
+  "chevron",
+  "chevron-reversed",
+  "cross",
+  "saltire",
+  "pall",
+  "pall-reversed",
+  "pile",
+  "pile-reversed",
+];
+
 // Ordinaries that can be chequy of two tinctures, e.g. `fess-chequy-azure-argent`.
 export const CHEQUY = ["fess", "pale"];
 
@@ -349,3 +366,47 @@ BETWEEN_LINED["bend-sinister"] = mapValues(BETWEEN_LINED.bend, (entry) =>
 BETWEEN_LINED["pall-reversed"] = mapValues(BETWEEN_LINED.pall, (entry) =>
   mirrorLined(entry, mirror),
 );
+
+// `between` overrides where a cotise reaches a charge, by ordinary and `cotised` or
+// `double-cotised`; the rest falls back to the plain ordinary's. Single and double cotises end
+// at the same width (COTISES in ordinaries.js), so one layout serves both. The charges move off
+// the cotises; the reversed chevron's three and the pall's three also shrink, as moving them far
+// enough would leave the shield.
+/**
+ * One `between` override for both `cotised` and `double-cotised`. test/modes.mjs checks that their
+ * COTISES multiples are equal, which this assumes.
+ * @param {object} entry The override: its size, points or counts.
+ * @returns {{cotised: object, "double-cotised": object}} The same entry under both.
+ */
+const bothCotised = (entry) => ({ cotised: entry, "double-cotised": entry });
+// prettier-ignore
+export const BETWEEN_COTISED = {
+  bend: bothCotised({ points: [[72.5, 24], [24, 72]], counts: {
+    3: { size: 18, points: [[60, 13], [86, 36], [27, 70.5]] } } }),
+  chevron: bothCotised({ points: [[24, 22], [76, 22], [50, 73]] }),
+  "chevron-reversed": bothCotised({ size: 20, points: [[25, 76], [75, 76], [50, 28]], counts: {
+    6: { size: 12, points: [[26, 78], [50, 89], [74, 78], [41, 27], [59, 27], [50, 16]] } } }),
+  saltire: bothCotised({ points: [[50, 11.5], [14, 45], [86, 45], [50, 84]] }),
+  // The top charge can't move far enough up, under the shield's top, so the three shrink; two keep
+  // their size.
+  pall: bothCotised({ size: 16, points: [[50, 8.5], [18, 56], [82, 56]], counts: {
+    2: { size: 18, points: [[18, 56], [82, 56]] } } }),
+};
+BETWEEN_COTISED["bend-sinister"] = mapValues(BETWEEN_COTISED.bend, (entry) =>
+  mirrorLined(entry, mirrorX),
+);
+BETWEEN_COTISED["pall-reversed"] = mapValues(BETWEEN_COTISED.pall, (entry) =>
+  mirrorLined(entry, mirror),
+);
+
+// `on` overrides on a cotised ordinary, by ordinary and `cotised` or `double-cotised`, before the
+// charges are scaled with the narrowed ordinary; the rest falls back to the plain ordinary's. The
+// narrowed pile's point rises, so its charges move up into the wider part, evenly spaced.
+// prettier-ignore
+export const ON_COTISED = {
+  pile: {
+    cotised: { counts: { 3: { points: [[50, 14], [50, 32], [50, 50]] } } },
+    "double-cotised": { counts: { 3: { points: [[50, 14], [50, 30], [50, 46]] } } },
+  },
+};
+ON_COTISED["pile-reversed"] = mapValues(ON_COTISED.pile, (entry) => mirrorLined(entry, mirror));
