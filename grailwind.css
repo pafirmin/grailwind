@@ -254,8 +254,8 @@
  * ------------------------------------------------------------------------- */
 
 /* Per pale: split vertically into dexter | sinister. A split field's parts are its children that
- * aren't charges, an inescutcheon, a canton or a label (a `label-` class): those lie over all of
- * it. The same selector is PART in ordinaries.js. */
+ * aren't charges, an inescutcheon, a canton, a label (a `label-` class) or `over-all`: those lie
+ * over all of it. The same selector is PART in ordinaries.js. */
 @utility per-pale {
   display: grid;
   grid-auto-flow: column;
@@ -268,6 +268,7 @@
       .charges,
       .inescutcheon,
       .canton,
+      .over-all,
       [class^="label-"],
       [class*=" label-"]
     ) {
@@ -294,6 +295,7 @@
               .charges,
               .inescutcheon,
               .canton,
+              .over-all,
               [class^="label-"],
               [class*=" label-"]
             )
@@ -304,6 +306,7 @@
               .charges,
               .inescutcheon,
               .canton,
+              .over-all,
               [class^="label-"],
               [class*=" label-"]
             )
@@ -318,6 +321,7 @@
         .charges,
         .inescutcheon,
         .canton,
+        .over-all,
         [class^="label-"],
         [class*=" label-"]
       ) {
@@ -341,6 +345,7 @@
       .charges,
       .inescutcheon,
       .canton,
+      .over-all,
       [class^="label-"],
       [class*=" label-"]
     ) {
@@ -358,6 +363,7 @@
         .charges,
         .inescutcheon,
         .canton,
+        .over-all,
         [class^="label-"],
         [class*=" label-"]
       ) {
@@ -399,6 +405,7 @@
           .charges,
           .inescutcheon,
           .canton,
+          .over-all,
           [class^="label-"],
           [class*=" label-"]
         )
@@ -416,6 +423,7 @@
               .charges,
               .inescutcheon,
               .canton,
+              .over-all,
               [class^="label-"],
               [class*=" label-"]
             )
@@ -433,6 +441,7 @@
           .charges,
           .inescutcheon,
           .canton,
+          .over-all,
           [class^="label-"],
           [class*=" label-"]
         )
@@ -450,6 +459,7 @@
               .charges,
               .inescutcheon,
               .canton,
+              .over-all,
               [class^="label-"],
               [class*=" label-"]
             )
@@ -481,6 +491,7 @@
           .charges,
           .inescutcheon,
           .canton,
+          .over-all,
           [class^="label-"],
           [class*=" label-"]
         )
@@ -498,6 +509,7 @@
               .charges,
               .inescutcheon,
               .canton,
+              .over-all,
               [class^="label-"],
               [class*=" label-"]
             )
@@ -515,6 +527,7 @@
           .charges,
           .inescutcheon,
           .canton,
+          .over-all,
           [class^="label-"],
           [class*=" label-"]
         )
@@ -532,6 +545,7 @@
               .charges,
               .inescutcheon,
               .canton,
+              .over-all,
               [class^="label-"],
               [class*=" label-"]
             )
@@ -565,6 +579,15 @@
     --outer-inset: var(--bordure-inset);
     --layer-inset: var(--bordure-inset);
   }
+}
+
+/* Over all: a second ordinary on a child of the field, over its ordinary and charges (z 1), under
+ * the bordure ring (z 2, later in tree order) and the chief (z 3). Fills the field's padding box,
+ * so it stops inside a bordure. */
+@utility over-all {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
 }
 
 /* Canton: a third of the shield each way in dexter chief, so a ninth of it, and

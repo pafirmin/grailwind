@@ -8,6 +8,9 @@ const transformed = (cls) => ({ messageId: "transformed", data: { cls } });
 
 run("modifier-needs-target", rule, {
   valid: [
+    // POWER: an ordinary over all on a child of the field, plain or in a divided field.
+    `<div class="heater"><div class="argent two-bars-wavy-sable"><div class="over-all bend-or"></div></div></div>`,
+    `<div class="heater"><div class="quarterly"><div class="or"></div><div class="gules"></div><div class="over-all bend-argent"></div></div></div>`,
     `<div class="heater"><div class="per-pale-argent-gules chevron-counterchanged"></div></div>`,
     `<div class="heater"><div class="quarterly-or-gules chief-counterchanged"></div></div>`,
     `<div class="heater"><div class="barry-argent-gules fess-counterchanged"></div></div>`,
@@ -48,6 +51,18 @@ run("modifier-needs-target", rule, {
     `<div class="heater"><div class="per-pale-or-gules"><div class="charges"><i class="mullet counterchanged hover:rotate-45"></i></div></div></div>`,
   ],
   invalid: [
+    {
+      code: `<div class="heater"><div class="argent"><div class="over-all"></div></div></div>`,
+      errors: [{ messageId: "overAll" }],
+    },
+    {
+      code: `<div class="heater"><div class="argent"><div class="over-all chief-or"></div></div></div>`,
+      errors: [{ messageId: "overAllChief" }],
+    },
+    {
+      code: `<div class="heater"><div class="argent over-all bend-gules"></div></div>`,
+      errors: [{ messageId: "overAll" }],
+    },
     {
       code: `<div class="heater"><div class="azure chevron-counterchanged"></div></div>`,
       errors: [

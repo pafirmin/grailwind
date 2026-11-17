@@ -66,6 +66,8 @@ No metal (`or`, `argent`) on metal, and no colour on colour.
   field: `or chevron-sable fimbriated-argent` is metal on metal (Argent on Or).
 - Cotises in their own tincture are checked against the field: `or bend-azure cotised-or` is
   metal on metal. Bare `cotised` is the ordinary's tincture.
+- An `over-all` ordinary lies on its parent's field and on the parent's own ordinary, and is flagged
+  only if it clashes with both: `argent two-bars-wavy-sable` › `over-all bend-or` passes.
 - Charges in a `charges` container are checked against the field.
 - Charges in a `charges on` container are checked against the ordinary they lie on.
 - Charges at `in-dexter-chief`, `in-chief-point` or `in-sinister-chief`, or in a
@@ -124,10 +126,10 @@ one, other than a chief, they have nowhere to go. `charges on` inside a label is
 ### `one-ordinary`
 
 An element draws one ordinary plus, optionally, a chief. With two, such as
-`fess-azure chevron-gules`, only one shows. Two chiefs are flagged too. A `charges` container
-takes one arrangement: `between`, `on`, `in-pale`, `in-fess`, `in-bend` or `in-bend-sinister`.
-Counterchanged, engrailed, invected, wavy, indented, embattled, voided, fur and chequy ordinaries
-count as ordinaries.
+`fess-azure chevron-gules`, they mis-draw: put the one over all on a child with `over-all`. Two
+chiefs are flagged too. A `charges` container takes one arrangement: `between`, `on`, `in-pale`,
+`in-fess`, `in-bend` or `in-bend-sinister`. Counterchanged, engrailed, invected, wavy, indented,
+embattled, voided, fur and chequy ordinaries count as ordinaries.
 
 A charge at a named point (`in-dexter-chief` and so on) is a separate group in the blazon, so it
 goes in its own `charges` container. Among other charges, it still counts towards their number
@@ -144,6 +146,8 @@ Modifiers that would otherwise do nothing:
   the container.
 - `fimbriated-*` needs a plain tinctured ordinary. A chief, and an engrailed, invected, wavy,
   indented, embattled, voided, fur, chequy or counterchanged ordinary, aren't fimbriated.
+- `over-all` needs an ordinary to lie over the field: it's flagged with no ordinary, with only a
+  chief (put `chief-*` on the field), or on the field itself.
 - `cotised` and `double-cotised` (also `cotised-or` and the like) need an ordinary other than a
   chief on the same element: a cotise never stands alone, and a chief is never cotised.
 - `counterchanged` doesn't work on a charge with a transform (`rotate-*`, `scale-*`, `skew-*`,

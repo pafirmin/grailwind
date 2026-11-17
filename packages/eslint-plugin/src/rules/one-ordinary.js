@@ -13,7 +13,8 @@ export default {
     },
     schema: [],
     messages: {
-      ordinaries: "{{classes}} both draw an ordinary; only one will show.",
+      ordinaries:
+        "{{classes}} both draw an ordinary on one element; put the one over all on a child with `over-all`",
       chiefs: "{{classes}} both draw a chief; only one will show",
       arrangements: "{{classes}} both place these charges",
       pointed:

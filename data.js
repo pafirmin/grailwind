@@ -7,6 +7,8 @@ export const COLOURS = ["gules", "azure", "vert", "purpure", "sable"];
 export const TINCTURES = [...METALS, ...COLOURS];
 // Paints in the field's first tincture, as "of the first" in a blazon.
 export const OF_THE_FIRST = "of-the-first";
+// A second ordinary on a child of the field, drawn over everything but the chief.
+export const OVER_ALL = "over-all";
 
 export const DIVISIONS = [
   "per-pale",

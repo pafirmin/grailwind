@@ -5,6 +5,11 @@ const error = (message) => ({ message });
 
 run("rule-of-tincture", rule, {
   valid: [
+    // An ordinary over all lies on its parent's field.
+    `<div class="heater"><div class="argent two-bars-wavy-sable"><div class="over-all bend-or"></div></div></div>`,
+    `<div class="heater"><div class="sable pile-argent"><div class="over-all chevron-gules"></div></div></div>`,
+    `<div class="heater"><div class="azure chevron-argent"><div class="over-all bend-or"></div></div></div>`,
+    `<div class="heater"><div class="quarterly"><div class="or"></div><div class="gules"></div><div class="over-all bend-or"></div></div></div>`,
     `<div class="heater"><div class="or fess-azure"></div></div>`,
     `<div class="heater"><div class="or three-chevronels-gules"></div></div>`,
     // A label lies on the chief if there is one, else on the field.
@@ -139,6 +144,21 @@ run("rule-of-tincture", rule, {
     },
   ],
   invalid: [
+    {
+      code: `<div class="heater"><div class="ermine"><div class="over-all fess-argent"></div></div></div>`,
+      errors: [{ messageId: "violation" }],
+    },
+    {
+      code: `<div class="heater"><div class="azure pale-sable"><div class="over-all fess-gules"></div></div></div>`,
+      errors: [
+        error("`pale-sable` puts a pale Sable on Azure: colour on colour"),
+        error("`fess-gules` puts a fess Gules on Azure: colour on colour"),
+      ],
+    },
+    {
+      code: `<div class="heater"><div class="or"><div class="over-all bend-or"></div></div></div>`,
+      errors: [{ messageId: "violation" }],
+    },
     {
       code: `<div class="heater"><div class="azure"><div class="label-or"><div class="charges on"><i class="bezant"></i></div></div></div></div>`,
       errors: [error("`bezant` puts a bezant Or on Or: metal on metal")],

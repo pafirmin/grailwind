@@ -105,7 +105,8 @@ const PSEUDO = { chief: "&::after" };
 
 // A split field's parts: its children that aren't over all of it. A label is recognised by its
 // `label-` class. Written out in grailwind.css.
-const PART = ':not(.charges, .inescutcheon, .canton, [class^="label-"], [class*=" label-"])';
+const PART =
+  ':not(.charges, .inescutcheon, .canton, .over-all, [class^="label-"], [class*=" label-"])';
 
 // The chief surmounts a bordure.
 const INSET = "var(--bordure-inset)";

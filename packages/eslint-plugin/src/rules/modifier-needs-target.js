@@ -1,5 +1,13 @@
+import { OVER_ALL } from "grailwind/data";
 import { getElements, UNKNOWN } from "../tree.js";
-import { cotisationOf, fimbriationOf, isDivided, isFimbriable, ordinariesOf } from "../blazon.js";
+import {
+  cotisationOf,
+  fimbriationOf,
+  frameOf,
+  isDivided,
+  isFimbriable,
+  ordinariesOf,
+} from "../blazon.js";
 
 // Any transform makes a charge the containing block for its fixed, swapped layer.
 const TRANSFORM = /^-?(rotate|scale|skew|translate)(-|$)/;
@@ -19,6 +27,9 @@ export default {
         "`{{cls}}` needs a plain tinctured ordinary to edge: a chief, and an engrailed, invected, wavy, indented, embattled, fur, chequy or counterchanged ordinary, aren't fimbriated",
       noCotisable:
         "`{{cls}}` needs an ordinary to cotise: a cotise never stands alone, and a chief is never cotised",
+      overAll: "an ordinary over all needs an ordinary to lie over the field",
+      overAllChief:
+        "a chief already lies over the field's ordinaries and charges: put `chief-*` on the field",
       transformed:
         "`{{cls}}` breaks `counterchanged`: a transformed charge shows its own small copy of the field",
     },
@@ -39,6 +50,16 @@ export default {
           if (!isDivided(el.classes)) {
             for (const { cls } of [...ordinaries, ...chiefs].filter((o) => o.counterchanged)) {
               report(el.reportNode, "noDivision", cls);
+            }
+          }
+
+          if (el.classes.has(OVER_ALL)) {
+            const onField =
+              el.parent !== UNKNOWN && el.parent.classes && frameOf(el.parent.classes);
+            if (!ordinaries.length && chiefs.length) {
+              report(el.reportNode, "overAllChief", OVER_ALL);
+            } else if (!ordinaries.length || onField) {
+              report(el.reportNode, "overAll", OVER_ALL);
             }
           }
 

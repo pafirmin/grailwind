@@ -18,7 +18,10 @@ run("one-ordinary", rule, {
     {
       code: `<div class="heater"><div class="or fess-azure chevron-gules"></div></div>`,
       errors: [
-        { message: "`fess-azure` and `chevron-gules` both draw an ordinary; only one will show." },
+        {
+          message:
+            "`fess-azure` and `chevron-gules` both draw an ordinary on one element; put the one over all on a child with `over-all`",
+        },
       ],
     },
     {

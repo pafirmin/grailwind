@@ -1,4 +1,4 @@
-import { FURS, OF_THE_FIRST } from "grailwind/data";
+import { FURS, OF_THE_FIRST, OVER_ALL } from "grailwind/data";
 import { getElements, UNKNOWN } from "../tree.js";
 import {
   chargeName,
@@ -80,7 +80,10 @@ export default {
   create(context) {
     const furs = furKinds(context.options[0]?.furs);
     // `el` is the element whose field or ordinary it is, for resolving `of-the-first`.
-    const check = (el, node, cls, thing, painted, ground, messageId = "violation") => {
+    // `grounds` is a tincture, or [tincture, other] for an over-all ordinary: it's reported only
+    // if it clashes with both.
+    const check = (el, node, cls, thing, painted, grounds, messageId = "violation") => {
+      let [ground, alt = null] = [grounds].flat();
       const first = [painted, ground].includes(OF_THE_FIRST) ? firstOf(el) : null;
       const tincture = painted === OF_THE_FIRST ? first : painted;
       if (ground === OF_THE_FIRST) {
@@ -94,7 +97,7 @@ export default {
         });
         return;
       }
-      if (!sameKind(tincture, ground, furs)) {
+      if (!sameKind(tincture, ground, furs) || (alt && !sameKind(tincture, alt, furs))) {
         return;
       }
       context.report({
@@ -117,7 +120,18 @@ export default {
           if (!el.classes) {
             continue;
           }
-          const field = fieldTincture(el.classes);
+          // An over-all ordinary lies on its parent's field and the parent's own ordinary: it's
+          // reported only if it clashes with both.
+          let field = fieldTincture(el.classes);
+          let alt = null;
+          if (el.classes.has(OVER_ALL)) {
+            const parent = el.parent !== UNKNOWN && el.parent.classes ? el.parent : null;
+            field = parent ? fieldTincture(parent.classes) : null;
+            const [under] = parent ? ordinariesOf(parent.classes).ordinaries : [];
+            if (under?.tincture && !under.fur && kind(under.tincture, furs)) {
+              alt = under.tincture;
+            }
+          }
           const { ordinaries, chiefs, bordures } = ordinariesOf(el.classes);
           const fimbriation = fimbriationOf(el.classes);
 
@@ -147,13 +161,16 @@ export default {
           const isFimbriated = fimbriation && ordinaries.some(isFimbriable);
 
           if (isFimbriated) {
-            check(el, el.reportNode, fimbriation.cls, "fimbriation", fimbriation.tincture, field);
+            check(el, el.reportNode, fimbriation.cls, "fimbriation", fimbriation.tincture, [
+              field,
+              alt,
+            ]);
           }
 
           // Cotises in their own tincture lie on the field; bare `cotised` is the ordinary's.
           const cotisation = cotisationOf(el.classes);
           if (cotisation?.tincture && ordinaries.length) {
-            check(el, el.reportNode, cotisation.cls, "cotise", cotisation.tincture, field);
+            check(el, el.reportNode, cotisation.cls, "cotise", cotisation.tincture, [field, alt]);
           }
 
           for (const o of ordinaries) {
@@ -163,7 +180,7 @@ export default {
               o.cls,
               name(o),
               o.tincture,
-              isFimbriated && isFimbriable(o) ? fimbriation.tincture : field,
+              isFimbriated && isFimbriable(o) ? fimbriation.tincture : [field, alt],
             );
           }
 

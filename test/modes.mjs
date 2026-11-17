@@ -76,7 +76,7 @@ const CLASSES = [
 // The bordure's width and depth as the CSS writes them: an eighth is `calc(100cqw / 8)`.
 const FRAME_BORDER = String.raw`calc\(100cqw \/ ${+(1 / BORDURE_WIDTH).toFixed(3)}\)`;
 const CANTON_BORDER = String.raw`calc\(100cqw \/ ${+(3 / BORDURE_WIDTH).toFixed(3)}\)`;
-const PART = String.raw`:not\(\.charges, \.inescutcheon, \.canton, \[class\^="label-"\], \[class\*=" label-"\]\)`;
+const PART = String.raw`:not\(\.charges, \.inescutcheon, \.canton, \.over-all, \[class\^="label-"\], \[class\*=" label-"\]\)`;
 const NARROWED = String.raw`0\.${String(+(1 - BORDURE_DEPTH).toFixed(3)).slice(2)}`;
 
 // Rules without a plain `.class {` selector, checked by pattern.

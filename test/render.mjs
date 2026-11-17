@@ -2063,6 +2063,32 @@ const PROBES = [
   { shield: "per-pale", quarters: ["or bordure-ermine", "gules bordure-ermine"], label: { shield: "label-azure" }, at: [[52, 60], [60, 70]], expect: "gules", why: "a label isn't a part: the last part keeps its palar side bare" },
   { shield: "azure", label: { shield: "label-of-five-points-ermine" }, at: furGround(1, 1), expect: "argent", why: "an ermine label's ground" },
   { shield: "azure", label: { shield: "label-of-five-points-ermine" }, at: [41.667, 21], expect: "azure", why: "the field beside an ermine label's points" },
+  // 078: an ordinary over all, on a child of the field, at z 2: over the field's ordinary and
+  // charges, under the bordure ring, the chief, a canton and an inescutcheon. The bend runs along
+  // y = x, the torteaux in bend sit on it, and the charges are written after the child.
+  { shield: "argent two-bars-sable", charges: "in-bend", items: Array(3).fill("torteau"), overAll: { shield: "bend-or" }, at: [50, 45], expect: "or", why: "over all: the bend lies over a torteau written after it" },
+  { shield: "argent two-bars-sable", overAll: { shield: "bend-or" }, at: [[35, 35], [65, 65]], expect: "or", why: "over all: the bend lies over both bars" },
+  { shield: "argent two-bars-sable", overAll: { shield: "bend-or" }, at: [[8, 33], [92, 57]], expect: "sable", why: "over all: the bars beyond the bend" },
+  { shield: "argent chief-azure", overAll: { shield: "bend-or" }, at: [[10, 10], [20, 10]], expect: "azure", why: "over all: the bend starts below the chief" },
+  { shield: "argent chief-azure", overAll: { shield: "bend-or" }, at: [[60, 60], [70, 70]], expect: "or", why: "over all: the bend below a chief" },
+  ...["", "-engrailed"].map((line) => (
+    { shield: `argent bordure${line}-gules`, overAll: { shield: "bend-or" }, at: line ? [78, 84] : [78, 82.5], expect: "gules", why: `over all: the ${line ? "engrailed " : ""}bordure lies over the bend` }
+  )),
+  { shield: "argent bordure-gules", overAll: { shield: "bend-or" }, at: [50, 50], expect: "or", why: "over all: the bend inside a bordure" },
+  { shield: "argent", overAll: { shield: "bend-or" }, inner: { kind: "canton", shield: "gules" }, at: [10, 10], expect: "gules", why: "over all: a canton lies over the bend" },
+  { shield: "argent", overAll: { shield: "bend-or" }, inner: { shield: "gules" }, at: [50, 45], expect: "gules", why: "over all: an inescutcheon lies over the bend" },
+  { shield: "argent", overAll: { shield: "bend-or" }, inner: { shield: "gules" }, at: [[30, 30], [70, 66]], expect: "or", why: "over all: the bend beyond the inescutcheon" },
+  { shield: "quarterly", quarters: ["azure", "gules", "vert", "sable"], overAll: { shield: "bend-or" }, at: [[50, 50], [30, 30]], expect: "or", why: "over all: the bend in a quarterly field" },
+  { shield: "quarterly", quarters: ["azure", "gules", "vert", "sable"], overAll: { shield: "bend-or" }, at: [90, 10], expect: "gules", why: "over all: the second quarter, beside the bend, is where it was" },
+  { shield: "quarterly", quarters: ["azure", "gules", "vert", "sable"], overAll: { shield: "bend-or" }, at: [[20, 70]], expect: "vert", why: "over all: the third quarter, beside the bend, is where it was" },
+  { shield: "argent", overAll: { shield: "bend-gules", charges: "on", items: bezants(3) }, at: ON.bend.counts[3].points.flatMap((point) => ring(point, ON.bend.size)), expect: "or", why: "over all: charges on the over-all bend" },
+  { shield: "azure fess-gules cotised-or", overAll: { shield: "bend-argent" }, at: [FESS_COTISE, FESS_COTISE], expect: "argent", why: "over all: a cotised field's cotise doesn't reach the bend" },
+  ...(() => {
+    const { inset, width, gap } = cotiseGeometry("bend", 1);
+    const [{ at: [x, y], step: [dx, dy] }] = COTISED_EDGES.bend;
+    const out = gap + width / 2 - inset;
+    return [{ shield: "azure", overAll: { shield: "bend-argent cotised-or" }, at: [x + dx * out, y + (dy * out) / 1.2], expect: "or", why: "over all: a cotised bend has its own cotise" }];
+  })(),
 ];
 
 const LINES = ["", "-engrailed", "-invected", "-wavy", "-indented", "-embattled"];
@@ -2176,8 +2202,8 @@ const CORNER_SHIELDS = ["engrailed", "invected"].map((line) => ({
 // Tile edges at % positions fall mid-pixel at this width, where seams show.
 const ODD_WIDTH = 155;
 // `more` is a second charges container, as { charges, items }.
-const key = ({ kind, shield, charges, items, inner, first, more, quarters, label }) =>
-  `${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ? JSON.stringify(quarters) : ""}|${label ? key(label) : ""}`;
+const key = ({ kind, shield, charges, items, inner, first, more, quarters, label, overAll }) =>
+  `${overAll ? key(overAll) : ""}~${kind ?? ""}|${shield}|${charges}|${items}|${inner ? key(inner) : ""}|${first ?? ""}|${more ? key(more) : ""}|${quarters ? JSON.stringify(quarters) : ""}|${label ? key(label) : ""}`;
 const SHIELDS = [...new Map(PROBES.map((p) => [key(p), p])).values()];
 const CHARGED = SHIELDS.filter((s) => s.items && !s.inner);
 const NESTED = SHIELDS.filter((s) => s.inner);
@@ -2223,13 +2249,21 @@ const quarterOf = (q) =>
   typeof q === "string"
     ? `<div class="${q}"></div>`
     : `<div class="${q.shield}">${chargesOf(q)}${nestedOf(q.inner)}</div>`;
-// `label` is a label, as { shield, charges, items }, written last in the field.
-const markup = ({ shield, charges, items, inner, first, more, quarters, label }, attrs = "") => {
+// `label` is a label, as { shield, charges, items }, written last in the field. `overAll` is a
+// second ordinary, as { shield, charges, items }, written before the field's own charges.
+const markup = (
+  { shield, charges, items, inner, first, more, quarters, label, overAll },
+  attrs = "",
+) => {
   const nested = nestedOf(inner);
   const own = chargesOf({ charges, items }) + (more ? chargesOf(more) : "");
   const labelled = label ? `<div class="${label.shield}">${chargesOf(label)}</div>` : "";
+  const over = overAll ? `<div class="over-all ${overAll.shield}">${chargesOf(overAll)}</div>` : "";
   const content =
-    (quarters ?? []).map(quarterOf).join("") + (first ? nested + own : own + nested) + labelled;
+    (quarters ?? []).map(quarterOf).join("") +
+    over +
+    (first ? nested + own : own + nested) +
+    labelled;
   // A width, e.g. `w-[305px]!`, goes on the frame; the rest on its field.
   const classes = shield.split(" ");
   const size = classes.filter((cls) => cls.startsWith("w-"));
