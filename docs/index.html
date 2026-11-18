@@ -154,7 +154,6 @@
             <a href="#divisions">Dividing the field</a>
             <ul>
               <li><a href="#layout">Dividing for layout</a></li>
-              <li><a href="#bordure">Bordure</a></li>
               <li><a href="#inescutcheon">Inescutcheon</a></li>
               <li><a href="#canton">Canton</a></li>
             </ul>
@@ -167,6 +166,8 @@
               <li><a href="#fimbriated">Fimbriated</a></li>
               <li><a href="#cotised">Cotised</a></li>
               <li><a href="#counterchanged">Counterchanged</a></li>
+              <li><a href="#bordure">Bordure</a></li>
+              <li><a href="#orle">Orle</a></li>
             </ul>
           </li>
           <li>
@@ -730,60 +731,6 @@
             </figure>
           </div>
 
-          <h3 id="bordure">Bordure</h3>
-          <p>
-            <code>bordure-</code>, with any tincture or fur, adds a bordure
-            around the shield. Bordures can also be engrailed or invected.
-          </p>
-          <div class="examples">
-            <figure data-blazon="Vert, a bordure Argent">
-              <div class="heater">
-                <div class="vert bordure-argent"></div>
-              </div>
-            </figure>
-            <figure data-blazon="Per pale Sable and Purpure, a bordure Or">
-              <div class="heater">
-                <div class="per-pale-sable-purpure bordure-or"></div>
-              </div>
-            </figure>
-            <figure data-blazon="Sable, a bordure Or, a canton Argent">
-              <div class="heater">
-                <div class="sable bordure-or">
-                  <div class="canton argent"></div>
-                </div>
-              </div>
-            </figure>
-            <figure data-blazon="Sable, a bordure Or, a chief Argent">
-              <div class="heater">
-                <div class="sable bordure-or chief-argent"></div>
-              </div>
-            </figure>
-            <figure
-              data-blazon="Azure, a fess Or within a bordure engrailed Argent"
-            >
-              <div class="heater">
-                <div class="azure fess-or bordure-engrailed-argent"></div>
-              </div>
-            </figure>
-            <figure data-blazon="Gules, a bordure Ermine">
-              <div class="heater">
-                <div class="gules bordure-ermine"></div>
-              </div>
-            </figure>
-            <figure data-blazon="Ermine, a bordure compony Or and Sable">
-              <div class="heater">
-                <div class="ermine bordure-compony-or-sable"></div>
-              </div>
-            </figure>
-          </div>
-          <p>
-            <code>bordure-compony-or-sable</code> and
-            <code>bordure-chequy-or-sable</code> take two tinctures, one
-            possibly a fur. They're plain in the first off a shield or
-            inescutcheon, as on a canton, and on a per-pale half. There's no
-            counter-compony.
-          </p>
-
           <h3 id="inescutcheon">Inescutcheon</h3>
           <p>
             <code>inescutcheon</code> is a small shield placed at the centre of
@@ -1044,11 +991,6 @@
                 <figure data-blazon="Or, a fess chequy Azure and Argent">
                   <div class="heater">
                     <div class="or fess-chequy-azure-argent"></div>
-                  </div>
-                </figure>
-                <figure data-blazon="Gules, an orle Argent">
-                  <div class="heater">
-                    <div class="gules orle-argent"></div>
                   </div>
                 </figure>
               </div>
@@ -1815,11 +1757,6 @@
             </div>
           </div>
 
-          <p class="text-sm">
-            Grailwind doesn't support a lined, voided, fimbriated or cotised
-            orle yet.
-          </p>
-
           <h3 id="combining">Combining</h3>
           <p>
             An element can have one ordinary plus a chief. With a chief, the
@@ -1855,13 +1792,6 @@
               <div class="heater">
                 <div class="argent two-bars-wavy-sable">
                   <div class="over-all bend-or"></div>
-                </div>
-              </div>
-            </figure>
-            <figure data-blazon="Gules, an orle Argent, over all a bend Ermine">
-              <div class="heater">
-                <div class="gules orle-argent">
-                  <div class="over-all bend-ermine"></div>
                 </div>
               </div>
             </figure>
@@ -2006,6 +1936,119 @@
               </div>
             </figure>
           </div>
+
+          <h3 id="bordure">Bordure</h3>
+          <p>
+            <code>bordure-</code>, with any tincture or fur, adds a bordure
+            around the shield. Like the orle below, it's a subordinary rather
+            than an ordinary. Bordures can also be engrailed or invected.
+          </p>
+          <div class="examples">
+            <figure data-blazon="Vert, a bordure Argent">
+              <div class="heater">
+                <div class="vert bordure-argent"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Per pale Sable and Purpure, a bordure Or">
+              <div class="heater">
+                <div class="per-pale-sable-purpure bordure-or"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Sable, a bordure Or, a canton Argent">
+              <div class="heater">
+                <div class="sable bordure-or">
+                  <div class="canton argent"></div>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Sable, a bordure Or, a chief Argent">
+              <div class="heater">
+                <div class="sable bordure-or chief-argent"></div>
+              </div>
+            </figure>
+            <figure
+              data-blazon="Azure, a fess Or within a bordure engrailed Argent"
+            >
+              <div class="heater">
+                <div class="azure fess-or bordure-engrailed-argent"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Gules, a bordure Ermine">
+              <div class="heater">
+                <div class="gules bordure-ermine"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Ermine, a bordure compony Or and Sable">
+              <div class="heater">
+                <div class="ermine bordure-compony-or-sable"></div>
+              </div>
+            </figure>
+          </div>
+          <p>
+            <code>bordure-compony-or-sable</code> and
+            <code>bordure-chequy-or-sable</code> take two tinctures, one
+            possibly a fur. They're plain in the first off a shield or
+            inescutcheon, as on a canton, and on a per-pale half. There's no
+            counter-compony.
+          </p>
+
+          <h3 id="orle">Orle</h3>
+          <p>
+            <code>orle-</code>, with any tincture or fur, adds a narrow band
+            inset from the shield's edge, inside any bordure. Charges on the
+            field sit within it, and in a part of a divided field it's half the
+            size. It takes the place of the field's ordinary, so another
+            ordinary goes <code>over-all</code>.
+          </p>
+          <div class="examples">
+            <figure data-blazon="Gules, an orle Argent">
+              <div class="heater">
+                <div class="gules orle-argent"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Gules, three bezants within an orle Argent">
+              <div class="heater">
+                <div class="gules orle-argent">
+                  <div class="charges">
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                  </div>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Azure, an orle Or, a bordure Argent">
+              <div class="heater">
+                <div class="azure orle-or bordure-argent"></div>
+              </div>
+            </figure>
+            <figure data-blazon="Per pale Or and Azure, an orle counterchanged">
+              <div class="heater">
+                <div class="per-pale-or-azure orle-counterchanged"></div>
+              </div>
+            </figure>
+            <figure
+              data-blazon="Gules, an orle Argent, impaling Vert, an orle Or"
+            >
+              <div class="heater">
+                <div class="per-pale">
+                  <div class="gules orle-argent"></div>
+                  <div class="vert orle-or"></div>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Gules, an orle Argent, over all a bend Ermine">
+              <div class="heater">
+                <div class="gules orle-argent">
+                  <div class="over-all bend-ermine"></div>
+                </div>
+              </div>
+            </figure>
+          </div>
+          <p class="text-sm">
+            Grailwind doesn't support a lined, voided, fimbriated or cotised
+            orle yet.
+          </p>
         </section>
 
         <section id="charges">
