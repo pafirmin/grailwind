@@ -9,7 +9,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - The orle, `orle-argent`, `orle-ermine` and `orle-counterchanged`: a narrow band inset from the
-  shield's edge, plain only, inside any bordure. Charges on a field with an orle sit within it.
+  shield's edge, plain only, inside any bordure, and half the size in a part of a divided field.
+  Charges on a field with an orle sit within it.
   The lint accepts it.
 - `in-orle` (6, 8 or 10 charges round the edge), `in-cross` (4 or 5), `in-saltire` (5) and
   `in-chevron` (3 or 5).

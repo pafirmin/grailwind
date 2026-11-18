@@ -1087,6 +1087,8 @@ const BORDURE_DEPTH = SCALLOP_DEPTH / BORDURE_WIDTH;
 const ORLE_INSET = 1;
 // An orle's width, as a multiple of the bordure's: "rather less than" half (FD 141). By eye.
 const ORLE_WIDTH = 0.45;
+// An orle's size in a part of a divided field, as a fraction of its size on the whole field.
+const ORLE_PART_SCALE = 0.5;
 // A lined bordure's scallop length in real units, as SCALLOP is an ordinary's: a run between
 // corners gets one scallop per this much of its length inside the bordure.
 const BORDURE_SCALLOP = 12;
@@ -1742,6 +1744,7 @@ export {
   ORDINARIES,
   ORLE_INSET,
   ORLE_WIDTH,
+  ORLE_PART_SCALE,
   pathShape,
   svgPath,
 };
@@ -2173,16 +2176,17 @@ export default plugin(({ addBase, addUtilities, theme }) => {
   // ORDINARIES, so no polygon, fimbriation, cotise or line path reaches it. Its pseudo is inset 0,
   // not --field-top, so a chief covers its top. In a part of a frame's field it follows the
   // shield's edge and the part's own edges (FD 141: on an impaled coat it runs down the palar
-  // line); elsewhere, as on a canton, it is a rectangular ring. Limits: it is rectangular in a
-  // part of a part, in a part of a field split in three or more, and in a per-fess or quarterly
-  // part with its own bordure; its charges sit within its rectangular inner edge in a part; the
+  // line), at ORLE_PART_SCALE of its size; elsewhere, as on a canton, it is a rectangular ring.
+  // Limits: it is rectangular in a part of a part, in a part of a field split in three or more, and
+  // in a per-fess or quarterly part with its own bordure; its charges sit within its rectangular inner edge in a part; the
   // lined orle, and a fimbriated, cotised or voided one, aren't drawn; charges in orle with a
   // chief aren't supported, as the container is the field below the chief and the lower ones
   // leave the base's curve. A container holding both chief-placed charges and field charges takes
   // one inset: the chief's, if there is a chief, else the orle's.
   {
-    const orleOuter = `calc(var(--bordure-width) * ${ORLE_INSET})`;
-    const orleInner = `calc(var(--bordure-width) * ${num(ORLE_INSET + ORLE_WIDTH)})`;
+    // Set on the orle's own element, so the polygons below repeat var()s, not their calc()s.
+    const orleOuter = "var(--orle-outer)";
+    const orleInner = "var(--orle-inner)";
     /**
      * A rectangle's corners, as a closed run of polygon points.
      * @param {string} inset A CSS length, the distance in from each edge.
@@ -2220,6 +2224,14 @@ export default plugin(({ addBase, addUtilities, theme }) => {
      * @returns {object} The utility's rules.
      */
     const orle = (ground) => ({
+      // Its own, so an orle on a canton or inescutcheon in a part doesn't inherit the part's.
+      "--orle-scale": "1",
+      "--orle-outer": `calc(var(--bordure-width) * var(--orle-scale) * ${ORLE_INSET})`,
+      "--orle-inner": `calc(var(--bordure-width) * var(--orle-scale) * ${num(ORLE_INSET + ORLE_WIDTH)})`,
+      // In a part of a divided field it is smaller, so it doesn't crowd the part out.
+      [`:is(.per-pale, .per-fess, .quarterly) > &:is(${PART})`]: {
+        "--orle-scale": ORLE_PART_SCALE,
+      },
       // The charges sit within its inner edge.
       "--charges-inset": orleInner,
       ...ordinaryRules("orle", { inset: "0", ...ground, "clip-path": orleClip }),
