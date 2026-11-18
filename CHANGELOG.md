@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-18
+
 ### Added
 
 - The orle, `orle-argent`, `orle-ermine` and `orle-counterchanged`: a narrow band inset from the
@@ -28,11 +30,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   possibly a fur. The lint lets them lie on any field and doesn't check charges on them.
 - The bordure compony and chequy, e.g. `bordure-compony-or-sable`, one tincture possibly a fur.
   Plain in the first off a frame and on a part. The lint lets them lie on any field.
+- `over-all` on a child of the field draws a second ordinary over the first and its charges,
+  e.g. `<div class="over-all bend-or">`. The lint checks it against the ground it lies on.
 
 ### Changed
 
 - The canton has a 2px sable line along its right and bottom edges, like the inescutcheon's
   outline, so a canton in its field's tincture shows.
+- `@grailwind/eslint-plugin` 0.1.0-beta.6 needs `grailwind` 0.10.x, for the new ordinaries.
+
+### Fixed
+
+- Vair's top row of panes is no longer cut off by the shield's outline.
 
 ## [0.9.0] - 2026-11-15
 
@@ -265,7 +274,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Initial release: tinctures, divisions, ordinaries, charges, strict mode and
 custom SVG charges.
 
-[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/pafirmin/grailwind/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/pafirmin/grailwind/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/pafirmin/grailwind/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/pafirmin/grailwind/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/pafirmin/grailwind/compare/v0.7.0...v0.8.0
