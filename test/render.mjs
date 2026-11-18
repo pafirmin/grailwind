@@ -11,6 +11,8 @@ import {
   cotiseGeometry,
   cotisedVars,
   ORDINARIES as SHAPES,
+  ORLE_INSET,
+  ORLE_WIDTH,
   SCALLOP_DEPTH,
 } from "../ordinaries.js";
 import { PATHS } from "../paths.js";
@@ -179,6 +181,26 @@ const charged = (shield, charges, size, points, why) =>
     items: bezants(points.length),
     at: ring(point, size),
     expect: "or",
+    why: points.length > 1 ? `${why}, charge ${i + 1}` : why,
+  }));
+/**
+ * Clear ground just past each charge's rim, on the side towards the pale, so a larger charge
+ * covers it.
+ * @param {string} shield The field's classes.
+ * @param {string} charges The container's classes besides `charges`.
+ * @param {number} size The charges' width, as % of the shield's.
+ * @param {number[][]} points Each charge's centre, as [x%, y%] of the shield.
+ * @param {string} ground The tincture the field shows there.
+ * @param {string} why What the probe shows.
+ * @returns {object[]} One probe per charge.
+ */
+const clearBeside = (shield, charges, size, points, ground, why) =>
+  points.map(([x, y], i) => ({
+    shield,
+    charges,
+    items: bezants(points.length),
+    at: [x + (x < 50 ? 1 : -1) * 0.46 * size * 1.15, y],
+    expect: ground,
     why: points.length > 1 ? `${why}, charge ${i + 1}` : why,
   }));
 // An ermine tile, as % of the shield: 6 across by default, and 5:6 like the shield, so the same %
@@ -2089,6 +2111,166 @@ const PROBES = [
     const out = gap + width / 2 - inset;
     return [{ shield: "azure", overAll: { shield: "bend-argent cotised-or" }, at: [x + dx * out, y + (dy * out) / 1.2], expect: "or", why: "over all: a cotised bend has its own cotise" }];
   })(),
+
+  // 060 (orle). The orle lies ORLE_INSET bordures in from its field's box and ORLE_WIDTH wide. A
+  // point on the heater's right-hand base curve, mapped into a box inset by `inset`, is where the
+  // band's middle, its outside and its inside go (the left-hand curve is the mirror).
+  ...(() => {
+    const [outer, inner] = [BORDER * ORLE_INSET, BORDER * (ORLE_INSET + ORLE_WIDTH)];
+    const middle = (outer + inner) / 2;
+    const out = outer / 2;
+    const inside = inner + BORDER * 0.4;
+    const [, x1, y1, x2, y2, x3, y3] = PATHS.heater.find(([command]) => command === "C");
+    const bezier = (t) => {
+      const [a, b, c, d] = [(1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3];
+      return [100 * a + b * x1 + c * x2 + d * x3, 66 * a + b * y1 + c * y2 + d * y3];
+    };
+    // `box` is [left, top, width, height] in px: the shield's by default.
+    const onCurve = (t, inset, box = [0, 0, WIDTH, WIDTH * 1.2], side = 1) => {
+      const [x, y] = bezier(t);
+      const across = inset + (x / 100) * (box[2] - 2 * inset);
+      return px(
+        box[0] + (side > 0 ? across : box[2] - across),
+        box[1] + inset + (y / 120) * (box[3] - 2 * inset),
+      );
+    };
+    const bands = (shield, box, why) => [
+      { shield, at: [onCurve(0.5, middle, box), onCurve(0.5, middle, box, -1), onCurve(0.9, middle, box)], expect: "argent", why: `${why}: the band follows the base curve` },
+      { shield, at: [onCurve(0.5, out, box), onCurve(0.5, out, box, -1)], expect: "gules", why: `${why}: field outside the band` },
+      { shield, at: [onCurve(0.5, inside, box), onCurve(0.9, inside, box)], expect: "gules", why: `${why}: field inside the band` },
+    ];
+    // The straight sides, at `y` px down.
+    const sides = (shield, left, width, why) => [
+      { shield, at: [px(left + middle, 100), px(left + width - middle, 100)], expect: "argent", why: `${why}: the band down both sides` },
+      { shield, at: [px(left + out, 100), px(left + width - out, 100), px(left + inner + 12, 100)], expect: "gules", why: `${why}: field beside the band` },
+    ];
+    // In a part, the band follows the field's curve and runs along the part's own edges: probes at
+    // the band's middle, just outside it and just inside it, on the curve and along each edge.
+    const [palar, fess] = [WIDTH / 2, WIDTH * 1.2 * 0.45];
+    const inPart = (part, curve, edges, why) => [
+      { ...part, at: [curve(middle), ...edges(middle)], expect: "argent", why: `${why}: the band follows the curve and the part's edges` },
+      { ...part, at: [curve(out), ...edges(out)], expect: "gules", why: `${why}: field outside the band` },
+      { ...part, at: [curve(inside), ...edges(inside)], expect: "gules", why: `${why}: field inside the band` },
+    ];
+    const field = "gules orle-argent";
+    return [
+      ...bands(field, undefined, "an orle"),
+      ...sides(field, 0, WIDTH, "an orle"),
+      { shield: field, at: px(WIDTH / 2, WIDTH * 1.2 - middle), expect: "argent", why: "an orle at the base point" },
+      { shield: field, at: px(WIDTH / 2, WIDTH * 1.2 - out), expect: "gules", why: "field outside an orle at the base point" },
+      { shield: field, at: px(WIDTH / 2, 100), expect: "gules", why: "an orle leaves the middle of the field" },
+      { shield: "gules orle-ermine", at: [px(0.165 * WIDTH, 120), px(WIDTH - 0.165 * WIDTH, 120)], expect: "argent", why: "an orle of ermine" },
+      { shield: "gules orle-ermine", at: px(0.08 * WIDTH, 120), expect: "gules", why: "field outside an orle of ermine" },
+      { shield: "per-pale-or-azure orle-counterchanged", at: px(middle, 100), expect: "azure", why: "a counterchanged orle on the dexter side" },
+      { shield: "per-pale-or-azure orle-counterchanged", at: px(WIDTH - middle, 100), expect: "or", why: "a counterchanged orle on the sinister side" },
+      // A bordure's ring is outside it, and the orle's insets are measured inside the bordure.
+      ...bands("gules orle-argent bordure-or", [BORDER, BORDER, FIELD[0], FIELD[1]], "an orle in a bordure"),
+      ...sides("gules orle-argent bordure-or", BORDER, FIELD[0], "an orle in a bordure"),
+      { shield: "gules orle-argent bordure-or", at: [px(BORDER / 2, 100), px(WIDTH - BORDER / 2, 100)], expect: "or", why: "an orle's bordure" },
+      // A chief covers the orle's top, and it shows below.
+      { shield: "gules orle-argent chief-or", at: [px(WIDTH / 2, middle), px(middle, 60)], expect: "or", why: "a chief covers an orle's top" },
+      { shield: "gules orle-argent chief-or", at: [px(middle, 150), px(WIDTH - middle, 150)], expect: "argent", why: "an orle below a chief" },
+      // An upper quarter is a rectangle above the curve, and so is its orle.
+      { shield: "quarterly", quarters: [field, "azure", "azure", "azure"], at: [px(WIDTH / 4, middle), px(middle, 60)], expect: "argent", why: "an orle on an upper quarter is a rectangular ring" },
+      { shield: "quarterly", quarters: [field, "azure", "azure", "azure"], at: [px(WIDTH / 4, out), px(out, 60), px(WIDTH / 4, inside)], expect: "gules", why: "field beside an orle on an upper quarter" },
+      // A part that reaches the base follows the shield's curve, and runs along the palar or fess line.
+      ...inPart(
+        { shield: "per-pale", quarters: [field, "azure"] },
+        (inset) => onCurve(inset === inside ? 0.4 : 0.5, inset, undefined, -1),
+        (inset) => [px(palar - inset, 150)],
+        "an orle in a per-pale half",
+      ),
+      ...inPart(
+        { shield: "per-fess", quarters: ["azure", field] },
+        (inset) => onCurve(0.5, inset),
+        (inset) => [px(WIDTH / 2, fess + inset)],
+        "an orle in a per-fess base",
+      ),
+      ...inPart(
+        { shield: "quarterly", quarters: ["azure", "azure", field, "azure"] },
+        (inset) => onCurve(inset === inside ? 0.3 : 0.4, inset, undefined, -1),
+        (inset) => [px(palar - inset, 225), px(WIDTH / 4, fess + inset)],
+        "an orle in a lower quarter",
+      ),
+      // The palar band stops at the curve, where a rectangle would run on to the base.
+      { shield: "per-pale", quarters: [field, "azure"], at: px(palar - middle, 318), expect: "gules", why: "an orle in a per-pale half: field below the palar band" },
+      // A per-pale half's own bordure is the frame's ring on that half: its orle is inside it, too
+      // narrow to probe within.
+      ...(() => {
+        const part = { shield: "per-pale", quarters: [`${field} bordure-or`, "azure"] };
+        const box = [BORDER, BORDER, FIELD[0], FIELD[1]];
+        return [
+          { ...part, at: [onCurve(0.15, middle, box, -1), px(palar - middle, 150)], expect: "argent", why: "an orle in a bordured per-pale half" },
+          { ...part, at: [onCurve(0.15, out, box, -1), px(palar - out, 150), px(BORDER + middle, 280)], expect: "gules", why: "field outside an orle in a bordured per-pale half" },
+        ];
+      })(),
+      // A canton's bordure is a third as wide.
+      { shield: "azure", inner: { kind: "canton", shield: field }, at: [px(middle / 3, 60), px(50, middle / 3)], expect: "argent", why: "an orle on a canton" },
+      { shield: "azure", inner: { kind: "canton", shield: field }, at: [px(out / 3, 60), px(inside / 3, 60)], expect: "gules", why: "field beside an orle on a canton" },
+      // An inescutcheon is a frame, with a bordure an eighth of its own width: its orle follows its outline.
+      ...(() => {
+        const box = [0.335 * WIDTH, 0.285 * WIDTH * 1.2, 0.33 * WIDTH, 0.33 * WIDTH * 1.2];
+        const unit = box[2] / 8;
+        const shield = { shield: "azure", inner: { shield: field } };
+        return [
+          { ...shield, at: [onCurve(0.5, unit * (ORLE_INSET + ORLE_WIDTH / 2), box), onCurve(0.9, unit * (ORLE_INSET + ORLE_WIDTH / 2), box)], expect: "argent", why: "an orle on an inescutcheon follows its outline" },
+          { ...shield, at: [onCurve(0.5, unit * (ORLE_INSET + ORLE_WIDTH + 0.4), box)], expect: "gules", why: "an inescutcheon's field inside its orle" },
+        ];
+      })(),
+      // Over all: Richmond's bend lies over the orle.
+      { shield: field, overAll: { shield: "bend-sable" }, at: px(middle, middle), expect: "sable", why: "over all: a bend over an orle" },
+      { shield: field, overAll: { shield: "bend-sable" }, at: px(middle, 190), expect: "argent", why: "over all: the orle beyond the bend" },
+      // Charges sit within the orle's inner edge, and are scaled to that box.
+      ...(() => {
+        const [width, height] = [WIDTH - 2 * inner, WIDTH * 1.2 - 2 * inner];
+        const within = ([x, y]) => [(inner + (x * width) / 100) / 3, (inner + (y * height) / 100) / 3.6];
+        const scale = width / WIDTH;
+        return [
+          [50, [[50, 45]]],
+          [28, [[28, 25], [72, 25], [50, 64]]],
+          [22, [[27, 20], [73, 20], [50, 42], [27, 64], [73, 64]]],
+        ].flatMap(([size, points]) => [
+          ...charged(field, "", size * scale, points.map(within), `${points.length} within an orle`),
+          ...clearBeside(field, "", size * scale, points.map(within), "gules", `${points.length} within an orle are scaled to it`),
+        ]);
+      })(),
+    ];
+  })(),
+
+  // 060 (in-orle, in-cross, in-saltire, in-chevron): each count's points, with clear field beside
+  // each charge, so a charge of another size fails. Other counts take the default layout.
+  ...[
+    ["in-orle", 6, 13, [[9, 8], [50, 8], [91, 8], [90, 58], [50, 92], [10, 58]]],
+    ["in-orle", 8, 12, [[9, 8], [50, 8], [91, 8], [91, 42], [83, 74], [50, 92], [17, 74], [9, 42]]],
+    ["in-orle", 10, 10, [[9, 8], [50, 8], [91, 8], [91, 33], [90, 58], [77, 81], [50, 92], [23, 81], [10, 58], [9, 33]]],
+    ["in-cross", 4, 20, [[50, 17], [24, 45], [76, 45], [50, 73]]],
+    ["in-cross", 5, 18, [[50, 17], [24, 45], [50, 45], [76, 45], [50, 73]]],
+    ["in-saltire", 5, 18, [[26, 19], [74, 19], [50, 45], [26, 68], [74, 68]]],
+    ["in-chevron", 3, 22, [[24, 62], [50, 36], [76, 62]]],
+    ["in-chevron", 5, 16, [[20, 62], [35, 47], [50, 32], [65, 47], [80, 62]]],
+  ].flatMap(([arrangement, count, size, points]) => [
+    ...charged("azure", arrangement, size, points, `${arrangement} of ${count}`),
+    ...clearBeside("azure", arrangement, size, points, "azure", `${arrangement} of ${count} is its own size`),
+  ]),
+  ...charged("azure", "in-saltire", 24, [[30, 24], [70, 24], [30, 60], [70, 60]], "in-saltire of 4 takes the default layout"),
+  // In a bordure, in-orle is inside it.
+  ...charged("azure bordure-argent", "in-orle", 12 * BORDURED, [[9, 8], [50, 8], [91, 8], [91, 42], [83, 74], [50, 92], [17, 74], [9, 42]].map(inBordure), "in-orle in a bordure sits inside it"),
+  // An orle's charges inset reaches only the field's own container: not charges on the chief, a label or an over-all ordinary, and not a counterchanged charge's layer.
+  ...charged("gules orle-argent chief-azure", "in-chief", 18, [[25, 15], [50, 15], [75, 15]], "three in chief, on a shield with an orle"),
+  { shield: "gules orle-argent chief-azure", charges: "", items: ["bezant in-chief-point"], at: ring([50, 15], 18), expect: "or", why: "a charge at the chief point, on a shield with an orle" },
+  { shield: "gules orle-argent", label: { shield: "label-azure", charges: "on", items: bezants(3) }, at: ON.label.counts[3].points.flatMap((p) => ring(p, ON.label.counts[3].size)), expect: "or", why: "a bezant on each of a label's points, on a shield with an orle" },
+  { shield: "azure orle-argent", overAll: { shield: "bend-gules", charges: "on", items: bezants(3) }, at: ON.bend.counts[3].points.flatMap((point) => ring(point, ON.bend.size)), expect: "or", why: "charges on an over-all bend, on a shield with an orle" },
+  ...(() => {
+    const [side, width, height] = [BORDER * (ORLE_INSET + ORLE_WIDTH), WIDTH, WIDTH * 1.2];
+    const within = ([x, y]) => [(side + (x * (width - 2 * side)) / 100) / 3, (side + (y * (height - 2 * side)) / 100) / 3.6];
+    const scale = (width - 2 * side) / width;
+    return [
+      ...charged("gules orle-argent", "in-chief", 22 * scale, [[25, 17], [50, 15], [75, 17]].map(within), "three in chief, within an orle"),
+      ...charged("gules orle-argent", "", 22 * scale, [within([25, 17])], "a charge at the dexter chief, within an orle").map((p) => ({ ...p, charges: "", items: ["bezant in-dexter-chief"] })),
+      { shield: "per-pale-or-gules orle-argent", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: within([30, 45]), expect: "gules", why: "a counterchanged charge within an orle, on the or half" },
+      { shield: "per-pale-or-gules orle-argent", charges: "in-fess counterchanged", items: ["roundel", "roundel"], at: within([70, 45]), expect: "or", why: "a counterchanged charge within an orle, on the gules half" },
+    ];
+  })(),
 ];
 
 const LINES = ["", "-engrailed", "-invected", "-wavy", "-indented", "-embattled"];
@@ -2162,6 +2344,38 @@ const BORDURES = [
   { shield: "azure", inner: { shield: "gules bordure-invected-or" } },
   { shield: "azure", inner: { kind: "canton", shield: "vert bordure-engrailed-or" } },
   { shield: "azure bordure-engrailed-gules w-[150px]!" },
+];
+// 060: the orle and the cross-shaped arrangements, for the user to tune their sizes and points by
+// eye: the orle plain, in a fur, counterchanged, with a bordure, a chief, charges and over all
+// (Richmond), on quarters, a canton, an inescutcheon and parts; then each arrangement at each count.
+const ORLES = [
+  { shield: "gules orle-argent" },
+  { shield: "gules orle-ermine" },
+  { shield: "per-pale-or-azure orle-counterchanged" },
+  { shield: "gules orle-argent bordure-or" },
+  { shield: "gules orle-argent chief-or" },
+  { shield: "gules orle-argent", charges: "", items: bezants(1) },
+  { shield: "gules orle-argent", charges: "", items: bezants(3) },
+  { shield: "gules orle-argent", charges: "", items: bezants(5) },
+  { shield: "gules orle-argent", overAll: { shield: "bend-ermine" } },
+  { shield: "quarterly", quarters: ["gules orle-argent", "azure", "azure", "gules orle-argent"] },
+  { shield: "azure", inner: { kind: "canton", shield: "gules orle-argent" } },
+  { shield: "azure", inner: { shield: "gules orle-argent" } },
+  { shield: "azure orle-or w-[150px]!" },
+  { shield: "per-pale", quarters: ["gules orle-argent", "vert orle-or"] },
+  { shield: "per-fess", quarters: ["azure", "gules orle-argent"] },
+];
+const ARRANGED = [
+  ...[
+    ["in-orle", [6, 8, 10]],
+    ["in-cross", [4, 5]],
+    ["in-saltire", [5]],
+    ["in-chevron", [3, 5]],
+  ].flatMap(([arrangement, counts]) =>
+    counts.map((n) => ({ shield: "azure", charges: arrangement, items: bezants(n) })),
+  ),
+  { shield: "azure bordure-argent", charges: "in-orle", items: bezants(8) },
+  { shield: "azure orle-or", charges: "in-orle", items: bezants(8) },
 ];
 // 028: fur bordures, for the user to tune the spot phase by eye, with the per-pale part cases.
 const FUR_BORDURES = [
@@ -2288,6 +2502,8 @@ const buildShields = (dir) => {
     ...FURRED,
     ...BORDURES,
     ...FUR_BORDURES,
+    ...ORLES,
+    ...ARRANGED,
     ...CORNER_SHIELDS,
   ];
   const classes = [...specs.map((s) => markup(s)), ...TINCTURES.map((t) => `<i class="${t}"></i>`)];
@@ -2465,6 +2681,8 @@ try {
         await contactSheet(page, css, PATTERNED, 4, `patterned-${name}.png`, 240);
         await contactSheet(page, css, BORDURES, 6, `bordures-${name}.png`, 200);
         await contactSheet(page, css, FUR_BORDURES, 6, `bordures-fur-${name}.png`, 200);
+        await contactSheet(page, css, ORLES, 5, `orles-${name}.png`, 240);
+        await contactSheet(page, css, ARRANGED, 5, `arrangements-${name}.png`, 240);
         await cornerSheet(page, css, dir, `bordure-corners-${name}.png`);
         await contactSheet(page, css, DIVIDED, 8, `divisions-odd-${name}.png`, ODD_WIDTH);
       } catch (error) {

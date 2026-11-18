@@ -65,7 +65,7 @@ tinctures replace Tailwind's colours entirely.
 - **Divided fields:** `per-pale-or-gules`, `quarterly-azure-argent`,
   `gyronny-or-sable`, `barry-argent-azure`, `bendy-argent-gules`, `chequy-or-azure` and more, or
   `per-pale`, `per-fess` and `quarterly` for layout.
-- **Ordinaries:** `fess-or`, `chevron-gules`, `cross-argent`, `chief-azure`,
+- **Ordinaries:** `fess-or`, `chevron-gules`, `cross-argent`, `chief-azure`, `orle-argent`,
   `two-bars-or` and more, with `fimbriated-*` for a narrow border, `cotised-*` for cotises,
   `fess-engrailed-or` and the like for an engrailed, invected, wavy, indented or embattled edge,
   `cross-voided-argent` and the like to show the field through it,
@@ -73,7 +73,8 @@ tinctures replace Tailwind's colours entirely.
   `chief-ermine` and the like in a fur, `fess-chequy-azure-argent` (also the pale) in two tinctures,
   or `chevron-counterchanged` and the like on a divided field.
 - **Charges:** `mullet`, `fleur-de-lis`, `bezant`, crosses and more, arranged by
-  number, `in-pale`, `in-fess`, `in-bend`, `in-bend-sinister`, `on` or `between`
+  number, `in-pale`, `in-fess`, `in-bend`, `in-bend-sinister`, `in-orle`, `in-cross`,
+  `in-saltire`, `in-chevron`, `on` or `between`
   the ordinary, or placed at a named point such as `in-dexter-chief`, strewn
   `semy` across the field, sized with `charge-size-*`, and `counterchanged` on
   a divided field.

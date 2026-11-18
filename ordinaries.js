@@ -1082,6 +1082,11 @@ const BORDURE_WIDTH = 1 / 8;
 const SCALLOP_DEPTH = 0.037;
 // The same as a fraction of the bordure's width: an engrailed field's border narrows by it.
 const BORDURE_DEPTH = SCALLOP_DEPTH / BORDURE_WIDTH;
+// An orle's distance from its frame's edge, as a multiple of the bordure's width (FD 141: at least
+// a bordure's width of field outside it). By eye.
+const ORLE_INSET = 1;
+// An orle's width, as a multiple of the bordure's: "rather less than" half (FD 141). By eye.
+const ORLE_WIDTH = 0.45;
 // A lined bordure's scallop length in real units, as SCALLOP is an ordinary's: a run between
 // corners gets one scallop per this much of its length inside the bordure.
 const BORDURE_SCALLOP = 12;
@@ -1214,26 +1219,102 @@ const bordurePath = (segments, sweep) => {
  * A frame's clip-paths from its drawing: the outline, and rings just inside it. Each is a polygon
  * fallback, then the shape().
  * @param {Array[]} segments The drawing's segments, as in paths.js.
- * @returns {{ outer: string[], ring: (inset: string) => string[], lined: (inset: string, sweep: number) => string[] }}
- *   The outline, and a ring `inset` wide: the outline minus the outline mapped into a box inset by
- *   `inset`. A lined ring has its inner edge scalloped as bordurePath() draws it, bulging outward
- *   for a `sweep` of 1 and inward for -1. Its shape() is drawn for an `inset` of BORDURE_WIDTH,
- *   and its polygon is the plain ring. The outline must be a heater's.
+ * @returns {{ outer: string[], ring: (inner: string, outer?: string|null) => string[], lined: (inset: string, sweep: number) => string[], part: (inner: string, outer: string, box: number[]) => string }}
+ *   The outline, and a ring: the outline mapped into a box inset by `outer` (none by default),
+ *   minus the outline mapped into a box inset by `inner`. A lined ring has its inner edge scalloped
+ *   as bordurePath() draws it, bulging outward for a `sweep` of 1 and inward for -1. Its shape() is
+ *   drawn for an `inset` of BORDURE_WIDTH, and its polygon is the plain ring. A part's ring is the
+ *   ring's polygon drawn in a part of the field, `box` ([left, top, width, height] as fractions of
+ *   the field), with each loop kept inside the part's box inset by the loop's inset. The outline
+ *   must be a heater's.
  */
 const frameOutline = (segments) => {
   const points = outlinePoints(segments);
   const start = [segments[0][1], segments[0][2]];
-  const loop = (inset) => [...points, points[0]].map((p) => insetPoint(p, inset)).join(", ");
-  const ring = (inset) => [
-    `polygon(evenodd, ${loop(null)}, ${loop(inset)})`,
-    `shape(evenodd from ${insetPoint(start, null)}, ${insetCommands(segments, null).join(", ")}, move to ${insetPoint(start, inset)}, ${insetCommands(segments, inset).join(", ")})`,
+  const closed = [...points, points[0]];
+  const loop = (inset) => closed.map((p) => insetPoint(p, inset)).join(", ");
+  const ring = (inner, outer = null) => [
+    `polygon(evenodd, ${loop(outer)}, ${loop(inner)})`,
+    `shape(evenodd from ${insetPoint(start, outer)}, ${insetCommands(segments, outer).join(", ")}, move to ${insetPoint(start, inner)}, ${insetCommands(segments, inner).join(", ")})`,
   ];
+  /**
+   * A ring's polygon in a part of the field. Only the polygon: clamping a curve's control points
+   * would distort it, and clamping a convex outline's points to a straight edge cuts it there.
+   * @param {string} inner A CSS length, the inner loop's inset from the field's edge.
+   * @param {string} outer A CSS length, the outer loop's.
+   * @param {number[]} box The part's [left, top, width, height], as fractions of the field.
+   * @returns {string} A clip-path in the part's box.
+   */
+  const part = (inner, outer, [left, top, width, height]) => {
+    /**
+     * A coordinate in the field inset by `inset`, as a length in the part's box, kept inside the
+     * part's box inset by `inset` on the sides it shares with another part.
+     * @param {number} fraction 0 at the field's top or left edge, 1 at its bottom or right.
+     * @param {string} inset A CSS length.
+     * @param {number} from The part's top or left edge, as a fraction of the field.
+     * @param {number} span The part's height or width, as a fraction of the field.
+     * @returns {string} A CSS length-percentage.
+     */
+    const coordinate = (fraction, inset, from, span) => {
+      // A point beyond the part's edge is always clamped to it.
+      if (from > 0 && fraction <= from) {
+        return inset;
+      }
+      if (from + span < 1 && fraction >= from + span) {
+        return `calc(100% - ${inset})`;
+      }
+      // The field is 100% / span of the part long, and starts `from` of it before the part.
+      let at = `calc(${num(1 - 2 * fraction)} * ${inset} + ${num((100 * (fraction - from)) / span)}%)`;
+      if (from > 0) {
+        at = `max(${inset}, ${at})`;
+      }
+      if (from + span < 1) {
+        at = `min(${at}, calc(100% - ${inset}))`;
+      }
+      return at;
+    };
+    /**
+     * Whether a point lies on a straight run between its neighbours, along one of the part's edges.
+     * @param {object[]} run Three points, each its real units and its CSS coordinates.
+     * @returns {boolean} True if the middle one can go.
+     */
+    const onRun = ([before, middle, after]) =>
+      [0, 1].some((axis) => {
+        const other = 1 - axis;
+        const [a, b, c] = [before.raw[other], middle.raw[other], after.raw[other]];
+        return (
+          before.at[axis] === middle.at[axis] &&
+          middle.at[axis] === after.at[axis] &&
+          (a - b) * (c - b) <= 0
+        );
+      });
+    /**
+     * One loop of the ring in the part's box, without the points along the part's edges.
+     * @param {string} inset A CSS length, the loop's inset from the field's edge.
+     * @returns {string} Polygon points.
+     */
+    const partLoop = (inset) => {
+      const kept = [];
+      for (const [x, y] of closed) {
+        kept.push({
+          raw: [x, y],
+          at: [coordinate(x / W, inset, left, width), coordinate(y / H, inset, top, height)],
+        });
+        while (kept.length > 2 && onRun(kept.slice(-3))) {
+          kept.splice(-2, 1);
+        }
+      }
+      return kept.map(({ at }) => at.join(" ")).join(", ");
+    };
+    return `polygon(evenodd, ${partLoop(outer)}, ${partLoop(inner)})`;
+  };
   return {
     outer: [
       `polygon(${points.map((p) => insetPoint(p, null)).join(", ")})`,
       `shape(from ${insetPoint(start, null)}, ${insetCommands(segments, null).join(", ")})`,
     ],
     ring,
+    part,
     lined: (inset, sweep) => {
       // The inner subpath runs counter-clockwise, against the outer, so a nonzero fill leaves the
       // field unpainted and still paints where invected scallops overlap.
@@ -1591,7 +1672,13 @@ const layoutVars = () => {
     allVars.push(...Object.keys(vars));
   }
 
-  const chiefVars = ["--field-top", "--chief-points-y", "--chief-points-size"];
+  const chiefVars = [
+    "--field-top",
+    "--chief-points-y",
+    "--chief-points-size",
+    "--chief-charges-inset",
+    "--charges-inset",
+  ];
   allVars.push(...chiefVars);
 
   return [...new Set(allVars)];
@@ -1653,6 +1740,8 @@ export {
   frameOutline,
   generatedShape,
   ORDINARIES,
+  ORLE_INSET,
+  ORLE_WIDTH,
   pathShape,
   svgPath,
 };
@@ -1901,6 +1990,8 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       // The chief's centre line, relative to the charges container below it.
       "--chief-points-y": "calc(-15% / 0.7)",
       "--chief-points-size": "18%",
+      // Charges on the chief ignore an orle's inset (see charges.js).
+      "--chief-charges-inset": "0%",
     }),
     [PSEUDO[ordinary] ?? "&::before"]: {
       content: '""',
@@ -1911,6 +2002,22 @@ export default plugin(({ addBase, addUtilities, theme }) => {
     },
     [`&:not(${FRAME} > *)`]: { isolation: "isolate" },
   });
+
+  // The field with its tinctures swapped, as the shield's division sets them.
+  const COUNTERCHANGED_GROUND = {
+    // Registered not to inherit, so a shield inside another can't pick up its swap.
+    ...Object.fromEntries(
+      ["color", "image", "size", "position", "repeat"].map((n) => [
+        `--counterchange-${n}`,
+        "inherit",
+      ]),
+    ),
+    "background-color": "var(--counterchange-color, transparent)",
+    "background-image": "var(--counterchange-image, none)",
+    "background-size": "var(--counterchange-size, auto)",
+    "background-position": "var(--counterchange-position, 0 0)",
+    "background-repeat": "var(--counterchange-repeat, repeat)",
+  };
 
   for (const [ordinary, vertices] of Object.entries(ORDINARIES)) {
     const chief = ordinary === "chief";
@@ -1936,18 +2043,7 @@ export default plugin(({ addBase, addUtilities, theme }) => {
     // and the clip moves the ordinary below any chief instead.
     const counterchanged = {
       ...(chief ? OVER_BORDURE : { inset: "0" }),
-      // Registered not to inherit, so a shield inside another can't pick up its swap.
-      ...Object.fromEntries(
-        ["color", "image", "size", "position", "repeat"].map((n) => [
-          `--counterchange-${n}`,
-          "inherit",
-        ]),
-      ),
-      "background-color": "var(--counterchange-color, transparent)",
-      "background-image": "var(--counterchange-image, none)",
-      "background-size": "var(--counterchange-size, auto)",
-      "background-position": "var(--counterchange-position, 0 0)",
-      "background-repeat": "var(--counterchange-repeat, repeat)",
+      ...COUNTERCHANGED_GROUND,
       // The swapped field's tiles would wrap into the bordure's strips, so the bordure shows there.
       ...(chief && { "background-clip": "content-box" }),
     };
@@ -2073,6 +2169,72 @@ export default plugin(({ addBase, addUtilities, theme }) => {
     }
   }
 
+  // The orle: a narrow ring inset from the field's edge, with field on both sides. It isn't in
+  // ORDINARIES, so no polygon, fimbriation, cotise or line path reaches it. Its pseudo is inset 0,
+  // not --field-top, so a chief covers its top. In a part of a frame's field it follows the
+  // shield's edge and the part's own edges (FD 141: on an impaled coat it runs down the palar
+  // line); elsewhere, as on a canton, it is a rectangular ring. Limits: it is rectangular in a
+  // part of a part, in a part of a field split in three or more, and in a per-fess or quarterly
+  // part with its own bordure; its charges sit within its rectangular inner edge in a part; the
+  // lined orle, and a fimbriated, cotised or voided one, aren't drawn; charges in orle with a
+  // chief aren't supported, as the container is the field below the chief and the lower ones
+  // leave the base's curve. A container holding both chief-placed charges and field charges takes
+  // one inset: the chief's, if there is a chief, else the orle's.
+  {
+    const orleOuter = `calc(var(--bordure-width) * ${ORLE_INSET})`;
+    const orleInner = `calc(var(--bordure-width) * ${num(ORLE_INSET + ORLE_WIDTH)})`;
+    /**
+     * A rectangle's corners, as a closed run of polygon points.
+     * @param {string} inset A CSS length, the distance in from each edge.
+     * @returns {string[]} The five points, ending where it began.
+     */
+    const rectangle = (inset) => [
+      `${inset} ${inset}`,
+      `calc(100% - ${inset}) ${inset}`,
+      `calc(100% - ${inset}) calc(100% - ${inset})`,
+      `${inset} calc(100% - ${inset})`,
+      `${inset} ${inset}`,
+    ];
+    const orleClip = `polygon(evenodd, ${[...rectangle(orleOuter), ...rectangle(orleInner)].join(", ")})`;
+    const orleOnFrame = heater.ring(orleInner, orleOuter);
+    // The parts that reach the base's curve, and each one's box in the field: [left, top, width,
+    // height]. The parts above the fess point are rectangles, which the plain ring draws. A painted
+    // bordure on a per-fess or quarterly part leaves its box short of the field's slice.
+    const fess = FESS_POINT / 100;
+    const unbordured = ':not([class*="bordure-"])';
+    const orleParts = Object.fromEntries(
+      Object.entries({
+        [`.per-pale${TWO_PARTS} > &:nth-child(1 of ${PART})`]: [0, 0, 0.5, 1],
+        [`.per-pale${TWO_PARTS} > &:nth-child(2 of ${PART})`]: [0.5, 0, 0.5, 1],
+        [`.per-fess${TWO_PARTS} > &:nth-child(2 of ${PART})${unbordured}`]: [0, fess, 1, 1 - fess],
+        [`.quarterly > &:nth-child(3 of ${PART})${unbordured}`]: [0, fess, 0.5, 1 - fess],
+        [`.quarterly > &:nth-child(4 of ${PART})${unbordured}`]: [0.5, fess, 0.5, 1 - fess],
+      }).map(([part, box]) => [
+        `${FRAME} > ${part}::before`,
+        { "clip-path": heater.part(orleInner, orleOuter, box) },
+      ]),
+    );
+    /**
+     * An orle's utility.
+     * @param {object} ground The pseudo's background declarations.
+     * @returns {object} The utility's rules.
+     */
+    const orle = (ground) => ({
+      // The charges sit within its inner edge.
+      "--charges-inset": orleInner,
+      ...ordinaryRules("orle", { inset: "0", ...ground, "clip-path": orleClip }),
+      [`${FRAME} > &::before`]: { "clip-path": orleOnFrame },
+      ...orleParts,
+    });
+    for (const [tincture, colour] of PAINTS) {
+      utilities[`.orle-${tincture}`] = orle({ "background-color": colour });
+    }
+    for (const fur of Object.keys(FURS)) {
+      utilities[`.orle-${fur}`] = orle(furBackground(fur, theme));
+    }
+    utilities[".orle-counterchanged"] = orle(COUNTERCHANGED_GROUND);
+  }
+
   // A label is a child of the field, over everything but a canton or inescutcheon, and on the
   // chief if there is one. Its shape is in its ::before, so charges on its points aren't clipped.
   for (const [name, points] of Object.entries(LABELS)) {
@@ -2083,6 +2245,7 @@ export default plugin(({ addBase, addUtilities, theme }) => {
       "z-index": "4",
       // It lies on a chief, so it and its charges ignore the field's.
       "--field-top": "0%",
+      "--charges-inset": "0%",
       ...onVars(ON[name]),
       "&::before": {
         content: '""',

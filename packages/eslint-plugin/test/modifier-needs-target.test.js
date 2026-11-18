@@ -37,6 +37,10 @@ run("modifier-needs-target", rule, {
     // Grailwind doesn't cotise the diminutives or two and three bars, but heraldry allows it.
     `<div class="heater"><div class="azure bendlet-argent cotised-or"></div></div>`,
     `<div class="heater"><div class="gules three-bars-or double-cotised"></div></div>`,
+    // The orle: Richmond's bend over all, and a fimbriated or cotised orle, which heraldry allows.
+    `<div class="heater"><div class="gules orle-argent"><div class="over-all bend-ermine"></div></div></div>`,
+    `<div class="heater"><div class="gules orle-argent fimbriated-or"></div></div>`,
+    `<div class="heater"><div class="gules orle-argent cotised"></div></div>`,
     // A chief beside a cotisable ordinary: the cotises are the ordinary's.
     `<div class="heater"><div class="azure fess-argent chief-or cotised"></div></div>`,
     // A plain field is fine for charges that aren't counterchanged.
@@ -143,6 +147,11 @@ run("modifier-needs-target", rule, {
     {
       code: `<div class="heater"><div class="azure chief-or cotised"></div></div>`,
       errors: [noCotisable("cotised")],
+    },
+    {
+      // There is no lined orle yet, so its class isn't an ordinary.
+      code: `<div class="heater"><div class="gules orle-engrailed-argent fimbriated-or"></div></div>`,
+      errors: [noOrdinary("fimbriated-or")],
     },
     {
       // A fur field isn't divided.

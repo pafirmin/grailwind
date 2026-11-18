@@ -118,6 +118,25 @@ const ARRANGEMENTS = {
     2: { size: 28, points: [[70, 26], [30, 64]] },
     3: { size: 22, points: [[78, 16], [50, 45], [22, 74]] },
   },
+  // Round the shield three-quarters of a bordure in, from the heater's outline: the top's corners
+  // and middle, the base's point, and the sides' charges evenly along them.
+  "in-orle": {
+    6: { size: 13, points: [[9, 8], [50, 8], [91, 8], [90, 58], [50, 92], [10, 58]] },
+    8: { size: 12, points: [[9, 8], [50, 8], [91, 8], [91, 42], [83, 74], [50, 92], [17, 74], [9, 42]] },
+    10: { size: 10, points: [[9, 8], [50, 8], [91, 8], [91, 33], [90, 58], [77, 81], [50, 92], [23, 81], [10, 58], [9, 33]] },
+  },
+  // Four or five. Two charges in cross or in saltire are crossed over each other, not placed.
+  "in-cross": {
+    4: { size: 20, points: [[50, 17], [24, 45], [76, 45], [50, 73]] },
+    5: { size: 18, points: [[50, 17], [24, 45], [50, 45], [76, 45], [50, 73]] },
+  },
+  "in-saltire": {
+    5: { size: 18, points: [[26, 19], [74, 19], [50, 45], [26, 68], [74, 68]] },
+  },
+  "in-chevron": {
+    3: { size: 22, points: [[24, 62], [50, 36], [76, 62]] },
+    5: { size: 16, points: [[20, 62], [35, 47], [50, 32], [65, 47], [80, 62]] },
+  },
 };
 
 const svgUrl = (shape) =>
@@ -228,7 +247,9 @@ export default plugin(({ addUtilities, matchUtilities }) => {
   // Defaults use :where() so arrangements and `between` always win.
   const charges = {
     position: "absolute",
-    inset: "var(--field-top, 0%) 0 0",
+    // Within an orle, if there is one (see ordinaries.js).
+    inset:
+      "max(var(--field-top, 0%), var(--charges-inset, 0%)) var(--charges-inset, 0%) var(--charges-inset, 0%)",
     // Above the field's ordinaries. Charges on the chief go higher, with it (see below).
     "z-index": "1",
     ...inheritCounterchange,
@@ -259,8 +280,13 @@ export default plugin(({ addUtilities, matchUtilities }) => {
     utilities[`.${name}`] = arrangement;
   }
 
-  // Charges on the chief go over it (z 3), which goes over a frame's bordure ring (z 2).
-  const onChief = { "z-index": "4" };
+  // Charges on the chief go over it (z 3), which goes over a frame's bordure ring (z 2). Their
+  // points are in the full-width container, so with a chief an orle's inset doesn't apply.
+  const chiefInset = "var(--chief-charges-inset, var(--charges-inset, 0%))";
+  const onChief = {
+    "z-index": "4",
+    inset: `max(var(--field-top, 0%), ${chiefInset}) ${chiefInset} ${chiefInset}`,
+  };
 
   for (const [name, counts] of Object.entries(ALONG)) {
     const arrangement = name === "in-chief" ? { "&.charges": onChief } : {};

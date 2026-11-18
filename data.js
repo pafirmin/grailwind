@@ -67,6 +67,7 @@ export const ORDINARIES = [
   "chief",
   "pile",
   ...REVERSIBLE.map(reversed),
+  "orle",
 ];
 
 export const CHARGES = [
@@ -100,8 +101,8 @@ export const ROUNDELS = {
 // Lines of partition for an ordinary's edge, e.g. `fess-engrailed-or`.
 export const LINES = ["engrailed", "invected", "wavy", "indented", "embattled"];
 
-// The ordinaries that take a line: every one, the cornered ones drawn by hand (064).
-export const lineOrdinaries = () => ORDINARIES;
+// The ordinaries that take a line: all but the orle, which isn't lined yet.
+export const lineOrdinaries = () => ORDINARIES.filter((ordinary) => ordinary !== "orle");
 
 // Ordinaries that can be voided, e.g. `cross-voided-argent`.
 export const VOIDABLE = [
@@ -214,6 +215,10 @@ export const ARRANGEMENTS = [
   "in-bend-sinister",
   "in-chief",
   "in-base",
+  "in-orle",
+  "in-cross",
+  "in-saltire",
+  "in-chevron",
   "semy",
 ];
 

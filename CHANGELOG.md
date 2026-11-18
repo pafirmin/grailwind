@@ -8,6 +8,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- The orle, `orle-argent`, `orle-ermine` and `orle-counterchanged`: a narrow band inset from the
+  shield's edge, plain only, inside any bordure. Charges on a field with an orle sit within it.
+  The lint accepts it.
+- `in-orle` (6, 8 or 10 charges round the edge), `in-cross` (4 or 5), `in-saltire` (5) and
+  `in-chevron` (3 or 5).
 - The label, e.g. `label-azure`, and `label-of-five-points-azure`. Its own element in the field,
   drawn throughout over everything but a canton or inescutcheon, and on the chief if there is one.
   `charges on` inside it puts one charge on each point. The lint checks labels.

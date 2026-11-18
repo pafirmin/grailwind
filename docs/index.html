@@ -9,6 +9,7 @@
       content="Draw coats of arms in pure CSS with Tailwind classes named in heraldic blazon: tinctures, divisions, ordinaries, charges and furs."
     />
     <link rel="canonical" href="https://grailwind.dev/" />
+    <link rel="icon" href="favicon.ico" sizes="48x48" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <meta property="og:type" content="website" />
@@ -180,6 +181,7 @@
             <a href="#arrangement">Arrangement</a>
             <ul>
               <li><a href="#in-a-line">In a line</a></li>
+              <li><a href="#in-a-shape">In a shape</a></li>
               <li><a href="#between">Between</a></li>
               <li><a href="#on">On</a></li>
               <li><a href="#points">At a named point</a></li>
@@ -1044,6 +1046,11 @@
                     <div class="or fess-chequy-azure-argent"></div>
                   </div>
                 </figure>
+                <figure data-blazon="Gules, an orle Argent">
+                  <div class="heater">
+                    <div class="gules orle-argent"></div>
+                  </div>
+                </figure>
               </div>
               <h4>Diminutives</h4>
               <p>
@@ -1808,6 +1815,11 @@
             </div>
           </div>
 
+          <p class="text-sm">
+            Grailwind doesn't support a lined, voided, fimbriated or cotised
+            orle yet.
+          </p>
+
           <h3 id="combining">Combining</h3>
           <p>
             An element can have one ordinary plus a chief. With a chief, the
@@ -1823,23 +1835,6 @@
             <figure data-blazon="Per pale Azure and Gules, a fess Or">
               <div class="heater">
                 <div class="per-pale-azure-gules fess-or"></div>
-              </div>
-            </figure>
-            <figure data-blazon="Quarterly Or and Gules, a bend Sable">
-              <div class="heater">
-                <div class="quarterly bend-sable">
-                  <div class="or"></div>
-                  <div class="gules"></div>
-                  <div class="gules"></div>
-                  <div class="or"></div>
-                </div>
-              </div>
-            </figure>
-            <figure
-              data-blazon="Per fess Azure and Argent, a pale of the first"
-            >
-              <div class="heater">
-                <div class="per-fess-azure-argent pale-of-the-first"></div>
               </div>
             </figure>
             <figure
@@ -1863,21 +1858,18 @@
                 </div>
               </div>
             </figure>
+            <figure data-blazon="Gules, an orle Argent, over all a bend Ermine">
+              <div class="heater">
+                <div class="gules orle-argent">
+                  <div class="over-all bend-ermine"></div>
+                </div>
+              </div>
+            </figure>
           </div>
           <p>
             <code>over-all</code> on a child of the field draws a second
             ordinary over everything but the chief. Counterchanging an ordinary
             placed in this way isn't supported yet.
-          </p>
-          <p>
-            <strong>
-              <span aria-hidden="true" class="font-serif text-xl leading-none"
-                >☞</span
-              >
-              Fun fact:</strong
-            >
-            when a field has plain colours you can refer to its first tincture
-            using <code>-of-the-first</code>, as in the pale above.
           </p>
 
           <h3 id="fimbriated">Fimbriated</h3>
@@ -1938,9 +1930,9 @@
                 <div class="or chevron-sable cotised"></div>
               </div>
             </figure>
-            <figure data-blazon="Vert, a saltire cotised Argent">
+            <figure data-blazon="Vert, a saltire double cotised or">
               <div class="heater">
-                <div class="vert saltire-argent cotised"></div>
+                <div class="vert saltire-argent double-cotised-or"></div>
               </div>
             </figure>
           </div>
@@ -2463,6 +2455,73 @@
             </figure>
           </div>
 
+          <h3 id="in-a-shape">In a shape</h3>
+          <p>
+            <code>in-orle</code> sets six, eight or ten charges round the edge,
+            <code>in-cross</code> four or five, <code>in-saltire</code> five and
+            <code>in-chevron</code> three or five. Grailwind doesn't support
+            other counts yet, so they're laid out as usual. Two charges in cross
+            or in saltire are crossed over each other, which isn't a placement.
+          </p>
+          <div class="examples">
+            <figure data-blazon="Azure, eight bezants in orle">
+              <div class="heater">
+                <div class="azure">
+                  <div class="charges in-orle">
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                    <i class="bezant"></i>
+                  </div>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Argent, five lozenges in cross Sable">
+              <div class="heater">
+                <div class="argent">
+                  <div class="charges in-cross">
+                    <i class="lozenge sable"></i>
+                    <i class="lozenge sable"></i>
+                    <i class="lozenge sable"></i>
+                    <i class="lozenge sable"></i>
+                    <i class="lozenge sable"></i>
+                  </div>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Gules, five mullets in saltire Or">
+              <div class="heater">
+                <div class="gules">
+                  <div class="charges in-saltire">
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                    <i class="mullet or"></i>
+                  </div>
+                </div>
+              </div>
+            </figure>
+            <figure data-blazon="Vert, three crescents in chevron Argent">
+              <div class="heater">
+                <div class="vert">
+                  <div class="charges in-chevron">
+                    <i class="crescent argent"></i>
+                    <i class="crescent argent"></i>
+                    <i class="crescent argent"></i>
+                  </div>
+                </div>
+              </div>
+            </figure>
+          </div>
+          <p class="text-sm">
+            Grailwind doesn't support charges in orle with a chief yet.
+          </p>
+
           <h3 id="between">Between</h3>
           <p>
             <code>between</code> places charges around the ordinary on the
@@ -2585,11 +2644,13 @@
                 </div>
               </div>
             </figure>
-            <figure data-blazon="Vert, on a pale Argent a fleur-de-lis Gules">
+            <figure
+              data-blazon="Vert, on a pale Argent a fleur-de-lis of the first"
+            >
               <div class="heater">
                 <div class="vert pale-argent">
                   <div class="charges on">
-                    <i class="fleur-de-lis gules"></i>
+                    <i class="fleur-de-lis of-the-first"></i>
                   </div>
                 </div>
               </div>
@@ -2656,6 +2717,16 @@
               </div>
             </figure>
           </div>
+          <p>
+            <strong>
+              <span aria-hidden="true" class="font-serif text-xl leading-none"
+                >☞</span
+              >
+              Fun fact:</strong
+            >
+            when a field has plain colours you can refer to its first tincture
+            using <code>-of-the-first</code>, as in the fleur-de-lis above.
+          </p>
 
           <h3 id="points">At a named point</h3>
           <p>

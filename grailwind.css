@@ -588,6 +588,8 @@
   position: absolute;
   inset: 0;
   z-index: 2;
+  /* Its charges aren't within the field's orle. */
+  --charges-inset: 0%;
 }
 
 /* Canton: a third of the shield each way in dexter chief, so a ninth of it, and
