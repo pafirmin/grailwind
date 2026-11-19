@@ -116,7 +116,7 @@
     @apply scroll-mt-24 lg:scroll-mt-8;
   }
 
-  main :is(h1, h2, h3, h4) {
+  main :is(h1, h2, h3) {
     @apply font-serif font-semibold;
   }
 
@@ -128,8 +128,9 @@
     @apply text-xl mt-12 mb-3;
   }
 
-  main h4 {
-    @apply text-lg mt-4 mb-3;
+  /* Inside a tab, where the tab itself reads as the heading above. */
+  main [role="tabpanel"] h3 {
+    @apply text-lg mt-4;
   }
 
   main > section > p {
