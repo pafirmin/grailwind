@@ -3326,10 +3326,11 @@ export default [
         }
       });
 
-      // The sticky tab bar sits just below the header's top row.
+      // The sticky tab bar sits just below the header's top row. Set on the bar
+      // alone, as on <html> it would restyle the whole page.
       const headerRow = document.querySelector("header > div:first-child");
       new ResizeObserver(() => {
-        document.documentElement.style.setProperty(
+        lineTablist.style.setProperty(
           "--header-height",
           `${headerRow.offsetHeight}px`,
         );
